@@ -228,7 +228,8 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 | Ambito | Scelta | Note |
 |---|---|---|
 | Framework | **Flutter** (canale stable), linguaggio Dart | Un solo codice: Android, Windows, macOS, Linux distribuiti; iOS compilabile |
-| Gestione dello stato | Riverpod | |
+| Interfaccia | Pacchetto **material_ui** (team Flutter, BSD-3) | Da Flutter 3.50 Material non fa più parte dell'SDK. I delegati di localizzazione sono quelli di `material_ui` (`GlobalMaterialLocalizations.delegates`), non quelli di `flutter_localizations` (decisione M0) |
+| Gestione dello stato | Riverpod | Senza generatore di codice: provider scritti a mano (decisione M0) |
 | Database locale | SQLite tramite **drift** | Query tipizzate, migrazioni, funziona su tutte le piattaforme |
 | Mappa | **flutter_map** + **vector_map_tiles** (BSD-3) | Tile vettoriali su Android, iOS, Linux, macOS e Windows, con stili in formato JSON (lo stile deve corrispondere allo schema delle tile, 4.6). L'ultima versione stabile è dell'agosto 2024 e lo sviluppo prosegue con versioni beta: da valutare in M1 (R14). Il pacchetto `maplibre` per Flutter oggi **non supporta Linux**, quindi è escluso. |
 | Mappe offline | **pmtiles** (BSD-2, lettura di archivi PMTiles locali o remoti) + **vector_map_tiles_pmtiles** (MIT) | Vedi 4.6 e sezione 9 |
@@ -336,8 +337,9 @@ Un unico repository GitHub pubblico (monorepo), così Claude Code ha tutto il co
   /lib
     /core           modelli, database, sync, fornitori, utilità
     /features       una cartella per funzione (trip, map, budget, bookings…)
-    /l10n           traduzioni (file ARB)
+    /l10n           traduzioni (file ARB); i file generati (/l10n/generated) non sono versionati
   /test             test automatici
+  /tool             script di controllo (es. intestazione SPDX)
   /prototypes       prove di M1, separate dal codice dell'app
 /sync-server        Itinerea Sync Server (facoltativo, self-hosted) + Dockerfile
 /data-packs         script che generano i dati statici: veicoli, badge, pedaggi
@@ -348,6 +350,7 @@ LICENSE             testo della GPL-3.0 (il progetto è GPL-3.0-or-later)
 LICENSE-DATA.md     licenze dei dati (12.1)
 CONTRIBUTING.md     come contribuire (codice, traduzioni, pedaggi, regole prenotazioni, badge, grafiche)
 CODE_OF_CONDUCT.md  Contributor Covenant
+SECURITY.md         come segnalare una vulnerabilità (segnalazione privata di GitHub)
 CLAUDE.md           regole per Claude Code
 ```
 
