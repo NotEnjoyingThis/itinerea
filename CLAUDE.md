@@ -1,6 +1,6 @@
-# CLAUDE.md — Regole del progetto Girovia
+# CLAUDE.md — Regole del progetto Itinerea
 
-> Girovia (nome provvisorio) è un'app open source (GPL-3.0) per pianificare viaggi e roadtrip in auto e moto.
+> Itinerea è un'app open source (GPL-3.0) per pianificare viaggi e roadtrip in auto e moto.
 > Il documento di riferimento è **`docs/PRD.md`**. Leggilo prima di qualsiasi lavoro e ricontrollalo quando una scelta ti sembra incerta.
 
 ## 1. Come lavorare
@@ -20,7 +20,7 @@
 
 ## 2. Principi non negoziabili (PRD 1.4)
 
-- **Nessun server centrale.** Niente backend del progetto, niente account Girovia. L'unico server ammesso è il *Girovia Sync Server* facoltativo e self-hosted (`/sync-server`).
+- **Nessun server centrale.** Niente backend del progetto, niente account Itinerea. L'unico server ammesso è il *Itinerea Sync Server* facoltativo e self-hosted (`/sync-server`).
 - **Nessuna telemetria**, analytics, crash reporting automatico, pubblicità, acquisti in-app o affiliazioni.
 - **Nessun SDK proprietario** (Firebase, Google Play Services, SDK pubblicitari…): l'app deve poter entrare in F-Droid.
 - **Local-first:** ogni funzione deve funzionare offline con i dati salvati, oppure degradare in modo chiaro (PRD 7.7, 9.1).
@@ -32,7 +32,7 @@
 - Flutter (stable), Dart, **Riverpod**, **drift** (SQLite), **flutter_map** + **vector_map_tiles** (+ `pmtiles`, `vector_map_tiles_pmtiles` per l'offline), flutter_local_notifications, flutter_secure_storage, localizzazione ufficiale Flutter (ARB).
 - Mappa: **OpenFreeMap** sia online sia offline (stesso schema OpenMapTiles e stesso stile, PRD 4.6). Non mischiare tile con schemi diversi.
 - Percorsi: **Valhalla** (istanza pubblica FOSSGIS come default, URL configurabile).
-- Identificativo dell'app (`applicationId` / bundle id): `io.github.notenjoyingthis.girovia`, provvisorio come il nome (PRD R16).
+- Identificativo dell'app (`applicationId` / bundle id): `io.github.notenjoyingthis.itinerea` (definitivo, PRD R16): non cambiarlo.
 - Piattaforme distribuite: **Android, Windows, macOS, Linux**. iOS non è distribuito, ma non introdurre codice che ne rompa la compilazione.
 
 ### Aggiungere una dipendenza
@@ -46,7 +46,7 @@ Prima di aggiungere un pacchetto verifica e riporta: licenza compatibile con GPL
 - **Denaro:** sempre `Money` (intero in unità minime + ISO 4217). **Mai `double` per importi.**
 - **Date e ore:** data/ora locale + fuso IANA del luogo; istanti assoluti in UTC (PRD 8.1).
 - **Testi:** mai stringhe visibili nel codice; sempre ARB con descrizione per i traduttori, plurali ICU, nessuna frase composta a pezzi.
-- **Servizi esterni:** sempre tramite l'interfaccia `Provider` della categoria (mappa, percorsi, ricerca, mezzi, meteo, cambi, carburante…), con URL configurabile, **User-Agent** `Girovia/<versione> (+<url del repository>)`, cache, limiti di frequenza e gestione dell'assenza di rete (PRD 5.4).
+- **Servizi esterni:** sempre tramite l'interfaccia `Provider` della categoria (mappa, percorsi, ricerca, mezzi, meteo, cambi, carburante…), con URL configurabile, **User-Agent** `Itinerea/<versione> (+<url del repository>)`, cache, limiti di frequenza e gestione dell'assenza di rete (PRD 5.4).
 - **Segreti:** nessuna chiave o token nel repository. Le chiavi personali degli utenti vanno in `flutter_secure_storage`.
 - **Licenza:** ogni nuovo file sorgente inizia con `// SPDX-License-Identifier: GPL-3.0-or-later` (finché D1 non è decisa diversamente).
 - **Accessibilità:** etichette semantiche, rispetto della dimensione del testo di sistema, contrasto adeguato in tema chiaro e scuro.
@@ -67,7 +67,7 @@ Prima di aggiungere un pacchetto verifica e riporta: licenza compatibile con GPL
 
 ## 7. Sicurezza e privacy (PRD 13)
 
-- I file importati (`.girovia`, PDF, email, immagini) sono **non affidabili**: limiti di dimensione, nessuna esecuzione, protezione dai percorsi malevoli negli archivi.
+- I file importati (`.itinerea`, PDF, email, immagini) sono **non affidabili**: limiti di dimensione, nessuna esecuzione, protezione dai percorsi malevoli negli archivi.
 - Coordinate arrotondate dove la precisione non serve. Nessun identificativo dell'utente nelle richieste esterne.
 - Crittografia solo con librerie affermate; mai algoritmi fatti in casa.
 

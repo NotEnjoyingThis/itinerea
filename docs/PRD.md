@@ -1,11 +1,11 @@
-# Girovia — Product Requirements Document (PRD)
+# Itinerea — Product Requirements Document (PRD)
 
 > **Stato del documento:** versione 1.1 dell'11/11/2026, rivista e con controllo incrociato tra sezioni, librerie e servizi.
 > **Come usarlo:** per le **funzionalità** il PRD è il punto di partenza, non un vincolo rigido; per l'**aspetto grafico** il riferimento è Wanderlog, da migliorare liberamente (sezione 7). Restano vincolanti i principi (1.4), i non-obiettivi (1.5) e le decisioni segnate come "decisione presa".
 > **Ultima verifica delle fonti esterne (sez. 5):** novembre 2026. Prima di implementare, ricontrollare licenze e limiti.
 > **Lingua del documento:** italiano. Lingue dell'app al lancio: italiano e inglese.
 > **Modello del progetto** (decisione dell'11/11/2026): **open source** su GitHub, **gratuito**, **senza pubblicità**, **senza pagamenti** di alcun tipo e **senza server centrale**. L'app funziona interamente in locale e si sincronizza tramite Google Drive, OneDrive, Dropbox o un server self-hosted dell'utente. **Licenza: GPL-3.0** ("or-later" o "only" da decidere, D1). **Distribuzione:** GitHub, F-Droid, Flathub e Google Play (niente App Store Apple).
-> **Nome dell'app:** Girovia (**nome provvisorio**, da "giro" + "via"). Scartati perché già usati da app di viaggio o da aziende del turismo: Itinera (app di viaggio omonime su App Store **e Google Play**, marchio registrato negli USA per servizi di viaggio), Detour, Waymark, Roamwise, Bivio. **Prima del lancio:** controllare il marchio nella banca dati EUIPO e registrare il dominio.
+> **Nome dell'app:** **Itinerea** (definitivo, decisione del 12/11/2026), da *itinera*, latino "i percorsi". Scartati perché già usati da app di viaggio o da aziende del turismo: Girovia (app open source di viaggio omonima su GitHub), Itinera (app di viaggio omonime su App Store **e Google Play**, marchio registrato negli USA per servizi di viaggio), Detour, Waymark, Roamwise, Bivio. **Prima del lancio:** confermare su TMview che non ci siano marchi uguali o troppo simili (anche rispetto a Itinera, R13) e registrare il dominio.
 
 ---
 
@@ -50,7 +50,7 @@ Chi organizza viaggi finisce per fare tutto a mano, unendo i pezzi con documenti
 
 ### 1.2 La visione
 
-**Girovia è un'unica app, open source e gratuita, senza pubblicità e senza server centrale, che sostituisce tutte queste app.** Permette di pianificare, condividere e vivere un viaggio. Il viaggio può essere un itinerario (a piedi o con i mezzi), un roadtrip in auto o in moto, oppure un mix dei due.
+**Itinerea è un'unica app, open source e gratuita, senza pubblicità e senza server centrale, che sostituisce tutte queste app.** Permette di pianificare, condividere e vivere un viaggio. Il viaggio può essere un itinerario (a piedi o con i mezzi), un roadtrip in auto o in moto, oppure un mix dei due.
 
 ### 1.3 Obiettivi
 
@@ -70,7 +70,7 @@ Ogni decisione di design e di sviluppo deve rispettare questi principi. In caso 
 
 1. **Gratis, open source, senza pubblicità né pagamenti.** Nessun acquisto di alcun tipo, né l'app né dentro l'app. I punti viaggio dello shop si guadagnano solo viaggiando.
 2. **Solo locale, nessun server centrale.** Il viaggio vive sul dispositivo. L'app funziona senza account e senza internet. Per condividere e sincronizzare si usa uno spazio scelto dall'utente (Google Drive, OneDrive, Dropbox, WebDAV, cartella locale o un server self-hosted). Il progetto non gestisce alcun server.
-3. **Privacy di default.** Il progetto non raccoglie nessun dato: nessuna telemetria, nessun account Girovia. I dati vanno solo dove l'utente decide (il suo spazio di sincronizzazione e i servizi esterni necessari per mappe, percorsi, meteo…).
+3. **Privacy di default.** Il progetto non raccoglie nessun dato: nessuna telemetria, nessun account Itinerea. I dati vanno solo dove l'utente decide (il suo spazio di sincronizzazione e i servizi esterni necessari per mappe, percorsi, meteo…).
 4. **Pochi tocchi.** Se un'azione frequente richiede più di 3 tocchi, il design va rivisto.
 5. **Onestà sui dati.** Quando un dato può essere vecchio o impreciso, l'app lo dice. Esempi: orari dei mezzi scaricati offline, stime dei consumi, percorsi panoramici calcolati, legalità del campeggio libero.
 6. **Stessa app ovunque.** Android, Windows 11, macOS e Linux hanno le stesse funzioni. Il layout si adatta allo schermo, le funzioni no. **iOS:** l'app non viene distribuita (niente App Store, 4.9), ma il codice resta compatibile, così chi ha un Mac può compilarla per sé.
@@ -80,7 +80,7 @@ Ogni decisione di design e di sviluppo deve rispettare questi principi. In caso 
 
 Queste esclusioni sono decisioni prese, non dimenticanze:
 
-- **Nessun server centrale, nessun account Girovia, nessuna telemetria.**
+- **Nessun server centrale, nessun account Itinerea, nessuna telemetria.**
 - **Nessuna pubblicità, nessun pagamento, nessuna affiliazione.**
 - **Nessuna prenotazione interna.** Hotel e alloggi si vedono nell'app e si prenotano su Booking tramite un link semplice. La conferma poi entra nell'app.
 - **Nessuna community online centralizzata.** Gli itinerari si condividono come file (F4.3).
@@ -125,7 +125,7 @@ L'utente crea un viaggio "Itinerario" di 4 giorni. Condivide con l'app l'email d
 
 **S2 — Due settimane in Giappone in gruppo (P1 + P2)**
 *Nota: il Giappone è fuori dalla copertura iniziale (solo Europa). Lo scenario descrive l'esperienza completa a cui tendere.*
-L'organizzatore crea il viaggio nel suo Google Drive e invita 3 amici: due come editor e uno solo in visualizzazione. Le modifiche arrivano agli altri in pochi secondi o minuti; se il gruppo usa un Girovia Sync Server installato da uno di loro, in tempo reale. Le spese si registrano in yen e la conversione usa il cambio del giorno della spesa. Un amico presta soldi a un altro, e il prestito entra nel saldo. A fine viaggio l'app mostra chi deve quanto a chi, con il minor numero possibile di pagamenti.
+L'organizzatore crea il viaggio nel suo Google Drive e invita 3 amici: due come editor e uno solo in visualizzazione. Le modifiche arrivano agli altri in pochi secondi o minuti; se il gruppo usa un Itinerea Sync Server installato da uno di loro, in tempo reale. Le spese si registrano in yen e la conversione usa il cambio del giorno della spesa. Un amico presta soldi a un altro, e il prestito entra nel saldo. A fine viaggio l'app mostra chi deve quanto a chi, con il minor numero possibile di pagamenti.
 
 **S3 — Roma e Firenze in 7 giorni (assistente consigli)**
 L'utente vuole vedere il Colosseo e gli Uffizi e ha 7 giorni. Chiede aiuto all'assistente, che gli fa alcune domande: approfondire Roma, approfondire Firenze, fare tappe a metà strada o vedere subito le due cose e poi altre regioni; ritmo; interessi; budget. Poi propone una distribuzione dei giorni e dei luoghi, che l'utente può accettare o modificare in parte.
@@ -162,9 +162,9 @@ Questi termini vanno usati in modo coerente nel codice, nell'interfaccia e nei d
 | **Prenotazione** | `Booking` | Una prenotazione con orario vincolante: volo, treno, bus, traghetto, hotel, museo, noleggio auto, ecc. Si crea da email, PDF o screenshot, oppure a mano. Blocca il ricalcolo automatico degli orari. |
 | **Allegato** | `Attachment` | File salvato in locale e collegato a una tappa o prenotazione: PDF, screenshot, biglietto con QR. Disponibile offline. |
 | **Alloggio** | `Lodging` | Dove si dorme una notte: hotel/B&B, campeggio, area sosta, notte in auto. Collegato ai giorni corrispondenti, con check-in e check-out. |
-| **Partecipante** | `Participant` | Persona che partecipa al viaggio: ha l'app installata e accesso allo spazio di sincronizzazione del viaggio. Non esistono account Girovia: è identificata da un profilo locale (nome + ID) collegato all'account del servizio usato. |
+| **Partecipante** | `Participant` | Persona che partecipa al viaggio: ha l'app installata e accesso allo spazio di sincronizzazione del viaggio. Non esistono account Itinerea: è identificata da un profilo locale (nome + ID) collegato all'account del servizio usato. |
 | **Ruolo** | `Role` | Permessi di un partecipante: **Proprietario** (tutto, compresi inviti ed eliminazione), **Editor** (modifica itinerario e spese), **Visualizzatore** (solo lettura). In modalità file coincidono con i permessi di condivisione della cartella (4.4). |
-| **Spazio di sincronizzazione** | `SyncSpace` | Dove si salvano e si scambiano i dati di un viaggio: Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (**modalità file**) oppure Girovia Sync Server (**modalità server**). iCloud Drive è escluso. |
+| **Spazio di sincronizzazione** | `SyncSpace` | Dove si salvano e si scambiano i dati di un viaggio: Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (**modalità file**) oppure Itinerea Sync Server (**modalità server**). iCloud Drive è escluso. |
 | **Fornitore** | `Provider` | Il servizio esterno usato per un tipo di dato (mappa, percorsi, ricerca, mezzi, meteo…). Di default è un servizio pubblico, sostituibile con un server dell'utente. |
 | **Pacchetto dati** | `DataPack` | File scaricato e usato offline: regione di mappa (PMTiles), luoghi di una zona, database veicoli, liste dei badge, tabelle pedaggi. |
 | **Budget** | campi `budgetMode`, `budgetTotal` (Trip) e `budget` (Day) | Limite di spesa del viaggio: generale oppure per giorno. |
@@ -180,7 +180,7 @@ Questi termini vanno usati in modo coerente nel codice, nell'interfaccia e nei d
 | **Visita verificata** | `VerifiedVisit` | La visita a un luogo confermata dal GPS sul posto. Serve per badge e punti. |
 | **Badge** | `Badge` | Riconoscimento legato a un'area geografica: città, regione o nazione. Ha livelli da 1 a 10, che salgono con le visite verificate ai luoghi della sua lista. |
 | **Punti viaggio** | `PointsLedger` (movimenti) | Valuta interna dell'app. Si guadagnano **solo viaggiando** (non si possono comprare) e si spendono solo in oggetti estetici nello shop. |
-| **Itinerario condiviso** | `SharedItinerary` | Copia anonimizzata di un viaggio, esportata come file `.girovia`, che altri possono importare e copiare (F4.3). |
+| **Itinerario condiviso** | `SharedItinerary` | Copia anonimizzata di un viaggio, esportata come file `.itinerea`, che altri possono importare e copiare (F4.3). |
 
 ---
 
@@ -190,7 +190,7 @@ Questi termini vanno usati in modo coerente nel codice, nell'interfaccia e nei d
 
 ### 4.1 Panoramica
 
-L'architettura è **interamente locale, senza server centrale** (decisione dell'11/11/2026). Il progetto Girovia non gestisce server, account o database online. Ogni dispositivo contiene l'app completa. Per condividere e sincronizzare, l'app usa uno **spazio di sincronizzazione** scelto dall'utente.
+L'architettura è **interamente locale, senza server centrale** (decisione dell'11/11/2026). Il progetto Itinerea non gestisce server, account o database online. Ogni dispositivo contiene l'app completa. Per condividere e sincronizzare, l'app usa uno **spazio di sincronizzazione** scelto dall'utente.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -211,7 +211,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 │ • Microsoft OneDrive · Dropbox  │  │ mezzi, meteo, cambi,          │
 │ • WebDAV (Nextcloud, NAS…)      │  │ carburante, POI OSM           │
 │ • Cartella locale (es. Syncthing)│ │ + pacchetti dati statici      │
-│ • Girovia Sync Server           │  │   (GitHub Releases)           │
+│ • Itinerea Sync Server           │  │   (GitHub Releases)           │
 │   (self-hosted dall'utente)     │  └───────────────────────────────┘
 └─────────────────────────────────┘
 ```
@@ -245,7 +245,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 - **Testo delle note:**
   - **Cronologia delle versioni:** ogni nota conserva le versioni precedenti, consultabili e ripristinabili.
   - **Modifiche contemporanee:** vince l'ultima modifica e la versione dell'altra persona resta nella cronologia, quindi nulla va perso.
-  - **Blocco morbido** ("Nome sta scrivendo…", rilascio dopo 10 secondi senza digitazione): **solo con il Girovia Sync Server**, l'unica modalità abbastanza veloce da renderlo affidabile.
+  - **Blocco morbido** ("Nome sta scrivendo…", rilascio dopo 10 secondi senza digitazione): **solo con il Itinerea Sync Server**, l'unica modalità abbastanza veloce da renderlo affidabile.
   - **Più avanti:** la scrittura simultanea carattere per carattere, come in Google Docs, con un CRDT di testo (per esempio `dart_crdt`, compatibile con Yjs) quando le librerie Dart saranno mature. Oggi sono pre-1.0.
 
 **Log delle modifiche.** Ogni modifica locale viene salvata come operazione in una tabella dedicata. Il motore di sync scrive le operazioni nuove nello spazio di sincronizzazione e legge quelle degli altri dispositivi.
@@ -254,7 +254,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 
 | | **Modalità file** | **Modalità server** |
 |---|---|---|
-| Spazi | Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (es. sincronizzata da Syncthing) | Girovia Sync Server installato dall'utente |
+| Spazi | Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (es. sincronizzata da Syncthing) | Itinerea Sync Server installato dall'utente |
 | Come funziona | Ogni viaggio è una cartella. Ogni dispositivo scrive i propri file di operazioni in una sua sottocartella (`ops/<idDispositivo>/`) e legge quelli degli altri. Periodicamente si scrive un'istantanea completa per velocizzare l'apertura. | Le operazioni passano dal server via WebSocket e arrivano subito agli altri |
 | Tempo di arrivo delle modifiche | **Da pochi secondi a qualche minuto**: l'app controlla le novità all'apertura, ogni 30 secondi mentre è in primo piano e con "Aggiorna" | **Entro 2 secondi** |
 | Presenza ("chi sta guardando") | No | Sì |
@@ -275,9 +275,9 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 
 ### 4.4 Partecipanti, inviti e ruoli senza server
 
-- **Nessun account Girovia.** Ogni installazione ha un **profilo locale** (nome visualizzato + ID generato). Nel viaggio, il partecipante è identificato da questo profilo e dall'account del servizio usato (es. l'account Google).
+- **Nessun account Itinerea.** Ogni installazione ha un **profilo locale** (nome visualizzato + ID generato). Nel viaggio, il partecipante è identificato da questo profilo e dall'account del servizio usato (es. l'account Google).
 - **Tutti i partecipanti di un viaggio usano lo stesso spazio**, scelto da chi crea il viaggio. Con Google Drive, ognuno deve avere un account Google; con il Sync Server, le credenziali di quel server.
-- **Invito:** il proprietario condivide la cartella del viaggio (o lo invita sul Sync Server) e l'app genera un **link o codice di invito** che, aperto in Girovia, collega il viaggio.
+- **Invito:** il proprietario condivide la cartella del viaggio (o lo invita sul Sync Server) e l'app genera un **link o codice di invito** che, aperto in Itinerea, collega il viaggio.
 - **Ruoli in modalità file:** sono i **permessi della cartella**. Chi ha accesso in sola lettura è **Visualizzatore**: il servizio stesso gli impedisce di scrivere. Chi può scrivere è **Editor**. Il **Proprietario** è chi possiede la cartella. L'app mostra e modifica i ruoli attraverso le funzioni di condivisione del servizio, dove l'API lo permette.
 - **Ruoli in modalità server:** applicati dal Sync Server.
 
@@ -290,7 +290,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 
 Il backup serve a **non perdere i dati** e a spostarli tra dispositivi senza spazio di sincronizzazione. Lo spazio di sincronizzazione, quando c'è, fa già anche da backup.
 
-- **Formato:** un file `.girovia` per viaggio (JSON + allegati in un unico pacchetto compresso), con password facoltativa per cifrarlo. Lo stesso formato serve per condividere itinerari (F4.3).
+- **Formato:** un file `.itinerea` per viaggio (JSON + allegati in un unico pacchetto compresso), con password facoltativa per cifrarlo. Lo stesso formato serve per condividere itinerari (F4.3).
 - **Destinazioni:** Google Drive, OneDrive, Dropbox, WebDAV oppure un file salvato dove vuole l'utente.
 - **Automatico:** l'utente sceglie la frequenza (a ogni modifica / giornaliero / manuale).
 - **Ripristino:** si importa il file e il viaggio torna com'era.
@@ -312,7 +312,7 @@ Il backup serve a **non perdere i dati** e a spostarli tra dispositivi senza spa
 | **Lettura prenotazioni** | **Sul dispositivo** | Dati strutturati delle email, codici a barre delle carte d'imbarco, testo dei PDF (F2.3) |
 | **Dati statici** (database veicoli, liste dei badge, tabelle pedaggi e vignette) | **File statici pubblicati su GitHub Releases** | Generati da script nel repository e scaricati dall'app. Non è un server: sono file scaricabili, gratuiti, aggiornati a ogni rilascio. |
 
-### 4.7 Girovia Sync Server (facoltativo, self-hosted)
+### 4.7 Itinerea Sync Server (facoltativo, self-hosted)
 
 Un piccolo server **incluso nel repository**, che **chi vuole installa per sé** (a casa, su un NAS o su un VPS). Il progetto non ne gestisce nessuna istanza pubblica.
 
@@ -332,7 +332,7 @@ Un unico repository GitHub pubblico (monorepo), così Claude Code ha tutto il co
     /features       una cartella per funzione (trip, map, budget, bookings…)
     /l10n           traduzioni
   /prototypes       prove di M1, separate dal codice dell'app
-/sync-server        Girovia Sync Server (facoltativo, self-hosted) + Dockerfile
+/sync-server        Itinerea Sync Server (facoltativo, self-hosted) + Dockerfile
 /data-packs         script che generano i dati statici: veicoli, badge, pedaggi
 /docs               PRD.md, DECISIONS.md (decisioni), DESIGN.md (stile), ROADMAP.md (avanzamento)
 LICENSE             GPL-3.0
@@ -363,7 +363,7 @@ CLAUDE.md           regole per Claude Code
 - **Versione da GitHub:** all'avvio, al massimo una volta al giorno, l'app controlla le release pubbliche su GitHub. Se c'è una versione nuova mostra "Nuova versione disponibile" con le novità e un pulsante per scaricarla. Su Android il sistema chiede sempre conferma prima di installare; su desktop si scarica il nuovo installer o AppImage. Il controllo si può disattivare e non invia nessun dato personale.
 - L'app capisce da quale canale è stata installata e mostra il controllo GitHub **solo** per le versioni prese da GitHub.
 - **Pacchetti dati** (veicoli, badge, pedaggi): hanno una versione propria e si aggiornano **senza aggiornare l'app**. L'app controlla se esistono pacchetti più recenti e li scarica in background quando è connessa (anche solo su Wi-Fi, a scelta).
-- **Migrazioni:** ogni versione nuova deve leggere i dati e i file di sincronizzazione delle versioni precedenti. In un viaggio di gruppo possono convivere versioni diverse dell'app: il formato delle operazioni è versionato e un'app vecchia avvisa "Aggiorna Girovia per vedere tutte le modifiche" invece di rompere i dati.
+- **Migrazioni:** ogni versione nuova deve leggere i dati e i file di sincronizzazione delle versioni precedenti. In un viaggio di gruppo possono convivere versioni diverse dell'app: il formato delle operazioni è versionato e un'app vecchia avvisa "Aggiorna Itinerea per vedere tutte le modifiche" invece di rompere i dati.
 
 ### 4.10 Costi
 
@@ -398,11 +398,11 @@ CLAUDE.md           regole per Claude Code
 | **Mappe offline** | Planet **PMTiles** settimanale di **OpenFreeMap** (schema OpenMapTiles, uguale alla mappa online) | ODbL (dati OSM) | Il formato PMTiles permette di leggere solo le parti necessarie di un archivio remoto; il pacchetto Dart `pmtiles` lo supporta in lettura. Salvare le tile scaricate in un archivio locale (PMTiles o MBTiles) va implementato. **Da prototipare** e da verificare con OpenFreeMap che lo scaricamento parziale del planet da parte di un'app sia gradito. **Non mischiare schemi:** le tile Protomaps hanno uno schema diverso e richiederebbero un altro stile. | Importare un file PMTiles/MBTiles preparato dall'utente; cache delle tile già viste |
 | **Percorsi** (auto, moto, bici, a piedi) | **Valhalla pubblico di FOSSGIS** (lo stesso usato da openstreetmap.org) | Gratis, fair use | Opzioni utili: evitare autostrade, pedaggi, traghetti, sterrato; profilo moto. Uso moderato, User-Agent identificativo. **Condizioni d'uso da rileggere prima del rilascio** (pagina FOSSGIS non accessibile durante la verifica). | OSRM pubblico di FOSSGIS (senza preferenze avanzate) oppure server GraphHopper/Valhalla dell'utente |
 | **Curve e panoramico** (mare, lago, montagna) | **Valutazione sul dispositivo**: l'app chiede a Valhalla più percorsi alternativi (parametro `alternates`, anche con punti di passaggio diversi) e li ordina per tortuosità (dalla geometria), vicinanza a coste o laghi (dati OSM via Overpass lungo il corridoio) e quota | — | **Risultato "il meglio possibile"**, non un giudizio umano sulla bellezza | Profilo personalizzato su un GraphHopper dell'utente |
-| **Altitudine** | Endpoint `/height` di Valhalla, se attivo sull'istanza usata; altrimenti **Open-Meteo Elevation API** | Open-Meteo: gratis per uso non commerciale (Girovia lo è) | Da verificare in M1 quale delle due è disponibile e con quali limiti | Solo tag OSM (passi di montagna, vette vicine) |
+| **Altitudine** | Endpoint `/height` di Valhalla, se attivo sull'istanza usata; altrimenti **Open-Meteo Elevation API** | Open-Meteo: gratis per uso non commerciale (Itinerea lo è) | Da verificare in M1 quale delle due è disponibile e con quali limiti | Solo tag OSM (passi di montagna, vette vicine) |
 | **Ricerca luoghi e indirizzi** | Photon pubblico (OSM) | Fair use | Uso intensivo rallentato | Nominatim pubblico (max 1 richiesta al secondo) o server dell'utente |
 | **Dettagli dei luoghi** (orari, telefono, sito, descrizione, foto) | OpenStreetMap + Wikidata e Wikimedia Commons | OSM: ODbL. Wikidata: CC0 | **Meno completi di Google**, soprattutto orari. Nessuna recensione. | Valutazioni personali dell'utente (F4.4) |
 | **Luoghi offline e livelli mappa** (bagni, distributori, colonnine, campeggi, aree sosta, hotel) | Overpass API (OSM) | ODbL, fair use | Query per area, salvate in locale. Niente scaricamenti di intere nazioni a ogni avvio. | Istanze Overpass alternative o server dell'utente |
-| **Mezzi pubblici** | Transitous (motore MOTIS) | Gratis | Pensato proprio per app open source e non-profit: **Girovia rientra nell'uso previsto**. Copertura variabile da paese a paese. | Server MOTIS dell'utente |
+| **Mezzi pubblici** | Transitous (motore MOTIS) | Gratis | Pensato proprio per app open source e non-profit: **Itinerea rientra nell'uso previsto**. Copertura variabile da paese a paese. | Server MOTIS dell'utente |
 | **Meteo** | MET Norway (Locationforecast) | Gratis, CC BY 4.0 | User-Agent identificativo obbligatorio, cache, attribuzione | Open-Meteo (gratis per uso non commerciale) |
 | **Cambio valuta** | Frankfurter | Gratis, nessuna chiave | Cambi giornalieri e storici | Tassi di riferimento BCE scaricati direttamente |
 | **Prezzi carburante — Italia** | MIMIT (open data ufficiale) | Gratis, IODL 2.0 | CSV quotidiani scaricati direttamente dall'app | — |
@@ -432,7 +432,7 @@ CLAUDE.md           regole per Claude Code
 ### 5.4 Uso responsabile dei servizi pubblici
 
 Senza server propri, l'app dipende da servizi gestiti da volontari e associazioni. Regole obbligatorie:
-- **User-Agent identificativo** in ogni richiesta, es. `Girovia/1.2 (+https://github.com/<repo>)`.
+- **User-Agent identificativo** in ogni richiesta, es. `Itinerea/1.2 (+https://github.com/<repo>)`.
 - **Cache locale** di tutto ciò che si può riusare: percorsi già calcolati, luoghi, meteo per la durata indicata dal servizio, cambi del giorno.
 - **Limiti di frequenza** lato app (es. ricerca con attesa di 300 ms dopo l'ultima lettera digitata, nessuna richiesta automatica ripetuta).
 - **Niente scaricamenti massivi** automatici.
@@ -651,7 +651,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 
 #### F2.1 Collaborazione
 **Requisiti**
-- Il proprietario sceglie lo spazio del viaggio: **modalità file** (Google Drive, OneDrive, Dropbox, WebDAV) o **modalità server** (Girovia Sync Server self-hosted). Vedi 4.3 e 4.4.
+- Il proprietario sceglie lo spazio del viaggio: **modalità file** (Google Drive, OneDrive, Dropbox, WebDAV) o **modalità server** (Itinerea Sync Server self-hosted). Vedi 4.3 e 4.4.
 - Invito tramite link o codice generato dall'app. Chi lo riceve deve avere l'app e accesso allo stesso spazio (es. un account Google).
 - Ruoli: **Proprietario**, **Editor**, **Visualizzatore**.
 - Tempi: in modalità file le modifiche arrivano in pochi secondi o minuti (controllo all'apertura, ogni 30 secondi in primo piano e con "Aggiorna"); in modalità server entro 2 secondi, con presenza e blocco morbido delle note.
@@ -663,7 +663,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 **CA**
 - Due editor che modificano offline tappe diverse dello stesso giorno ritrovano entrambe le modifiche dopo la sincronizzazione.
 - Un Visualizzatore non può modificare nulla, nemmeno offline: l'interfaccia di modifica è nascosta e lo spazio di sincronizzazione (permessi della cartella o Sync Server) rifiuta le scritture.
-- Il Girovia Sync Server si installa con un solo comando Docker seguendo la documentazione del repository.
+- Il Itinerea Sync Server si installa con un solo comando Docker seguendo la documentazione del repository.
 
 #### F2.2 Spese di gruppo
 **Requisiti**
@@ -836,8 +836,8 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 
 #### F4.3 Itinerari condivisi
 **Requisiti**
-- "Condividi itinerario": esporta una copia anonimizzata come file `.girovia`, da mandare a chi si vuole o pubblicare dove si vuole.
-- "Importa itinerario": apre un file `.girovia` e permette di **copiarlo** in un nuovo viaggio, tutto o in parte.
+- "Condividi itinerario": esporta una copia anonimizzata come file `.itinerea`, da mandare a chi si vuole o pubblicare dove si vuole.
+- "Importa itinerario": apre un file `.itinerea` e permette di **copiarlo** in un nuovo viaggio, tutto o in parte.
 - **Anonimizzazione:** niente nomi, note personali, prenotazioni, allegati, spese individuali o date esatte.
 - **Decisione presa:** solo condivisione come file, nessun catalogo pubblico.
 - Gli itinerari importati migliorano i consigli **solo per chi li importa** (F3.1).
@@ -860,7 +860,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 1. **La schermata del Giorno è il centro dell'app.** Quasi tutto parte da lì e ci torna.
 2. **Azioni rapide sempre a portata:** su ogni Giorno un pulsante "+" con 3 scelte immediate: Tappa, Spesa, Prenotazione.
 3. **Dettagli in pannelli, non in pagine nuove:** toccando una tappa o una tratta si apre un pannello dal basso (mobile) o laterale (desktop). Si chiude con un gesto senza perdere il punto in cui si era.
-4. **Niente login:** l'app si usa subito e non esistono account Girovia. Lo spazio di sincronizzazione si propone solo quando serve (collaborazione, sync tra dispositivi).
+4. **Niente login:** l'app si usa subito e non esistono account Itinerea. Lo spazio di sincronizzazione si propone solo quando serve (collaborazione, sync tra dispositivi).
 5. **Riferimento visivo:** **Wanderlog** è l'unico punto di partenza per l'estetica (lista + mappa affiancate). Va reso più snello e veloce: meno livelli di menu, niente schermate intermedie inutili.
 6. **Libertà di design:** colori, font, icone, componenti, animazioni e organizzazione delle schermate sono **scelti da chi sviluppa** (Claude Code), partendo da Wanderlog e da Material 3. Vincoli: stile moderno e comodo, tema chiaro e scuro, i principi 1.4 e i tocchi della tabella 7.5. Lo stile scelto si documenta in `docs/DESIGN.md`.
 
@@ -873,7 +873,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 | Sezione | Contenuto | Fase |
 |---|---|---|
 | **Viaggi** (home) | Viaggio in corso in evidenza, prossimi viaggi, viaggi passati | 1 |
-| **Esplora** | Importa e condividi itinerari (file `.girovia`) | 4 |
+| **Esplora** | Importa e condividi itinerari (file `.itinerea`) | 4 |
 | **Profilo** | Badge, statistiche, shop | 4 (prima: solo impostazioni) |
 
 Su mobile è una barra in basso. Finché le sezioni Esplora e Profilo non esistono, resta solo la home con l'accesso alle impostazioni.
@@ -956,7 +956,7 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | FL3 | **Registrare una spesa** | "+" → "Spesa" → importo → "Salva" (categoria e giorno precompilati, modificabili) | 3 |
 | FL4 | **Aprire il biglietto in viaggio** | Da Home: tocco il biglietto nella card "Oggi" | 1 |
 | FL5 | **Navigare verso la prossima tappa** | Da Home: "Naviga" nella card "Oggi" → app di navigazione predefinita | 1 |
-| FL6 | **Importare una prenotazione** (F2) | Dall'email: "Condividi" → Girovia → "Conferma" | 3 |
+| FL6 | **Importare una prenotazione** (F2) | Dall'email: "Condividi" → Itinerea → "Conferma" | 3 |
 | FL7 | **Cambiare percorso a una tratta** | Tocco la tratta → "Modifica percorso" → trascino → "Salva" | 3 + trascinamento |
 | FL8 | **Da un giorno in poi: Roadtrip** | Menu del giorno "⋯" → "Da qui: Roadtrip" → scelgo auto o moto (dalla Fase 2: il veicolo salvato, F2.5) | 3 |
 | FL9 | **Spostare una tappa in un altro giorno** | Tengo premuto sulla tappa → "Sposta a…" → scelgo il giorno (su desktop: trascino sul giorno nella colonna a sinistra) | 2–3 |
@@ -1171,7 +1171,7 @@ Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, presti
 | **PlaceRating** | ID del luogo, voto 1–5, nota |
 | **NotificationSettings** | per tipo: attivo, anticipo; fasce di silenzio; massimo al giorno (sezione 10) |
 | **ProviderSettings** | per servizio: fornitore scelto, URL personalizzato, chiave personale (salvata nel portachiavi sicuro del sistema) |
-| **ImportedItinerary** | file `.girovia` importati, con data |
+| **ImportedItinerary** | file `.itinerea` importati, con data |
 
 ### 8.5 Cache (non sincronizzata)
 
@@ -1190,7 +1190,7 @@ Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, presti
 ### 8.6 Formato dei file di sincronizzazione
 
 ```
-Girovia/
+Itinerea/
 ├── trips/<tripId>/
 │   ├── manifest.json              id, schemaVersion, cifratura (sale, parametri), data di creazione
 │   ├── ops/<deviceId>/
@@ -1270,7 +1270,7 @@ Stesso formato delle operazioni (8.6), ma trasportate via WebSocket. Il server c
 | Spesa con divisione non più valida (partecipante rimosso) | La spesa resta, segnata "Da rivedere" nel budget |
 | Orologio di un dispositivo sbagliato | L'HLC corregge le piccole differenze. Se lo scarto supera 24 ore l'app avvisa l'utente. |
 | Spazio pieno o permessi revocati | Messaggio chiaro e sync sospesa. I dati locali restano. |
-| Partecipante con app più vecchia | Ignora i campi che non conosce senza cancellarli e mostra "Aggiorna Girovia" (4.9) |
+| Partecipante con app più vecchia | Ignora i campi che non conosce senza cancellarli e mostra "Aggiorna Itinerea" (4.9) |
 | Cifratura e codice di recupero perso | Il viaggio resta leggibile sui dispositivi che hanno già la chiave. Senza dispositivi e senza codice non si recupera: avviso esplicito all'attivazione. |
 
 ### 9.6 Fusi orari
@@ -1307,7 +1307,7 @@ Le notifiche configurabili arrivano con F2.9. In Fase 1 c'è solo l'avviso di nu
 | **Modifiche dei compagni** | "Giulia ha modificato il giorno 3" | Disattivata, oppure riepilogo giornaliero | Alla sincronizzazione | 2 |
 | **Saldo da regolare** | "Viaggio finito: vedi chi deve a chi" | Attiva | Il giorno dopo la fine | 2 |
 | **Badge e punti** | "Badge Roma salito al livello 3" | Attiva | Subito, senza suono | 4 |
-| **Aggiornamento disponibile** (solo versione GitHub) | "Girovia 1.3 disponibile" | Attiva | Una volta per versione | 1 |
+| **Aggiornamento disponibile** (solo versione GitHub) | "Itinerea 1.3 disponibile" | Attiva | Una volta per versione | 1 |
 
 ### 10.3 Limiti delle piattaforme
 
@@ -1469,9 +1469,9 @@ Mai: contatti, microfono, calendario (in questa versione).
 - **Token di accesso** a Drive, OneDrive, Dropbox e Sync Server, chiavi personali e chiavi di cifratura: salvati nel **portachiavi sicuro del sistema** (`flutter_secure_storage`), mai nel database.
 - **Permessi OAuth minimi:** solo la cartella dell'app o i file creati dall'app, dove il servizio lo consente. Quali permessi servono per le cartelle condivise si verifica con il prototipo (4.4).
 - **Link di invito:** contengono la chiave del viaggio se la cifratura è attiva. L'app avvisa: "Chi ha questo link può leggere il viaggio". Il proprietario può generare un nuovo link e una nuova chiave, rimuovendo un partecipante.
-- **File importati** (`.girovia`, PDF, email, immagini) trattati come non affidabili: limiti di dimensione, nessuna esecuzione di contenuti, protezione dai percorsi malevoli negli archivi, parser robusti agli errori.
+- **File importati** (`.itinerea`, PDF, email, immagini) trattati come non affidabili: limiti di dimensione, nessuna esecuzione di contenuti, protezione dai percorsi malevoli negli archivi, parser robusti agli errori.
 - **Download degli aggiornamenti** (versione GitHub): verifica dell'impronta SHA-256 pubblicata con la release. Su Android la firma dell'APK deve coincidere con quella installata.
-- **Girovia Sync Server:** HTTPS obbligatorio (documentazione con un proxy come Caddy), password con hash robusto, limiti di tentativi, guida all'installazione sicura.
+- **Itinerea Sync Server:** HTTPS obbligatorio (documentazione con un proxy come Caddy), password con hash robusto, limiti di tentativi, guida all'installazione sicura.
 - **Blocco app** (facoltativo, Fase 2 o successive): PIN o impronta per aprire l'app, utile su dispositivi condivisi.
 
 ### 13.4 GDPR
@@ -1567,10 +1567,10 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 | R10 | Registrazione delle app OAuth presso Google, Microsoft e Dropbox (verifiche, schermate di consenso) | Medio | Avviare le registrazioni in M1, usare permessi non sensibili |
 | R11 | Progetto molto grande per una persona sola | Alto | Ordine rigoroso delle fasi, MVP piccolo, CLAUDE.md che vieta di anticipare le fasi |
 | R12 | Google Play: trovare 12 tester per 14 giorni | Basso | Cercarli durante la beta (M6) |
-| R13 | Nome "Girovia" già registrato come marchio | Medio | Controllo EUIPO prima della 1.0; il nome è provvisorio |
+| R13 | Nome "Itinerea" troppo simile a marchi esistenti, in particolare "Itinera" (app di viaggio, marchio registrato negli USA per servizi di viaggio) | Medio | Controllo su TMview (UE e Italia) prima della 1.0; l'app è distribuita in Europa e non negli store Apple |
 | R14 | `vector_map_tiles`: ultima versione stabile dell'agosto 2024, sviluppo attuale solo in beta | Medio (mappa) | Valutare in M1 la beta più recente; piano B: tile raster per la mappa online e un renderer alternativo |
 | R15 | Schemi di tile diversi tra mappa online e offline | Medio | Usare OpenFreeMap sia online sia offline (stesso schema OpenMapTiles e stesso stile) |
-| R16 | Identificativo dell'app Android (`applicationId`) non modificabile dopo la pubblicazione su Google Play e F-Droid | Medio | Sceglierlo neutro (es. `io.github.notenjoyingthis.girovia`) e confermarlo insieme al nome definitivo prima di M7 |
+| R16 | Identificativo dell'app Android (`applicationId`) non modificabile dopo la pubblicazione su Google Play e F-Droid | Medio | Deciso: `io.github.notenjoyingthis.itinerea` (12/11/2026). Non va più cambiato. |
 
 ### 16.2 Domande aperte
 
@@ -1581,7 +1581,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 | D3 | Conferma dei default delle notifiche (10.2) | Fase 2 |
 | D4 | Valori di punti, prezzi dello shop e soglie dei badge (11.3–11.5) | Fase 4 |
 | D5 | Ordine delle lingue dopo italiano e inglese (14.1) | Fase 4 |
-| D6 | Nome definitivo e identificativo dell'app (R16) | M7 |
+| D6 | ~~Nome definitivo e identificativo dell'app~~ — **Deciso:** Itinerea, `io.github.notenjoyingthis.itinerea` (12/11/2026) | — |
 
 ---
 
