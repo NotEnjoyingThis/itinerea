@@ -1,0 +1,11 @@
+# Localization settings (flutter gen-l10n). English is the template language.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-dir: lib/l10n/generated
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false
+# Generated files are not committed; they still carry the licence header and
+# are formatted, so the SPDX and formatting checks accept them.
+header: "// SPDX-License-Identifier: GPL-3.0-or-later"
+format: true

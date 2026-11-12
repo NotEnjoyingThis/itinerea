@@ -1,0 +1,28 @@
+name: itinerea
+description: "Open source trip and road trip planner for car and motorbike."
+publish_to: 'none'
+
+# build-name+build-number. On Android the build number is the versionCode.
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.5.0
+  intl: ^0.20.3
+  material_ui: ^1.1.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  # Generates lib/l10n/generated/ from the ARB files (see l10n.yaml).
+  generate: true
+  uses-material-design: true

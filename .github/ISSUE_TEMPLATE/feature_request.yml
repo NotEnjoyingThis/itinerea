@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest a new feature or an improvement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the [PRD](https://github.com/NotEnjoyingThis/itinerea/blob/main/docs/PRD.md) first: the feature may already be planned for a later phase, or deliberately excluded (section 1.5).
+        Itinerea will never have a central server, accounts, telemetry, ads or payments.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the situation during planning or travelling where you miss something.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you propose?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: input
+    id: prd
+    attributes:
+      label: Related PRD feature
+      description: The feature code, if there is one (e.g. F1.3).

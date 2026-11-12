@@ -1,0 +1,63 @@
+{
+  "@@locale": "en",
+  "appTitle": "Itinerea",
+  "@appTitle": {
+    "description": "Name of the app, shown in the title bar and in the task switcher. Do not translate."
+  },
+  "placeholderNotice": "Itinerea is under development. This temporary screen only lets you try the language and the theme.",
+  "@placeholderNotice": {
+    "description": "Notice on the temporary screen of milestone M0. It makes clear that the app has no features yet."
+  },
+  "languageSectionTitle": "Language",
+  "@languageSectionTitle": {
+    "description": "Title of the section where the user chooses the language of the app."
+  },
+  "currentLanguage": "{languageCode, select, it{Current language: Italiano} other{Current language: English}}",
+  "@currentLanguage": {
+    "description": "Tells which language the app is using right now. The language name stays in its own language (Italiano, English).",
+    "placeholders": {
+      "languageCode": {
+        "type": "String",
+        "example": "en"
+      }
+    }
+  },
+  "languageSystem": "System",
+  "@languageSystem": {
+    "description": "Language option: follow the language of the operating system. Keep it very short, it is a button label."
+  },
+  "languageItalian": "Italiano",
+  "@languageItalian": {
+    "description": "Language option: Italian. Always written in Italian, do not translate."
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Language option: English. Always written in English, do not translate."
+  },
+  "themeSectionTitle": "Theme",
+  "@themeSectionTitle": {
+    "description": "Title of the section where the user chooses the light or dark appearance of the app."
+  },
+  "currentTheme": "{brightness, select, dark{Current theme: dark} other{Current theme: light}}",
+  "@currentTheme": {
+    "description": "Tells whether the app is showing the light or the dark appearance right now.",
+    "placeholders": {
+      "brightness": {
+        "type": "String",
+        "example": "dark"
+      }
+    }
+  },
+  "themeSystem": "Automatic",
+  "@themeSystem": {
+    "description": "Theme option: follow the light or dark setting of the operating system. Keep it very short, it is a button label."
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Theme option: always use the light appearance. Button label."
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Theme option: always use the dark appearance. Button label."
+  }
+}

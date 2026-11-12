@@ -1,0 +1,31 @@
+# Flutter-specific ignores live in app/.gitignore.
+
+# Operating systems
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Dart / Flutter (anywhere in the monorepo)
+.dart_tool/
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# Secrets: never commit keys, tokens or OAuth client files.
+*.env
+.env.*
+*.jks
+*.keystore
+key.properties
+client_secret*.json
+credentials*.json
+
+# Logs
+*.log
