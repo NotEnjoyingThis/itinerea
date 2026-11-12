@@ -1,7 +1,10 @@
 name: CI
 
+# Pull requests and pushes to main only: a branch with an open pull request
+# would otherwise run everything twice, and macOS runners are scarce.
 on:
   push:
+    branches: [main]
   pull_request:
 
 # Read-only by default; no job in this workflow needs more.

@@ -26,6 +26,7 @@ Ogni decisione presa durante lo sviluppo si scrive qui e nella sezione pertinent
 | 12/11/2026 | **M0 — `require_trailing_commas` resta attiva.** Verificato con Dart 3.14: sul codice prodotto da `dart format` la regola non segnala nulla (provati i casi tipici di conflitto: funzione come primo argomento, lista e stringa su più righe come ultimo argomento). Se in futuro entrasse in conflitto, vince il formatter e la regola si toglie. | Il formatter di Dart ≥ 3.7 gestisce da solo le virgole finali; la regola non deve mai chiedere il contrario. | — |
 | 12/11/2026 | **M0 — Fine riga LF** per tutti i file di testo; unica eccezione gli script `.bat`/`.cmd` (CRLF). | Stesso contenuto su Windows, macOS e Linux; gli script batch richiedono CRLF. | — |
 | 12/11/2026 | **M0 — Codice di condotta:** Contributor Covenant 2.1. Vulnerabilità: solo segnalazione privata di GitHub (`SECURITY.md`). | Testo diffuso e riconosciuto; le vulnerabilità non devono comparire in issue pubbliche. | PRD 12.2 |
+| 12/11/2026 | **M0 — La CI gira sulle pull request e sui push a `main`**, non su ogni push. Un branch senza pull request aperta non viene verificato. | Con entrambi i trigger ogni pull request girava due volte e i job macOS/iOS venivano annullati da GitHub per mancanza di runner macOS liberi. | — |
 
 ## Punti aperti
 
