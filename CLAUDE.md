@@ -1,26 +1,27 @@
 # CLAUDE.md — Regole del progetto Itinerea
 
-> Itinerea è un'app open source (GPL-3.0) per pianificare viaggi e roadtrip in auto e moto.
+> Itinerea è un'app open source (GPL-3.0-or-later) per pianificare viaggi e roadtrip in auto e moto.
 > Il documento di riferimento è **`docs/PRD.md`**. Leggilo prima di qualsiasi lavoro e ricontrollalo quando una scelta ti sembra incerta.
 
 ## 1. Come lavorare
 
 1. **Una milestone alla volta** (PRD 15.2). Lavora solo sulla milestone indicata. **Non implementare la logica di fasi o milestone successive**, nemmeno "già che ci sei".
-   - **Impalcatura ammessa** quando richiesta (PRD 15.1): cartelle, interfacce astratte, modelli senza logica, schermate segnaposto, test segnaposto che riportano i CA (`skip: 'M4 – F1.5'`). Ogni segnaposto ha un commento `// TODO(Mx F2.1): …` con milestone e funzionalità.
+   - **Impalcatura ammessa** quando richiesta (PRD 15.1): cartelle, interfacce astratte, modelli senza logica, schermate segnaposto, test segnaposto che riportano i CA. Ogni segnaposto ha un commento TODO con la milestone (Fase 1) o la fase (Fasi 2–4) e la funzionalità: `// TODO(M4 F1.5): …`, `// TODO(Fase 2 F2.1): …`. Stesso schema per i test saltati: `skip: 'M4 – F1.5'`, `skip: 'Fase 2 – F2.1'`.
    - Un'impalcatura non deve mai sembrare una funzione finita: le schermate segnaposto lo dicono chiaramente.
+   - L'impalcatura copre **tutte le fasi** (1–4) e si prepara **dopo M1** (decisione presa). Le schermate segnaposto delle Fasi 2–4 sono raggiungibili **solo nelle build di debug** (`kDebugMode`), mai nelle versioni pubblicate.
 2. **Prima il piano, poi il codice.** All'inizio di ogni compito presenta un piano breve: file da creare o modificare, dipendenze, test. Aspetta conferma se il compito tocca più di una funzionalità (codice F*x.y*) o cambia il modello dati.
 3. **Se il PRD è ambiguo o contraddittorio, chiedi.** Non indovinare. Se una scelta tecnica del PRD si rivela impraticabile, fermati, spiega il problema e proponi alternative.
-
-### Libertà di design e di funzionalità
-- **Estetica:** l'unico riferimento è **Wanderlog** (lista + mappa affiancate), da rendere più snello, moderno e veloce. Colori, font, icone, componenti, animazioni e organizzazione delle schermate li scegli tu (base Material 3). Documenta le scelte in `docs/DESIGN.md` e mostrale prima di applicarle a tutta l'app.
-- **Funzionalità:** il PRD è il **punto di partenza**. Puoi proporre miglioramenti, semplificazioni o funzioni in più, unire o dividere schermate (PRD 7.2–7.3 sono una proposta). **Chiedi prima** di togliere o cambiare una funzionalità del PRD e scrivi la decisione in `docs/DECISIONS.md`.
-- **Sempre vincolanti:** i principi della sezione 2 qui sotto, i non-obiettivi (PRD 1.5) e le voci del PRD segnate "decisione presa".
 4. **Mantieni il PRD aggiornato.** Ogni decisione presa durante lo sviluppo va scritta nella sezione pertinente di `docs/PRD.md` e in `docs/DECISIONS.md` (data, decisione, motivo).
 5. **Definizione di "finito":** criteri di accettazione (CA) della funzionalità soddisfatti, test scritti e verdi, `flutter analyze` senza errori né avvisi, build funzionanti su Android, Windows, macOS e Linux (CI), testi tradotti in italiano e inglese.
 
+### Libertà di design e di funzionalità
+- **Estetica:** l'unico riferimento è **Wanderlog** (lista + mappa affiancate), da rendere più snello, moderno e veloce. Colori, font, icone, componenti, animazioni e organizzazione delle schermate li scegli tu. I componenti Material 3 di Flutter sono solo una base tecnica, da personalizzare liberamente. Documenta le scelte in `docs/DESIGN.md` e mostrale prima di applicarle a tutta l'app.
+- **Funzionalità:** il PRD è il **punto di partenza**. Puoi proporre miglioramenti, semplificazioni o funzioni in più, unire o dividere schermate (PRD 7.1–7.3 sono una proposta, salvo i vincoli indicati in 7.1). **Chiedi prima** di togliere o cambiare una funzionalità del PRD e scrivi la decisione in `docs/DECISIONS.md`.
+- **Sempre vincolanti:** i principi della sezione 2 qui sotto, i non-obiettivi (PRD 1.5) e le voci del PRD segnate "decisione presa".
+
 ## 2. Principi non negoziabili (PRD 1.4)
 
-- **Nessun server centrale.** Niente backend del progetto, niente account Itinerea. L'unico server ammesso è il *Itinerea Sync Server* facoltativo e self-hosted (`/sync-server`).
+- **Nessun server centrale.** Niente backend del progetto, niente account Itinerea. L'unico server ammesso è l'*Itinerea Sync Server* facoltativo e self-hosted (`/sync-server`).
 - **Nessuna telemetria**, analytics, crash reporting automatico, pubblicità, acquisti in-app o affiliazioni.
 - **Nessun SDK proprietario** (Firebase, Google Play Services, SDK pubblicitari…): l'app deve poter entrare in F-Droid.
 - **Local-first:** ogni funzione deve funzionare offline con i dati salvati, oppure degradare in modo chiaro (PRD 7.7, 9.1).
@@ -33,7 +34,13 @@
 - Mappa: **OpenFreeMap** sia online sia offline (stesso schema OpenMapTiles e stesso stile, PRD 4.6). Non mischiare tile con schemi diversi.
 - Percorsi: **Valhalla** (istanza pubblica FOSSGIS come default, URL configurabile).
 - Identificativo dell'app (`applicationId` / bundle id): `io.github.notenjoyingthis.itinerea` (definitivo, PRD R16): non cambiarlo.
-- Piattaforme distribuite: **Android, Windows, macOS, Linux**. iOS non è distribuito, ma non introdurre codice che ne rompa la compilazione.
+- Piattaforme distribuite: **Android, Windows, macOS, Linux**. iOS non è distribuito, ma non introdurre codice che ne rompa la compilazione: la CI lo verifica con una build iOS senza firma (`--no-codesign`).
+- Repository: https://github.com/NotEnjoyingThis/itinerea (pubblico). Da usare anche nell'User-Agent.
+
+### Ambiente di sviluppo
+- Lo sviluppatore lavora su **Windows 11**: progetto in `D:\Progetti\Personali\itinerea`, Flutter in `D:\SDK\flutter` (stable; a novembre 2026 Flutter 3.50, Dart 3.14), Android SDK 36, Visual Studio Build Tools 2022, VSCodium come editor.
+- In locale si compilano e si provano **Android e Windows**. **macOS e Linux** si verificano tramite GitHub Actions.
+- Comandi per PowerShell (non Bash) quando li suggerisci all'utente.
 
 ### Aggiungere una dipendenza
 Prima di aggiungere un pacchetto verifica e riporta: licenza compatibile con GPL-3.0 (MIT, BSD, Apache-2.0, LGPL, MPL-2.0 sì; proprietarie no), supporto alle 4 piattaforme, manutenzione attiva (rilascio negli ultimi 12 mesi, anche beta: in quel caso segnalalo), nessuna dipendenza da servizi proprietari. Chiedi conferma prima di aggiungerlo. I pacchetti già indicati nella sezione 3 sono approvati, ma verificane comunque la versione e lo stato.
@@ -48,7 +55,8 @@ Prima di aggiungere un pacchetto verifica e riporta: licenza compatibile con GPL
 - **Testi:** mai stringhe visibili nel codice; sempre ARB con descrizione per i traduttori, plurali ICU, nessuna frase composta a pezzi.
 - **Servizi esterni:** sempre tramite l'interfaccia `Provider` della categoria (mappa, percorsi, ricerca, mezzi, meteo, cambi, carburante…), con URL configurabile, **User-Agent** `Itinerea/<versione> (+<url del repository>)`, cache, limiti di frequenza e gestione dell'assenza di rete (PRD 5.4).
 - **Segreti:** nessuna chiave o token nel repository. Le chiavi personali degli utenti vanno in `flutter_secure_storage`.
-- **Licenza:** ogni nuovo file sorgente inizia con `// SPDX-License-Identifier: GPL-3.0-or-later` (finché D1 non è decisa diversamente).
+- **Licenza:** GPL-3.0-or-later (decisione presa, D1). Ogni nuovo file sorgente inizia con `// SPDX-License-Identifier: GPL-3.0-or-later`.
+- **Lingua:** nomi, commenti e messaggi di commit in **inglese**; README in inglese con una sezione in italiano; CONTRIBUTING e CODE_OF_CONDUCT in inglese; documenti in `docs/` (PRD, DECISIONS, DESIGN, ROADMAP) in **italiano**. Con l'utente parla in italiano.
 - **Accessibilità:** etichette semantiche, rispetto della dimensione del testo di sistema, contrasto adeguato in tema chiaro e scuro.
 
 ## 5. Test
@@ -61,9 +69,10 @@ Prima di aggiungere un pacchetto verifica e riporta: licenza compatibile con GPL
 ## 6. Git
 
 - Un branch per funzionalità o compito (es. `feat/F1.2-stops`).
-- Commit in stile **Conventional Commits** con il codice della funzionalità: `feat(F1.3): ricalcolo automatico degli orari`.
+- Commit in stile **Conventional Commits** con il codice della funzionalità: `feat(F1.3): automatic schedule recalculation`.
 - Ogni commit con `Signed-off-by` (DCO, PRD 12.2).
 - Non fare push né aprire PR senza che te lo chieda.
+- **GitHub Actions:** i permessi predefiniti del repository sono in sola lettura. Ogni workflow dichiara i permessi minimi (`permissions:`) e chiede la scrittura solo nel job che ne ha bisogno (es. pubblicazione delle release). Azioni di terze parti fissate a una versione precisa.
 
 ## 7. Sicurezza e privacy (PRD 13)
 

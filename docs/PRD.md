@@ -1,10 +1,12 @@
 # Itinerea — Product Requirements Document (PRD)
 
-> **Stato del documento:** versione 1.1 dell'11/11/2026, rivista e con controllo incrociato tra sezioni, librerie e servizi.
+> **Stato del documento:** versione 1.3 del 12/11/2026 (nome definitivo Itinerea, repository creato, scelte rese esplicite), rivista e con controllo incrociato tra sezioni, librerie e servizi.
+> **Repository:** https://github.com/NotEnjoyingThis/itinerea (pubblico, branch `main`).
 > **Come usarlo:** per le **funzionalità** il PRD è il punto di partenza, non un vincolo rigido; per l'**aspetto grafico** il riferimento è Wanderlog, da migliorare liberamente (sezione 7). Restano vincolanti i principi (1.4), i non-obiettivi (1.5) e le decisioni segnate come "decisione presa".
 > **Ultima verifica delle fonti esterne (sez. 5):** novembre 2026. Prima di implementare, ricontrollare licenze e limiti.
 > **Lingua del documento:** italiano. Lingue dell'app al lancio: italiano e inglese.
-> **Modello del progetto** (decisione dell'11/11/2026): **open source** su GitHub, **gratuito**, **senza pubblicità**, **senza pagamenti** di alcun tipo e **senza server centrale**. L'app funziona interamente in locale e si sincronizza tramite Google Drive, OneDrive, Dropbox o un server self-hosted dell'utente. **Licenza: GPL-3.0** ("or-later" o "only" da decidere, D1). **Distribuzione:** GitHub, F-Droid, Flathub e Google Play (niente App Store Apple).
+> **Lingua del codice** (decisione del 12/11/2026): nomi, commenti e messaggi di commit in **inglese**; README in inglese con una sezione in italiano; CONTRIBUTING e CODE_OF_CONDUCT in inglese; documenti di progetto in `docs/` (PRD, DECISIONS, DESIGN, ROADMAP) in **italiano**.
+> **Modello del progetto** (decisione dell'11/11/2026): **open source** su GitHub, **gratuito**, **senza pubblicità**, **senza pagamenti** di alcun tipo e **senza server centrale**. L'app funziona interamente in locale e, se l'utente lo vuole, si sincronizza tramite Google Drive, OneDrive, Dropbox, WebDAV, una cartella locale o un server self-hosted dell'utente. **Licenza: GPL-3.0-or-later** (decisione del 12/11/2026, D1). **Distribuzione:** GitHub, F-Droid, Flathub e Google Play (niente App Store Apple).
 > **Nome dell'app:** **Itinerea** (definitivo, decisione del 12/11/2026), da *itinera*, latino "i percorsi". Scartati perché già usati da app di viaggio o da aziende del turismo: Girovia (app open source di viaggio omonima su GitHub), Itinera (app di viaggio omonime su App Store **e Google Play**, marchio registrato negli USA per servizi di viaggio), Detour, Waymark, Roamwise, Bivio. **Prima del lancio:** confermare su TMview che non ci siano marchi uguali o troppo simili (anche rispetto a Itinera, R13) e registrare il dominio.
 
 ---
@@ -90,7 +92,7 @@ Queste esclusioni sono decisioni prese, non dimenticanze:
 - **Nessun movimento di denaro reale.** L'app registra chi deve cosa a chi, non fa pagamenti.
 - **Nessuna AI generativa per i consigli.** I consigli si basano su dati e algoritmi (vedi sezione 6).
 - **Nessuna partecipazione attiva per chi non ha l'app.** Chi non ha l'app può ricevere un PDF dell'itinerario con il link per scaricarla, ma non può modificare né essere aggiunto alle spese.
-- **Copertura geografica iniziale: solo Europa.**
+- **Copertura geografica iniziale: Europa** (decisione presa). I viaggi fuori dall'Europa **si possono creare**: mappa, percorsi, luoghi, meteo e cambi funzionano ovunque ci siano dati. Le funzioni con dati solo europei (prezzi carburante, pedaggi, badge, database veicoli) mostrano "Non disponibile in questo paese". Test e dati curati a mano si concentrano sull'Europa.
 
 ---
 
@@ -120,12 +122,14 @@ Gli piace tenere traccia di dove è stato, collezionare badge e mostrare il prop
 
 ### 2.2 Scenari d'uso
 
+Gli scenari descrivono l'esperienza completa a cui tendere, con funzioni di **tutte le fasi** (sezione 6): non sono la descrizione dell'MVP.
+
 **S1 — Weekend a Dublino (itinerario breve, P2)**
 L'utente crea un viaggio "Itinerario" di 4 giorni. Condivide con l'app l'email di conferma del volo: volo, orari e posto vengono aggiunti da soli al giorno 1 e al giorno 4. Carica lo screenshot della carta d'imbarco con il QR, che resta disponibile offline. Aggiunge le tappe di ogni giorno cercandole sulla mappa: orari di apertura e informazioni arrivano in automatico. Il giorno 2 prevede una gita alle scogliere, con piano B "museo in centro" in caso di pioggia. Il meteo della vigilia segnala pioggia e l'utente attiva il piano B con un tocco.
 
 **S2 — Due settimane in Giappone in gruppo (P1 + P2)**
 *Nota: il Giappone è fuori dalla copertura iniziale (solo Europa). Lo scenario descrive l'esperienza completa a cui tendere.*
-L'organizzatore crea il viaggio nel suo Google Drive e invita 3 amici: due come editor e uno solo in visualizzazione. Le modifiche arrivano agli altri in pochi secondi o minuti; se il gruppo usa un Itinerea Sync Server installato da uno di loro, in tempo reale. Le spese si registrano in yen e la conversione usa il cambio del giorno della spesa. Un amico presta soldi a un altro, e il prestito entra nel saldo. A fine viaggio l'app mostra chi deve quanto a chi, con il minor numero possibile di pagamenti.
+L'organizzatore crea il viaggio nel suo Google Drive e invita 3 amici: due come editor e uno solo in visualizzazione. Le modifiche arrivano agli altri in pochi secondi o minuti; se il gruppo usa un Itinerea Sync Server installato da uno di loro, in tempo reale. Le spese si registrano in yen e la conversione usa il cambio del giorno della spesa. Un amico presta soldi a un altro, e il prestito entra nel saldo. A fine viaggio l'app mostra chi deve quanto a chi, con pochi pagamenti (F2.2).
 
 **S3 — Roma e Firenze in 7 giorni (assistente consigli)**
 L'utente vuole vedere il Colosseo e gli Uffizi e ha 7 giorni. Chiede aiuto all'assistente, che gli fa alcune domande: approfondire Roma, approfondire Firenze, fare tappe a metà strada o vedere subito le due cose e poi altre regioni; ritmo; interessi; budget. Poi propone una distribuzione dei giorni e dei luoghi, che l'utente può accettare o modificare in parte.
@@ -153,32 +157,33 @@ Questi termini vanno usati in modo coerente nel codice, nell'interfaccia e nei d
 | **Viaggio** | `Trip` | Il contenitore principale. Ha nome, date, partecipanti, giorni, budget e uno o più segmenti. |
 | **Segmento** | `Segment` | Una porzione continua di giorni dello stesso tipo: **Itinerario** (a piedi o con i mezzi) o **Roadtrip** (auto o moto). Un viaggio misto ha più segmenti, per esempio giorni 1–4 itinerario e giorni 5–10 roadtrip. Il cambio di tipo vale dal giorno scelto in poi. |
 | **Giorno** | `Day` | Un giorno del viaggio. Contiene tappe, tratte, alloggio della notte ed eventuale budget giornaliero. |
-| **Tappa** | `Stop` | Un luogo o un'attività in un giorno. Campi principali: orario, durata, note, costo, link, allegati, stato (da visitare / visitata). Può essere collegata a una prenotazione. |
+| **Tappa** | `Stop` | Un luogo o un'attività in un giorno. Campi principali: orario, durata, note, costo, link, allegati, stato (da visitare / visitata / saltata). Può essere collegata a una prenotazione. |
+| **Tempo libero** | — | Tempo che avanza prima di una tappa a orario fisso (F1.3). L'assistente propone come usarlo (F3.1). |
 | **Tratta** | `Leg` | Lo spostamento tra due tappe consecutive. Ha un mezzo (auto, moto, a piedi, bus, treno, metro, traghetto, aereo…), un percorso, durata e costo stimati. |
 | **Alternativa (Piano A/B/C/D)** | campo `plan` | Opzioni di riserva per una tappa o per una tratta. Il piano A è quello attivo di default. Gli altri si attivano a mano con un tocco. Massimo 4 piani (A–D). |
 | **Posizione** | `StopSlot` / `LegSlot` | Il posto di una tappa o di una tratta nel giorno. Contiene i piani A–D e indica quale è attivo (8.3). |
 | **Percorso** | `Route` | Il tracciato geografico di una tratta, calcolato in base al profilo di percorso e modificabile dall'utente. |
 | **Profilo di percorso** | `RouteProfile` | Le preferenze per calcolare il percorso: più veloce / panoramico (mare, lago, montagna) / con curve; evita autostrade, pedaggi, sterrato, traghetti. Vale per qualsiasi veicolo. |
-| **Prenotazione** | `Booking` | Una prenotazione con orario vincolante: volo, treno, bus, traghetto, hotel, museo, noleggio auto, ecc. Si crea da email, PDF o screenshot, oppure a mano. Blocca il ricalcolo automatico degli orari. |
-| **Allegato** | `Attachment` | File salvato in locale e collegato a una tappa o prenotazione: PDF, screenshot, biglietto con QR. Disponibile offline. |
+| **Prenotazione** | `Booking` | Una prenotazione con orario vincolante: volo, treno, bus, traghetto, hotel, museo, noleggio auto, ecc. Si crea da email, PDF o screenshot, oppure a mano. Ha un orario fisso: il ricalcolo automatico degli orari non la sposta (F1.3). |
+| **Allegato** | `Attachment` | File salvato in locale e collegato a una tappa, una tratta, una prenotazione o una spesa: PDF, screenshot, biglietto con QR. Disponibile offline. |
 | **Alloggio** | `Lodging` | Dove si dorme una notte: hotel/B&B, campeggio, area sosta, notte in auto. Collegato ai giorni corrispondenti, con check-in e check-out. |
 | **Partecipante** | `Participant` | Persona che partecipa al viaggio: ha l'app installata e accesso allo spazio di sincronizzazione del viaggio. Non esistono account Itinerea: è identificata da un profilo locale (nome + ID) collegato all'account del servizio usato. |
 | **Ruolo** | `Role` | Permessi di un partecipante: **Proprietario** (tutto, compresi inviti ed eliminazione), **Editor** (modifica itinerario e spese), **Visualizzatore** (solo lettura). In modalità file coincidono con i permessi di condivisione della cartella (4.4). |
 | **Spazio di sincronizzazione** | `SyncSpace` | Dove si salvano e si scambiano i dati di un viaggio: Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (**modalità file**) oppure Itinerea Sync Server (**modalità server**). iCloud Drive è escluso. |
 | **Fornitore** | `Provider` | Il servizio esterno usato per un tipo di dato (mappa, percorsi, ricerca, mezzi, meteo…). Di default è un servizio pubblico, sostituibile con un server dell'utente. |
-| **Pacchetto dati** | `DataPack` | File scaricato e usato offline: regione di mappa (PMTiles), luoghi di una zona, database veicoli, liste dei badge, tabelle pedaggi. |
+| **Pacchetto dati** | `DataPack` | File scaricato e usato offline: regione di mappa (PMTiles o MBTiles), luoghi di una zona, database veicoli, liste dei badge, tabelle pedaggi. |
 | **Budget** | campi `budgetMode`, `budgetTotal` (Trip) e `budget` (Day) | Limite di spesa del viaggio: generale oppure per giorno. |
 | **Spesa** | `Expense` | Un costo sostenuto: importo, valuta, cambio del giorno, chi ha pagato, come si divide, categoria, foto dello scontrino facoltativa. |
 | **Divisione** | `Split` | Come una spesa si ripartisce tra i partecipanti: in parti uguali, a percentuale, a quote o per importi esatti. Si sceglie per ogni spesa. |
 | **Prestito** | `Loan` | Denaro prestato da un partecipante a un altro, fuori dalle spese comuni. Entra nel saldo. |
-| **Saldo** | `Settlement` | Il riepilogo "chi deve quanto a chi", ridotto al minimo numero di pagamenti. Si calcola, non si salva. |
+| **Saldo** | `Settlement` | Il riepilogo "chi deve quanto a chi", con pochi pagamenti (al massimo numero di persone − 1, F2.2). Si calcola, non si salva. |
 | **Rimborso** | `Repayment` | Un pagamento con cui un partecipante salda un debito; entra nel saldo. |
 | **Veicolo** | `Vehicle` | Auto o moto dell'utente: modello, tipo di alimentazione, consumo, capienza serbatoio o batteria, autonomia. Dati compilati dal database quando possibile, sempre modificabili. |
 | **Sosta pianificata** | `Stop` con `kind` = `refuel` / `charge` | Rifornimento o ricarica proposti dall'app in base all'autonomia del veicolo, oppure inseriti dall'utente se ha scelto la pianificazione manuale. |
 | **Luogo** | `Place` (`PlaceSnapshot` nel viaggio, `PlaceCache` nella cache) | Un punto d'interesse sulla mappa (monumento, museo, ristorante, distributore, bagno, campeggio…), con le informazioni prese dalle fonti dati. |
 | **Assistente** | `PlannerAssistant` | La procedura guidata, facoltativa, che fa domande all'utente e propone come distribuire giorni e luoghi. |
 | **Visita verificata** | `VerifiedVisit` | La visita a un luogo confermata dal GPS sul posto. Serve per badge e punti. |
-| **Badge** | `Badge` | Riconoscimento legato a un'area geografica: città, regione o nazione. Ha livelli da 1 a 10, che salgono con le visite verificate ai luoghi della sua lista. |
+| **Badge** | `Badge` | Riconoscimento legato a un'area geografica (città, regione o nazione) oppure a un traguardo speciale (es. passi alpini, km in moto, 11.3). Ha livelli da 1 a 10, che salgono con le visite verificate ai luoghi della sua lista. |
 | **Punti viaggio** | `PointsLedger` (movimenti) | Valuta interna dell'app. Si guadagnano **solo viaggiando** (non si possono comprare) e si spendono solo in oggetti estetici nello shop. |
 | **Itinerario condiviso** | `SharedItinerary` | Copia anonimizzata di un viaggio, esportata come file `.itinerea`, che altri possono importare e copiare (F4.3). |
 
@@ -210,8 +215,8 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 │ • Google Drive                  │  │ mappa, percorsi, ricerca,     │
 │ • Microsoft OneDrive · Dropbox  │  │ mezzi, meteo, cambi,          │
 │ • WebDAV (Nextcloud, NAS…)      │  │ carburante, POI OSM           │
-│ • Cartella locale (es. Syncthing)│ │ + pacchetti dati statici      │
-│ • Itinerea Sync Server           │  │   (GitHub Releases)           │
+│ • Cartella locale (Syncthing…)  │  │ + pacchetti dati statici      │
+│ • Itinerea Sync Server          │  │   (GitHub Releases)           │
 │   (self-hosted dall'utente)     │  └───────────────────────────────┘
 └─────────────────────────────────┘
 ```
@@ -232,6 +237,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 | Notifiche | flutter_local_notifications | **Solo notifiche locali**, calcolate sul dispositivo. Niente notifiche push: richiederebbero un server. |
 | Sincronizzazione | Client REST per Google Drive, Microsoft Graph (OneDrive) e Dropbox, client WebDAV, accesso a cartella locale, client WebSocket per il Sync Server | Login OAuth con PKCE nel browser di sistema. iCloud Drive escluso (l'app non è distribuita sugli store Apple). |
 | Dipendenze | **Preferire librerie open source** | Evitare SDK proprietari (es. Google Play Services, Firebase), così l'app può entrare in F-Droid |
+| Altre librerie | Scelte durante lo sviluppo | PDF (F1.14), posizione, condivisione, apertura di link, selettore di file e simili: le propone Claude Code rispettando le regole di CLAUDE.md (licenza, piattaforme, manutenzione) |
 
 ### 4.3 Dati locali e sincronizzazione
 
@@ -245,7 +251,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 - **Testo delle note:**
   - **Cronologia delle versioni:** ogni nota conserva le versioni precedenti, consultabili e ripristinabili.
   - **Modifiche contemporanee:** vince l'ultima modifica e la versione dell'altra persona resta nella cronologia, quindi nulla va perso.
-  - **Blocco morbido** ("Nome sta scrivendo…", rilascio dopo 10 secondi senza digitazione): **solo con il Itinerea Sync Server**, l'unica modalità abbastanza veloce da renderlo affidabile.
+  - **Blocco morbido** ("Nome sta scrivendo…", rilascio dopo 10 secondi senza digitazione): **solo con l'Itinerea Sync Server**, l'unica modalità abbastanza veloce da renderlo affidabile.
   - **Più avanti:** la scrittura simultanea carattere per carattere, come in Google Docs, con un CRDT di testo (per esempio `dart_crdt`, compatibile con Yjs) quando le librerie Dart saranno mature. Oggi sono pre-1.0.
 
 **Log delle modifiche.** Ogni modifica locale viene salvata come operazione in una tabella dedicata. Il motore di sync scrive le operazioni nuove nello spazio di sincronizzazione e legge quelle degli altri dispositivi.
@@ -271,18 +277,18 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 - Alla creazione l'app mostra un **codice di recupero** da conservare. Chi perde tutti i dispositivi e il codice non può più leggere il viaggio dal cloud: l'app lo spiega chiaramente prima di attivare la cifratura.
 - Algoritmi standard (es. XChaCha20-Poly1305) tramite una libreria crittografica affermata, mai implementazioni fatte in casa.
 
-> **Da validare con un prototipo nella Fase 1:** modalità file su Google Drive, OneDrive e Dropbox con 2–5 dispositivi sullo stesso viaggio, modifiche offline e riconnessione.
+> **Da validare con un prototipo:** modalità file con 2–5 dispositivi sullo stesso viaggio, modifiche offline e riconnessione. In M1 si prova **Google Drive** (il caso più incerto, R1); OneDrive e Dropbox si provano prima di iniziare la Fase 2.
 
 ### 4.4 Partecipanti, inviti e ruoli senza server
 
 - **Nessun account Itinerea.** Ogni installazione ha un **profilo locale** (nome visualizzato + ID generato). Nel viaggio, il partecipante è identificato da questo profilo e dall'account del servizio usato (es. l'account Google).
 - **Tutti i partecipanti di un viaggio usano lo stesso spazio**, scelto da chi crea il viaggio. Con Google Drive, ognuno deve avere un account Google; con il Sync Server, le credenziali di quel server.
 - **Invito:** il proprietario condivide la cartella del viaggio (o lo invita sul Sync Server) e l'app genera un **link o codice di invito** che, aperto in Itinerea, collega il viaggio.
-- **Ruoli in modalità file:** sono i **permessi della cartella**. Chi ha accesso in sola lettura è **Visualizzatore**: il servizio stesso gli impedisce di scrivere. Chi può scrivere è **Editor**. Il **Proprietario** è chi possiede la cartella. L'app mostra e modifica i ruoli attraverso le funzioni di condivisione del servizio, dove l'API lo permette.
+- **Ruoli in modalità file:** sono i **permessi della cartella**. Chi ha accesso in sola lettura è **Visualizzatore**: il servizio stesso gli impedisce di scrivere. Chi può scrivere è **Editor**. Il **Proprietario** è chi possiede la cartella. L'app mostra e modifica i ruoli attraverso le funzioni di condivisione del servizio, dove l'API lo permette; dove non lo permette, spiega passo passo come cambiarli dal sito del servizio.
 - **Ruoli in modalità server:** applicati dal Sync Server.
 
 > **Rischi tecnici da verificare con il prototipo:**
-> - Google Drive: con il permesso più ristretto (`drive.file`, accesso solo ai file creati o aperti dall'app) l'accesso a una cartella **condivisa da un altro utente** potrebbe richiedere che l'invitato la apra tramite il selettore di file di Google. Va provato. Il client OAuth va registrato presso Google e Microsoft a nome del progetto.
+> - Google Drive: con il permesso più ristretto (`drive.file`, accesso solo ai file creati o aperti dall'app) l'accesso a una cartella **condivisa da un altro utente** potrebbe richiedere che l'invitato la apra tramite il selettore di file di Google. Va provato. Il client OAuth va registrato presso Google, Microsoft e Dropbox a nome del progetto.
 > - Microsoft OneDrive: condivisione di cartelle tra account personali via Microsoft Graph.
 > - Dropbox: condivisione di cartelle tra account e permessi di sola lettura tramite API.
 
@@ -318,7 +324,7 @@ Un piccolo server **incluso nel repository**, che **chi vuole installa per sé**
 
 - **Funzioni:** smistamento delle operazioni in tempo reale (WebSocket), archivio dei viaggi e degli allegati, utenti e ruoli, presenza, blocco morbido delle note.
 - **Installazione:** un'immagine Docker e un singolo eseguibile. Configurazione minima: indirizzo, utenti, cartella dati.
-- **Tecnologia proposta:** Dart (stesso linguaggio dell'app, modelli condivisi) con SQLite. *Alternativa:* PocketBase.
+- **Tecnologia proposta:** Dart (stesso linguaggio dell'app, modelli condivisi) con SQLite. *Alternativa:* PocketBase. **La scelta definitiva si fa all'inizio della Fase 2**; fino ad allora `/sync-server` contiene solo struttura e README (15.1).
 - **Fase:** 2, insieme alla collaborazione.
 
 ### 4.8 Struttura del repository
@@ -330,13 +336,18 @@ Un unico repository GitHub pubblico (monorepo), così Claude Code ha tutto il co
   /lib
     /core           modelli, database, sync, fornitori, utilità
     /features       una cartella per funzione (trip, map, budget, bookings…)
-    /l10n           traduzioni
+    /l10n           traduzioni (file ARB)
+  /test             test automatici
   /prototypes       prove di M1, separate dal codice dell'app
 /sync-server        Itinerea Sync Server (facoltativo, self-hosted) + Dockerfile
 /data-packs         script che generano i dati statici: veicoli, badge, pedaggi
 /docs               PRD.md, DECISIONS.md (decisioni), DESIGN.md (stile), ROADMAP.md (avanzamento)
-LICENSE             GPL-3.0
-CONTRIBUTING.md     come contribuire (codice, traduzioni, tabelle pedaggi, itinerari)
+/.github            workflow della CI, modelli di issue, FUNDING.yml, dependabot.yml
+README.md           presentazione (in inglese, con una sezione in italiano)
+LICENSE             testo della GPL-3.0 (il progetto è GPL-3.0-or-later)
+LICENSE-DATA.md     licenze dei dati (12.1)
+CONTRIBUTING.md     come contribuire (codice, traduzioni, pedaggi, regole prenotazioni, badge, grafiche)
+CODE_OF_CONDUCT.md  Contributor Covenant
 CLAUDE.md           regole per Claude Code
 ```
 
@@ -346,7 +357,7 @@ CLAUDE.md           regole per Claude Code
 
 | Canale | Piattaforme | Aggiornamenti | Note |
 |---|---|---|---|
-| **GitHub Releases** | Android (APK), Windows (installer), macOS (DMG), Linux (AppImage) | Controllo nell'app (vedi sotto) | Sempre disponibile, è il canale di riferimento |
+| **GitHub Releases** | Android (APK), Windows (installer, formato da scegliere in M7), macOS (DMG), Linux (AppImage) | Controllo nell'app (vedi sotto) | Sempre disponibile, è il canale di riferimento |
 | **Google Play** | Android | Automatici dallo store | Iscrizione sviluppatore una tantum. Per i nuovi account personali Google chiede un **test chiuso con almeno 12 tester per 14 giorni consecutivi** prima della pubblicazione: vanno trovati per tempo (amici, compagni di corso). |
 | **F-Droid** | Android | Automatici dallo store | Compila l'app dal codice sorgente. Richiede solo dipendenze open source. Segnalerà probabilmente l'"anti-funzione" *NonFreeNet*, perché l'app può usare servizi non liberi (Google Drive, OneDrive, Dropbox): è normale e non impedisce la pubblicazione. |
 | **Flathub** | Linux | Automatici | Gratuito |
@@ -361,7 +372,7 @@ CLAUDE.md           regole per Claude Code
 **Aggiornamenti:**
 - **Store (Google Play, F-Droid, Flathub):** l'app si aggiorna come tutte le altre, gestita dallo store.
 - **Versione da GitHub:** all'avvio, al massimo una volta al giorno, l'app controlla le release pubbliche su GitHub. Se c'è una versione nuova mostra "Nuova versione disponibile" con le novità e un pulsante per scaricarla. Su Android il sistema chiede sempre conferma prima di installare; su desktop si scarica il nuovo installer o AppImage. Il controllo si può disattivare e non invia nessun dato personale.
-- L'app capisce da quale canale è stata installata e mostra il controllo GitHub **solo** per le versioni prese da GitHub.
+- L'app sa da quale canale proviene grazie a un parametro di compilazione (es. `--dart-define=DISTRIBUTION=github|play|fdroid|flathub`) e mostra il controllo GitHub **solo** nelle build per GitHub. Le build per Google Play, F-Droid e Flathub non contengono nessun controllo degli aggiornamenti: lì li gestisce lo store (Google Play vieta espressamente alle app di aggiornarsi da sole).
 - **Pacchetti dati** (veicoli, badge, pedaggi): hanno una versione propria e si aggiornano **senza aggiornare l'app**. L'app controlla se esistono pacchetti più recenti e li scarica in background quando è connessa (anche solo su Wi-Fi, a scelta).
 - **Migrazioni:** ogni versione nuova deve leggere i dati e i file di sincronizzazione delle versioni precedenti. In un viaggio di gruppo possono convivere versioni diverse dell'app: il formato delle operazioni è versionato e un'app vecchia avvisa "Aggiorna Itinerea per vedere tutte le modifiche" invece di rompere i dati.
 
@@ -402,9 +413,9 @@ CLAUDE.md           regole per Claude Code
 | **Ricerca luoghi e indirizzi** | Photon pubblico (OSM) | Fair use | Uso intensivo rallentato | Nominatim pubblico (max 1 richiesta al secondo) o server dell'utente |
 | **Dettagli dei luoghi** (orari, telefono, sito, descrizione, foto) | OpenStreetMap + Wikidata e Wikimedia Commons | OSM: ODbL. Wikidata: CC0 | **Meno completi di Google**, soprattutto orari. Nessuna recensione. | Valutazioni personali dell'utente (F4.4) |
 | **Luoghi offline e livelli mappa** (bagni, distributori, colonnine, campeggi, aree sosta, hotel) | Overpass API (OSM) | ODbL, fair use | Query per area, salvate in locale. Niente scaricamenti di intere nazioni a ogni avvio. | Istanze Overpass alternative o server dell'utente |
-| **Mezzi pubblici** | Transitous (motore MOTIS) | Gratis | Pensato proprio per app open source e non-profit: **Itinerea rientra nell'uso previsto**. Copertura variabile da paese a paese. | Server MOTIS dell'utente |
+| **Mezzi pubblici** | Transitous (motore MOTIS) | Gratis | Pensato proprio per app open source e non-profit: **Itinerea rientra nell'uso previsto**. Copertura variabile da paese a paese. Condizioni d'uso da rileggere prima del rilascio, come per Valhalla (R2). | Server MOTIS dell'utente |
 | **Meteo** | MET Norway (Locationforecast) | Gratis, CC BY 4.0 | User-Agent identificativo obbligatorio, cache, attribuzione | Open-Meteo (gratis per uso non commerciale) |
-| **Cambio valuta** | Frankfurter | Gratis, nessuna chiave | Cambi giornalieri e storici | Tassi di riferimento BCE scaricati direttamente |
+| **Cambio valuta** | Frankfurter | Gratis, nessuna chiave | Cambi giornalieri e storici. Se una valuta non è disponibile, l'utente inserisce il cambio a mano, etichettato come tale (T4). | Tassi di riferimento BCE scaricati direttamente |
 | **Prezzi carburante — Italia** | MIMIT (open data ufficiale) | Gratis, IODL 2.0 | CSV quotidiani scaricati direttamente dall'app | — |
 | **Prezzi carburante — Germania** | MTS-K tramite Tankerkönig | Gratis con chiave, CC BY 4.0 | **Ogni utente inserisce la propria chiave gratuita** (facoltativa), così non si pubblica una chiave nel codice e non si ridistribuiscono i dati | Senza chiave: prezzo medio nazionale o inserito dall'utente |
 | **Prezzi carburante — altri paesi** | Open data nazionali dove esistono (es. Francia) | Da verificare paese per paese | Copertura non uniforme | Prezzo inserito dall'utente |
@@ -432,7 +443,7 @@ CLAUDE.md           regole per Claude Code
 ### 5.4 Uso responsabile dei servizi pubblici
 
 Senza server propri, l'app dipende da servizi gestiti da volontari e associazioni. Regole obbligatorie:
-- **User-Agent identificativo** in ogni richiesta, es. `Itinerea/1.2 (+https://github.com/<repo>)`.
+- **User-Agent identificativo** in ogni richiesta, es. `Itinerea/1.2 (+https://github.com/NotEnjoyingThis/itinerea)`.
 - **Cache locale** di tutto ciò che si può riusare: percorsi già calcolati, luoghi, meteo per la durata indicata dal servizio, cambi del giorno.
 - **Limiti di frequenza** lato app (es. ricerca con attesa di 300 ms dopo l'ultima lettera digitata, nessuna richiesta automatica ripetuta).
 - **Niente scaricamenti massivi** automatici.
@@ -459,7 +470,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 - Ogni funzionalità ha un codice (**F1.3** = Fase 1, funzionalità 3), da usare anche nei commit e nelle issue.
 - **Requisiti:** cosa deve fare.
 - **Criteri di accettazione (CA):** come si verifica che è finita. Una funzionalità è finita solo quando tutti i CA passano su **tutte e 4 le piattaforme distribuite** (Android, Windows, macOS, Linux).
-- Le fasi si sviluppano in ordine. Una fase si considera conclusa quando tutte le sue funzionalità sono finite e l'app è stabile.
+- Le fasi si sviluppano in ordine. Una fase si considera conclusa quando tutte le sue funzionalità sono finite e l'app è stabile. L'impalcatura senza logica di tutte le fasi (15.1) non conta come sviluppo anticipato.
 
 | Fase | Obiettivo | Risultato |
 |---|---|---|
@@ -473,7 +484,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 | Codice | Requisito |
 |---|---|
 | T1 | Le azioni frequenti (aggiungere una tappa, registrare una spesa, aprire un biglietto, attivare un piano B) richiedono **al massimo 3 tocchi** dalla schermata del giorno. |
-| T2 | Un viaggio già salvato si apre in **meno di 1 secondo** su un telefono di fascia media. |
+| T2 | Un viaggio già salvato si apre in **meno di 1 secondo** su un telefono Android di fascia media (riferimento: un modello di fascia media di circa 3 anni prima). |
 | T3 | Tutto ciò che è salvato nel viaggio è consultabile e modificabile **offline**. |
 | T4 | Ogni dato potenzialmente vecchio o stimato è **etichettato** come tale: "Stima", "Offline – aggiornato il…", "Valore dichiarato dal costruttore". |
 | T5 | Tema chiaro e scuro, oppure automatico secondo il sistema. |
@@ -490,23 +501,25 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 #### F1.1 Creazione del viaggio
 **Requisiti**
 - Si sceglie il tipo: **Itinerario** o **Roadtrip**.
-- Dati iniziali: nome, destinazione o destinazioni, data di inizio e di fine (oppure numero di giorni), luogo di partenza e di ritorno.
+- Dati iniziali: nome, destinazione o destinazioni, data di inizio e di fine **oppure solo il numero di giorni** (date non ancora decise), luogo di partenza e di ritorno.
 - Se ci sono voli o treni di andata e ritorno, si possono aggiungere subito come prenotazioni (F1.9).
-- I giorni vengono creati in automatico in base alle date.
+- I giorni vengono creati in automatico in base alle date o al numero di giorni.
+- **Viaggio senza date:** i giorni si chiamano "Giorno 1", "Giorno 2"… Le funzioni che hanno bisogno della data (meteo, giorni di chiusura dei luoghi, cambio del giorno, notifiche) mostrano "Imposta le date del viaggio". Quando l'utente sceglie la data di inizio, ogni giorno prende la sua data.
 - In qualsiasi momento si può **cambiare tipo da un giorno in poi** (segmento, vedi glossario): per esempio giorni 1–4 Itinerario, dal giorno 5 Roadtrip. Il cambio si annulla rimettendo il tipo precedente.
 
 **CA**
 - Un viaggio base (nome, destinazione, date) si crea in meno di 2 minuti e in al massimo 4 schermate.
 - Cambiando le date, i giorni si aggiungono o si rimuovono. Se un giorno da rimuovere contiene tappe, l'app chiede se spostarle o eliminarle.
 - Con un viaggio misto, le funzioni roadtrip (veicolo, distributori, soste) compaiono solo nei giorni del segmento Roadtrip.
+- Un viaggio creato con il solo numero di giorni si può pianificare; impostando poi la data di inizio, ogni giorno riceve la data giusta senza perdere tappe.
 
 #### F1.2 Giorni e tappe
 **Requisiti**
 - Si aggiunge una tappa cercandola per nome o indirizzo, toccandola sulla mappa, oppure come tappa libera (solo nome e note).
 - Se il luogo è nelle fonti dati, la tappa si compila da sola con indirizzo, coordinate, orari di apertura, telefono e sito web.
-- Campi della tappa: orario di inizio, durata, note, costo stimato, link, allegati, stato (da visitare / visitata).
+- Campi della tappa: orario di inizio, durata, note, costo stimato, link, allegati, stato (da visitare / visitata / saltata). Durata predefinita: 1 ora, sempre modificabile.
 - Le tappe si riordinano trascinandole e si spostano in un altro giorno.
-- Ogni giorno ha l'**alloggio della notte**: hotel, campeggio, area sosta o notte in auto.
+- Ogni giorno può avere l'**alloggio della notte**: hotel, campeggio, area sosta o notte in auto (di solito l'ultimo giorno non ce l'ha).
 
 **CA**
 - Una tappa cercata per nome mostra orari e contatti quando OSM li ha. Quando non li ha, i campi restano vuoti e modificabili, senza errori.
@@ -515,9 +528,11 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 
 #### F1.3 Orari automatici e avvisi
 **Requisiti**
-- Gli orari del giorno si calcolano a catena: inizio della tappa precedente + durata + tempo della tratta = inizio della tappa successiva.
-- Le tappe **con prenotazione** hanno un orario **fisso**: il ricalcolo non le sposta.
-- Se cambia una durata, le tappe successive **senza prenotazione** si ricalcolano da sole.
+- La prima tappa del giorno inizia all'**orario di inizio della giornata** (default 9:00, modificabile nelle impostazioni e per singolo giorno).
+- Gli orari si calcolano a catena: inizio della tappa precedente + durata + tempo della tratta = inizio della tappa successiva.
+- Le tappe **con prenotazione** e quelle con l'orario **fissato a mano** (lucchetto) hanno un orario **fisso**: il ricalcolo non le sposta.
+- Se cambiano una durata, una tratta o l'ordine delle tappe, le tappe successive **senza orario fisso** si ricalcolano da sole.
+- Se si arriva **prima** di una tappa a orario fisso, il tempo che avanza si mostra come **"tempo libero"** (usato dall'assistente, F3.1).
 - Avvisi, senza blocchi:
   - "Arrivi alle 18:30, ma il luogo chiude alle 18:00" (dagli orari di apertura).
   - "Rischi di non arrivare in tempo per [prenotazione] delle 15:00".
@@ -526,13 +541,14 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 **CA**
 - Aumentando di 30 minuti la durata della tappa 2, le tappe 3 e 4 (non prenotate) slittano di 30 minuti, mentre la tappa 5 (prenotata alle 15:00) resta ferma e, se serve, compare l'avviso di ritardo.
 - Gli avvisi compaiono sia nella lista del giorno sia sulla tappa.
+- Arrivando alle 14:20 a una tappa prenotata alle 15:00, il giorno mostra 40 minuti di tempo libero prima di quella tappa.
 
 #### F1.4 Tratte e mezzi
 **Requisiti**
 - Tra due tappe consecutive c'è una tratta, con mezzo a scelta: a piedi, auto, moto, bici, bus, treno, metro, tram, traghetto, aereo, taxi, altro.
 - A piedi, in auto, in moto e in bici: durata e distanza calcolate (F1.5).
 - Mezzi pubblici in Fase 1: orario e durata **inseriti a mano**, con il biglietto allegato. Le soluzioni con orari automatici arrivano in F2.4.
-- Il mezzo predefinito dipende dal segmento: a piedi negli Itinerari, il veicolo del viaggio nei Roadtrip.
+- Il mezzo predefinito dipende dal segmento: a piedi negli Itinerari; auto o moto nei Roadtrip, secondo il tipo di veicolo scelto per il segmento. In Fase 1 si sceglie solo il tipo (auto o moto); dalla Fase 2 il veicolo salvato con i suoi dati (F2.5).
 
 **CA**
 - Cambiando il mezzo, durata e orari del giorno si aggiornano.
@@ -554,12 +570,15 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 **Requisiti**
 - Ogni **tappa** e ogni **tratta** può avere fino a 4 piani (A–D). Il piano A è attivo di default.
 - Il piano si cambia **a mano**, con un tocco. Gli orari del giorno si ricalcolano (F1.3).
+- Cambiando il piano di una tappa, le tratte vicine si ricalcolano da sole per collegare la nuova tappa. Se un percorso era stato modificato a mano (F1.5), l'app chiede prima di ricalcolarlo.
 - **Regola dei costi:** il budget si aggiorna in automatico **solo per gli elementi prenotati o già pagati**. Il costo stimato di un piano non prenotato resta visibile come stima, ma entra nel budget solo quando l'utente registra una spesa.
+- Una spesa già sostenuta (per esempio il biglietto pagato del piano A) **resta nel budget** anche se si passa a un altro piano: i soldi sono comunque spesi.
 - I piani non attivi restano visibili in modo discreto, per esempio "+2 alternative".
 
 **CA**
 - Passando dal piano A al piano B su una tappa, gli orari successivi si ricalcolano e il budget cambia solo se il piano B ha una prenotazione o una spesa registrata.
 - Si può tornare al piano A e tutto torna com'era.
+- Se il piano A era già pagato (spesa registrata), passando al piano B quella spesa resta nel budget.
 
 #### F1.7 Mappa
 **Requisiti**
@@ -587,12 +606,18 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 - Tipi: volo, treno, bus, traghetto, hotel/alloggio, museo/attrazione/evento, noleggio auto, ristorante, altro.
 - Campi comuni: data e ora (inizio e fine), luogo, codice di prenotazione, costo, valuta, allegati, note. Campi specifici per tipo: per esempio check-in e check-out per gli hotel, posto e terminal per i voli.
 - Una prenotazione **compare in automatico** nei giorni giusti: un hotel di 3 notti diventa l'alloggio dei 3 giorni.
+- **Dove va ogni tipo di prenotazione:**
+  - **volo, treno, bus, traghetto:** una **tratta** con quel mezzo e orari di partenza e arrivo fissi, tra due tappe create in automatico (es. "Aeroporto di Fiumicino" → "Aeroporto di Dublino"). Se il viaggio passa la mezzanotte, la tratta appartiene al giorno di partenza;
+  - **hotel o alloggio:** l'**alloggio** dei giorni coperti, con check-in e check-out;
+  - **museo, attrazione, evento, ristorante:** una **tappa** a orario fisso;
+  - **noleggio auto:** una tappa di ritiro e una di riconsegna a orario fisso; dal giorno del ritiro l'app propone "Da qui: Roadtrip" (FL8).
 - Il costo di una prenotazione entra nel budget (F1.10).
 - L'import automatico da email e PDF arriva in F2.3.
 
 **CA**
 - Un hotel dal 10 al 13 compare come alloggio del 10, 11 e 12, con check-in il 10 e check-out il 13.
 - Una prenotazione ha orario fisso nel ricalcolo (F1.3).
+- Un volo inserito a mano crea una tratta di tipo aereo con orari fissi, tra due tappe create in automatico per gli aeroporti.
 
 #### F1.10 Budget e spese (personali)
 **Requisiti**
@@ -601,7 +626,8 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 - Registrazione di una spesa: importo, valuta, data, categoria (alloggio, trasporti, cibo, attività, carburante, pedaggi, acquisti, altro), nota, foto dello scontrino facoltativa.
 - **Conversione con il cambio del giorno della spesa.** Se si è offline, si usa l'ultimo cambio disponibile, la spesa viene segnata "cambio da aggiornare" e si corregge da sola al ritorno online.
 - Riepilogo: speso / previsto / rimanente, per categoria e per giorno.
-- La divisione tra partecipanti e i prestiti arrivano in F2.2, insieme alla collaborazione.
+- In Fase 1 ogni viaggio ha un solo partecipante, l'utente: tutte le spese sono sue. La divisione tra partecipanti e i prestiti arrivano in F2.2, insieme alla collaborazione.
+- Se una valuta non è disponibile dal servizio dei cambi, il cambio si inserisce a mano (5.2).
 
 **CA**
 - Una spesa di 3.000 JPY del 12 marzo usa il cambio del 12 marzo, non quello di oggi.
@@ -609,7 +635,7 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 
 #### F1.11 Meteo
 **Requisiti**
-- Previsioni per ogni giorno del viaggio nel luogo principale del giorno, quando la data rientra nell'orizzonte di previsione.
+- Previsioni per ogni giorno del viaggio nel **luogo principale del giorno** (di default l'alloggio della notte, altrimenti la prima tappa; modificabile), quando la data rientra nell'orizzonte di previsione.
 - Icona meteo sulla giornata e sulle tappe all'aperto.
 
 **CA**
@@ -636,14 +662,14 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 
 #### F1.14 Esporta in PDF
 **Requisiti**
-- PDF dell'itinerario (giorni, tappe, orari, alloggi, mappe riassuntive) con un link per scaricare l'app, da mandare a chi non la usa.
+- PDF dell'itinerario (giorni, tappe, orari, alloggi, mappe riassuntive) con il link alla pagina del progetto su GitHub, da cui si scarica l'app per tutte le piattaforme. Serve per chi non usa l'app.
 - Scelta di cosa includere: per esempio senza costi o senza note.
 
 **CA**
 - Il PDF è leggibile su telefono e stampabile in A4.
 
 #### F1.15 Impostazioni di base
-- Lingua (italiano/inglese), tema, unità di misura (km/miglia, litri/galloni), valuta predefinita, formato di data e ora, profilo locale (nome), spazi di sincronizzazione e backup, **fornitori dei servizi** (indirizzi dei server alternativi, chiavi personali facoltative come Tankerkönig).
+- Lingua (italiano/inglese), tema, unità di misura (km/miglia, litri/galloni), valuta predefinita, formato di data e ora, orario di inizio della giornata (default 9:00), durata predefinita delle tappe (default 1 ora), profilo locale (nome), spazi di sincronizzazione e backup, **fornitori dei servizi** (indirizzi dei server alternativi, chiavi personali facoltative come Tankerkönig).
 
 ---
 
@@ -663,17 +689,19 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 **CA**
 - Due editor che modificano offline tappe diverse dello stesso giorno ritrovano entrambe le modifiche dopo la sincronizzazione.
 - Un Visualizzatore non può modificare nulla, nemmeno offline: l'interfaccia di modifica è nascosta e lo spazio di sincronizzazione (permessi della cartella o Sync Server) rifiuta le scritture.
-- Il Itinerea Sync Server si installa con un solo comando Docker seguendo la documentazione del repository.
+- L'Itinerea Sync Server si installa con un solo comando Docker seguendo la documentazione del repository.
 
 #### F2.2 Spese di gruppo
 **Requisiti**
 - Ogni spesa ha chi ha pagato e come si divide: **in parti uguali, a percentuale, a quote o per importi esatti**, scegliendo per ogni spesa e tra quali partecipanti.
 - **Prestiti:** "A ha prestato 50 € a B", fuori dalle spese comuni.
-- **Saldo finale:** chi deve quanto a chi, con il **minor numero possibile di pagamenti**.
+- **Saldo finale:** chi deve quanto a chi, con **pochi pagamenti**: al massimo (numero di persone − 1). Si usa un algoritmo semplice e prevedibile: chi deve di più paga chi deve ricevere di più, finché tutti sono a zero. Cercare sempre il minimo assoluto di pagamenti è troppo costoso da calcolare e non serve.
+- **Arrotondamenti:** le divisioni si fanno in centesimi interi. I centesimi che avanzano (es. 10 € in 3 = 3,34 + 3,33 + 3,33) vanno, uno a testa, ai partecipanti in ordine di ID, così il risultato è identico su tutti i dispositivi.
 - Si possono segnare i rimborsi come "saldati".
 
 **CA**
 - Tre persone, spese miste e un prestito: il saldo ha al massimo 2 pagamenti e la somma dei saldi è zero.
+- 10 € divisi in parti uguali tra 3 persone danno 3,34 + 3,33 + 3,33, con lo stesso risultato su tutti i dispositivi.
 
 #### F2.3 Import automatico delle prenotazioni
 **Requisiti**
@@ -862,9 +890,9 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 3. **Dettagli in pannelli, non in pagine nuove:** toccando una tappa o una tratta si apre un pannello dal basso (mobile) o laterale (desktop). Si chiude con un gesto senza perdere il punto in cui si era.
 4. **Niente login:** l'app si usa subito e non esistono account Itinerea. Lo spazio di sincronizzazione si propone solo quando serve (collaborazione, sync tra dispositivi).
 5. **Riferimento visivo:** **Wanderlog** è l'unico punto di partenza per l'estetica (lista + mappa affiancate). Va reso più snello e veloce: meno livelli di menu, niente schermate intermedie inutili.
-6. **Libertà di design:** colori, font, icone, componenti, animazioni e organizzazione delle schermate sono **scelti da chi sviluppa** (Claude Code), partendo da Wanderlog e da Material 3. Vincoli: stile moderno e comodo, tema chiaro e scuro, i principi 1.4 e i tocchi della tabella 7.5. Lo stile scelto si documenta in `docs/DESIGN.md`.
+6. **Libertà di design:** colori, font, icone, componenti, animazioni e organizzazione delle schermate sono **scelti da chi sviluppa** (Claude Code), partendo da Wanderlog. I componenti Material 3 di Flutter sono solo una base tecnica, da personalizzare liberamente. Vincoli: stile moderno e comodo, tema chiaro e scuro, i principi 1.4 e i tocchi della tabella 7.5. Lo stile scelto si documenta in `docs/DESIGN.md`.
 
-> **Nota:** le schermate (7.3) e la navigazione (7.2) qui sotto sono una **proposta di partenza**. Si possono unire, dividere o riorganizzare se il risultato è più semplice, purché le funzionalità restino raggiungibili e i flussi principali non richiedano più tocchi.
+> **Nota:** i principi 1–3 qui sopra, la navigazione (7.2), le schermate (7.3) e gli schemi sono una **proposta di partenza**. Si possono unire, dividere o riorganizzare se il risultato è più semplice, purché le funzionalità restino raggiungibili e i flussi principali non richiedano più tocchi. **Vincolanti:** niente login (principio 4), tema chiaro e scuro, numero massimo di tocchi della tabella 7.5.
 
 ### 7.2 Struttura della navigazione
 
@@ -1010,7 +1038,8 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | Campo | Tipo | Note |
 |---|---|---|
 | `name` | testo | |
-| `startDate`, `endDate` | data | I giorni (`Day`) si generano da queste date |
+| `startDate`, `endDate` | data? | Facoltative: un viaggio può avere solo il numero di giorni (F1.1) |
+| `dayCount` | intero | Numero di giorni; i giorni (`Day`) si generano da qui e, se ci sono, dalle date |
 | `destinations` | lista di `PlaceSnapshot` | Destinazioni indicate alla creazione (F1.1) |
 | `departurePlace`, `returnPlace` | `PlaceSnapshot` | |
 | `currency` | ISO 4217 | Valuta principale |
@@ -1026,7 +1055,7 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 |---|---|---|
 | `profileId` | ID | Profilo locale della persona |
 | `displayName` | testo | |
-| `role` | `owner` \| `editor` \| `viewer` | In modalità file è un riflesso dei permessi della cartella |
+| `role` | `owner` \| `editor` \| `viewer` | In modalità file è un riflesso dei permessi della cartella. In Fase 1 c'è un solo partecipante, l'utente (`owner`). |
 | `providerAccount` | testo? | Es. email dell'account Google, solo per gestire la condivisione |
 | `color` | colore | Per distinguere le persone nell'interfaccia |
 
@@ -1034,19 +1063,21 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | Campo | Tipo | Note |
 |---|---|---|
 | `type` | `itinerary` \| `roadtrip` | |
-| `startDate` | data | Il segmento vale fino all'inizio del successivo |
-| `vehicleSnapshot` | `VehicleSnapshot?` | Copia dei dati del veicolo usato (i veicoli sono dati personali, 8.4) |
+| `startDayIndex` | intero | Primo giorno del segmento; il segmento vale fino all'inizio del successivo |
+| `vehicleKind` | `car` \| `motorbike`? | Tipo di veicolo, solo per i Roadtrip (Fase 1) |
+| `vehicleSnapshot` | `VehicleSnapshot?` | Fase 2: copia dei dati del veicolo usato (i veicoli sono dati personali, 8.4) |
 | `routeProfile` | `RouteProfile?` | Sostituisce quello del viaggio, se presente |
 | `stopPlanning` | `auto` \| `manual` | Pianificazione delle soste carburante o ricarica |
 
 **Day** (Giorno)
 | Campo | Tipo | Note |
 |---|---|---|
-| `date` | data | |
+| `index` | intero | Posizione nel viaggio (Giorno 1, 2…) |
+| `date` | data? | Vuota se il viaggio non ha ancora date |
 | `timezone` | fuso IANA | Fuso del giorno (dal luogo principale); gli orari delle tappe sono in questo fuso |
-| `mainPlace` | `PlaceSnapshot?` | Luogo principale, usato per il meteo (F1.11) |
+| `mainPlace` | `PlaceSnapshot?` | Luogo principale, usato per meteo e fuso (F1.11). Di default l'alloggio della notte, altrimenti la prima tappa |
 | `budget` | `Money?` | Se `budgetMode = perDay` |
-| `startTime` | ora? | Orario di inizio della giornata (default dalle impostazioni) |
+| `startTime` | ora? | Orario di inizio della giornata; se vuoto vale quello delle impostazioni (default 9:00) |
 | `noteId` | ID? | |
 
 **Slot e Stop** (posizione nel giorno e Tappa)
@@ -1103,6 +1134,10 @@ I `LegSlot` seguono le coppie di posizioni vicine: quando le tappe si riordinano
 
 **RouteProfile** (Profilo di percorso, oggetto incorporato)
 `preference` (`fastest` \| `curvy` \| `scenic`), `scenicType` (`sea` \| `lake` \| `mountain` \| `any`), `avoidHighways`, `avoidTolls`, `avoidUnpaved`, `avoidFerries` (booleani).
+
+**VehicleSnapshot** (oggetto incorporato in `Segment`, Fase 2): copia dei campi di `Vehicle` (8.4) al momento della scelta, così il viaggio resta corretto anche se l'utente modifica o cancella il veicolo.
+
+**TransitSolution** (oggetto incorporato in `Leg`, Fase 2): elenco dei tratti (mezzo, linea, fermata di partenza e di arrivo, orari), durata totale, fornitore e `savedAt`.
 
 **Booking** (Prenotazione)
 | Campo | Tipo | Note |
@@ -1161,7 +1196,7 @@ Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, presti
 
 | Entità | Campi principali |
 |---|---|
-| **Profile** | `displayName`, lingua, tema, unità, valuta predefinita, orario di inizio giornata predefinito |
+| **Profile** | `displayName`, lingua, tema, unità, valuta predefinita, orario di inizio giornata (default 9:00), durata predefinita delle tappe (default 1 ora) |
 | **Vehicle** | `kind` (`car` \| `motorbike`), marca, modello, versione, `fuelType` (`petrol` \| `diesel` \| `lpg` \| `cng` \| `electric` \| `hybrid` \| `plugInHybrid`), consumo (l/100 km o kWh/100 km), serbatoio o batteria, autonomia, `source` (`eea:<id>` \| `manual`), margine di sicurezza (km), classe per i pedaggi |
 | **TollRecord** | casello di entrata, casello di uscita, classe del veicolo, importo, data |
 | **VerifiedVisit** | ID Wikidata del luogo, istante, coordinate, precisione GPS, `tripId?` |
@@ -1403,7 +1438,7 @@ Una visita allo stesso luogo dà punti una sola volta.
 
 ### 12.1 Licenza
 
-- **Codice:** **GPL-3.0** (decisione presa). Ogni file sorgente ha l'intestazione SPDX `// SPDX-License-Identifier: GPL-3.0-or-later`. *Da confermare:* "or-later", che permette di passare a versioni future della GPL, oppure "only".
+- **Codice:** **GPL-3.0-or-later** (decisione presa, 12/11/2026): permette di usare anche versioni future della GPL. Ogni file sorgente ha l'intestazione SPDX `// SPDX-License-Identifier: GPL-3.0-or-later`.
 - **Dipendenze:** ammesse solo licenze compatibili con la GPL-3.0 (es. MIT, BSD, Apache-2.0, LGPL, MPL-2.0). Vietati SDK proprietari. Prima di aggiungere una dipendenza si controlla la licenza (CLAUDE.md).
 - **Dati:** i pacchetti dati hanno la licenza delle fonti, indicata in un file `LICENSE-DATA.md`. Esempi: ODbL per i dati derivati da OpenStreetMap, CC BY-SA per Wikivoyage, CC0 per Wikidata.
 - **Grafiche e icone originali:** CC BY-SA 4.0.
@@ -1515,7 +1550,8 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 - Sviluppo da solo con Claude Code: le milestone si definiscono per **risultato**, non per data.
 - Ogni milestone termina con: criteri di accettazione superati, test automatici verdi in CI, build funzionanti su Android, Windows, macOS e Linux, PRD aggiornato se qualcosa è cambiato.
 - **Si procede in ordine.** Le funzioni di una fase successiva non si iniziano prima della fine della fase in corso.
-- **Impalcatura ammessa:** dopo M1 si prepara la struttura di tutte le milestone (cartelle, interfacce, schermate segnaposto, test segnaposto con i CA), **senza logica**. Serve a dare a tutto il progetto una forma coerente fin dall'inizio.
+- **Impalcatura (decisione presa, 12/11/2026):** **dopo M1**, usando i risultati dei prototipi, si prepara la struttura di **tutto il progetto**: milestone M2–M7 della Fase 1 **e** funzioni delle Fasi 2–4. Comprende cartelle, modelli senza logica, interfacce astratte, schermate segnaposto, test segnaposto con i CA e lo scheletro di `/sync-server` e `/data-packs`. **Nessuna logica.** Serve a dare a tutto il progetto una forma coerente fin dall'inizio.
+- Le schermate segnaposto delle Fasi 2–4 sono raggiungibili **solo nelle build di debug** e dicono chiaramente "Fase X – non ancora disponibile": non devono mai comparire agli utenti nelle versioni pubblicate.
 
 ### 15.2 Milestone della Fase 1 (MVP)
 
@@ -1532,6 +1568,8 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 
 ### 15.3 Fasi successive
 
+Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stesso metodo (risultati e CA), e si aggiungono a `docs/ROADMAP.md`.
+
 | Fase | Versione | Contenuto principale |
 |---|---|---|
 | 2 — Gruppo e strada | 2.x | Collaborazione e Sync Server, spese di gruppo, cifratura, import prenotazioni, mezzi pubblici, veicolo, carburante e soste, campeggi e bagni, mappe e luoghi offline, notifiche |
@@ -1542,7 +1580,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 
 | Livello | Cosa si testa | Esempi |
 |---|---|---|
-| Unità | Logica pura | Regole CRDT, ricalcolo orari (F1.3), saldo con minimo numero di pagamenti (F2.2), conversioni di valuta, soglie dei badge, parser `opening_hours` e BCBP |
+| Unità | Logica pura | Regole CRDT, ricalcolo orari (F1.3), saldo con pochi pagamenti e arrotondamenti (F2.2), conversioni di valuta, soglie dei badge, parser `opening_hours` e BCBP |
 | Widget | Schermate e componenti | Numero di tocchi dei flussi FL1–FL9, tema chiaro e scuro, testi lunghi in tedesco |
 | Integrazione | Flussi completi | Viaggio creato offline e sincronizzato; due dispositivi simulati con modifiche concorrenti |
 | Manuale | Prima di ogni rilascio | Lista di controllo per piattaforma, con particolare attenzione a mappa, notifiche, file |
@@ -1576,7 +1614,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 
 | # | Domanda | Serve entro |
 |---|---|---|
-| D1 | Licenza GPL-3.0 "or-later" oppure "only" | M0 |
+| D1 | ~~Licenza GPL-3.0 "or-later" oppure "only"~~ — **Deciso:** GPL-3.0-or-later (12/11/2026) | — |
 | D2 | Approvare lo stile proposto da Claude Code in `docs/DESIGN.md` (partendo da Wanderlog) | M3 |
 | D3 | Conferma dei default delle notifiche (10.2) | Fase 2 |
 | D4 | Valori di punti, prezzi dello shop e soglie dei badge (11.3–11.5) | Fase 4 |
