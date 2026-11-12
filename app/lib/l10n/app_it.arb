@@ -1,0 +1,15 @@
+{
+  "@@locale": "it",
+  "appTitle": "Itinerea",
+  "placeholderNotice": "Itinerea è in sviluppo. Questa schermata provvisoria serve solo a provare la lingua e il tema.",
+  "languageSectionTitle": "Lingua",
+  "currentLanguage": "{languageCode, select, it{Lingua attuale: Italiano} other{Lingua attuale: English}}",
+  "languageSystem": "Sistema",
+  "languageItalian": "Italiano",
+  "languageEnglish": "English",
+  "themeSectionTitle": "Tema",
+  "currentTheme": "{brightness, select, dark{Tema attuale: scuro} other{Tema attuale: chiaro}}",
+  "themeSystem": "Automatico",
+  "themeLight": "Chiaro",
+  "themeDark": "Scuro"
+}
