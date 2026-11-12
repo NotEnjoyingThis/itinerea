@@ -1,0 +1,72 @@
+name: Toll rate
+description: Report a motorway toll or vignette price that is missing or wrong (F3.3)
+labels: [data, tolls]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Toll estimates are planned for phase 3 (F3.3). Reports are collected already and will feed the toll tables.
+        Do not attach photos of receipts that show a number plate, a card number or other personal data.
+  - type: input
+    id: country
+    attributes:
+      label: Country
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - Toll (entry and exit)
+        - Toll (fixed price for a section, tunnel or bridge)
+        - Vignette
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: Entry toll station, or road section
+      placeholder: Firenze Sud (A1)
+    validations:
+      required: true
+  - type: input
+    id: exit
+    attributes:
+      label: Exit toll station
+      placeholder: Roma Nord (A1)
+  - type: dropdown
+    id: vehicle-class
+    attributes:
+      label: Vehicle
+      options:
+        - Car
+        - Motorbike
+        - Car with trailer or caravan
+        - Camper
+        - Other (explain below)
+    validations:
+      required: true
+  - type: input
+    id: amount
+    attributes:
+      label: Amount paid, with currency
+      placeholder: 19.40 EUR
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date of payment
+      placeholder: "2026-08-14"
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Amount estimated by Itinerea, if any
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes or official source
+      description: A link to the official price list helps a lot.

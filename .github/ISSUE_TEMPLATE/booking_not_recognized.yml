@@ -1,0 +1,68 @@
+name: Booking not recognized
+description: A booking confirmation was not read, or was read wrongly (F2.3)
+labels: [data, booking-import]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Automatic booking import is planned for phase 2 (F2.3).
+
+        **Never attach or paste a real booking.** This issue is public. Before sharing a sample, replace names, e-mail addresses, phone numbers, booking codes, ticket numbers, payment details and barcodes with made-up values. Do not attach QR codes or boarding pass images: they contain your personal data.
+  - type: input
+    id: company
+    attributes:
+      label: Company or service
+      placeholder: Airline, railway, hotel chain, booking site…
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Booking type
+      options:
+        - Flight
+        - Train
+        - Bus
+        - Ferry
+        - Hotel or lodging
+        - Museum, attraction or event
+        - Car rental
+        - Restaurant
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: Format
+      options:
+        - E-mail
+        - PDF
+        - Screenshot or image
+        - Boarding pass barcode
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language of the confirmation
+  - type: textarea
+    id: result
+    attributes:
+      label: What did Itinerea read?
+      description: Nothing at all, or which fields were missing or wrong (date, time, place, code, cost…).
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Anonymised sample
+      description: The text of the confirmation with every personal detail replaced by made-up values.
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed every personal detail from this report
+          required: true
