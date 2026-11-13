@@ -309,7 +309,7 @@ Il backup serve a **non perdere i dati** e a spostarli tra dispositivi senza spa
 | Servizio | Dove gira | Cosa fa |
 |---|---|---|
 | **Mappa base online** | Servizio pubblico (OpenFreeMap) o server dell'utente | Tile vettoriali della mappa |
-| **Mappe offline** | **Sul dispositivo** | L'app scarica dall'archivio PMTiles pubblico di **OpenFreeMap** solo le tile della regione scelta (richieste parziali HTTP) e le salva in un archivio locale. Si usa OpenFreeMap anche offline perché ha **lo stesso schema delle tile** (OpenMapTiles) della mappa online, quindi lo stesso stile grafico. *Da prototipare in M1*, vedi 5.2. |
+| **Mappe offline** | **Sul dispositivo** | L'app scarica dall'archivio PMTiles pubblico di **OpenFreeMap** solo le tile della regione scelta (richieste parziali HTTP) e le salva in un archivio locale. Si usa OpenFreeMap anche offline perché ha **lo stesso schema delle tile** (OpenMapTiles) della mappa online, quindi lo stesso stile grafico. **Esito M1 (13/11/2026):** la mappa offline funziona, ma la strada descritta qui (richieste parziali sul planet PMTiles) non è quella prevista dalle condizioni d'uso di OpenFreeMap e il pacchetto per leggere PMTiles oggi non è compatibile con il resto dello stack. Tre strade provate e **decisione in sospeso**: vedi 16.3. |
 | **Luoghi offline** (bagni, distributori, colonnine, campeggi, attrazioni) | **Sul dispositivo** | Scaricati dalla Overpass API di OpenStreetMap per l'area del viaggio e salvati nel database locale |
 | **Calcolo percorsi** | Servizio pubblico (Valhalla di FOSSGIS) o server dell'utente | Percorsi auto, moto, bici e a piedi con preferenze. Curve e panoramicità si ottengono **valutando sul dispositivo** più percorsi alternativi (5.2). |
 | **Altitudine** | Servizio pubblico (5.2) o server dell'utente | Quote lungo i percorsi, per il panoramico "montagna" (F3.4) |
@@ -409,7 +409,7 @@ CLAUDE.md           regole per Claude Code
 | Bisogno | Fonte principale | Licenza e costo | Limiti e obblighi | Piano B |
 |---|---|---|---|---|
 | **Mappa base online** | OpenFreeMap (dati OpenStreetMap) | Gratis, nessuna chiave | Servizio a donazioni, senza garanzie, senza limiti dichiarati sul numero di richieste. Attribuzione obbligatoria, da mostrare sulla mappa (testo esatto in 5.6). | Server di tile dell'utente |
-| **Mappe offline** | Planet **PMTiles** settimanale di **OpenFreeMap** (schema OpenMapTiles, uguale alla mappa online) | ODbL (dati OSM) | Il formato PMTiles permette di leggere solo le parti necessarie di un archivio remoto; il pacchetto Dart `pmtiles` lo supporta in lettura. Salvare le tile scaricate in un archivio locale (PMTiles o MBTiles) va implementato. **Da prototipare** e da verificare con OpenFreeMap che lo scaricamento parziale del planet da parte di un'app sia gradito. **Non mischiare schemi:** le tile Protomaps hanno uno schema diverso e richiederebbero un altro stile. | Importare un file PMTiles/MBTiles preparato dall'utente; cache delle tile già viste |
+| **Mappe offline** | Planet **PMTiles** settimanale di **OpenFreeMap** (schema OpenMapTiles, uguale alla mappa online) | ODbL (dati OSM) | Il formato PMTiles permette di leggere solo le parti necessarie di un archivio remoto; il pacchetto Dart `pmtiles` lo supporta in lettura. Salvare le tile scaricate in un archivio locale (PMTiles o MBTiles) va implementato. **Da prototipare** e da verificare con OpenFreeMap che lo scaricamento parziale del planet da parte di un'app sia gradito. **Non mischiare schemi:** le tile Protomaps hanno uno schema diverso e richiederebbero un altro stile. | Importare un file PMTiles/MBTiles preparato dall'utente; cache delle tile già viste. **Esito M1:** vedi 16.3 e le condizioni in 5.6 (download dal server delle tile ammesso entro 3.000 tile o 50 MB per download). |
 | **Percorsi** (auto, moto, bici, a piedi) | **Valhalla pubblico di FOSSGIS** (lo stesso usato da openstreetmap.org) | Gratis, fair use | Opzioni utili: evitare autostrade, pedaggi, traghetti, sterrato; profilo moto. Uso moderato, User-Agent identificativo. **Condizioni d'uso da rileggere prima del rilascio** (pagina FOSSGIS non accessibile durante la verifica). | OSRM pubblico di FOSSGIS (senza preferenze avanzate) oppure server GraphHopper/Valhalla dell'utente |
 | **Curve e panoramico** (mare, lago, montagna) | **Valutazione sul dispositivo**: l'app chiede a Valhalla più percorsi alternativi (parametro `alternates`, anche con punti di passaggio diversi) e li ordina per tortuosità (dalla geometria), vicinanza a coste o laghi (dati OSM via Overpass lungo il corridoio) e quota | — | **Risultato "il meglio possibile"**, non un giudizio umano sulla bellezza | Profilo personalizzato su un GraphHopper dell'utente |
 | **Altitudine** | Endpoint `/height` di Valhalla, se attivo sull'istanza usata; altrimenti **Open-Meteo Elevation API** | Open-Meteo: gratis per uso non commerciale (Itinerea lo è) | Da verificare in M1 quale delle due è disponibile e con quali limiti | Solo tag OSM (passi di montagna, vette vicine) |
@@ -476,6 +476,11 @@ Per ogni servizio: pagina, frase esatta (in lingua originale) e data in cui è s
 | OpenFreeMap — schema delle tile | https://openfreemap.org/ | "The map schema is unmodified OpenMapTiles." | 13/11/2026 |
 | OpenFreeMap — download offline (home) | https://openfreemap.org/ | "Can my app download areas for offline use? Yes, as long as each download is at most 3,000 tiles or 50 MB, uses at most 4 parallel requests, and sends a unique User-Agent identifying your app. For anything larger, please contact us." | 13/11/2026 |
 | OpenFreeMap — download offline e raccolta automatica (condizioni del 14/10/2026) | https://openfreemap.org/tos/ | "You will not: […] Collect data from the service in automated ways, except for offline downloads as described below" · "Your app may let users download areas for offline use if each download is: at most 3,000 tiles or 50 MB; made with at most 4 parallel requests; sent with a unique User-Agent identifying your app. For anything larger, please contact us" | 13/11/2026 |
+| OpenFreeMap — download del planet | https://github.com/hyperknot/openfreemap (README) | "Full planet runs are uploaded weekly. You can download them in Btrfs, MBTiles and PMTiles formats." · "MBTiles files are not required for this project. We provide them for your convenience, allowing you to use the processed planet tiles with any other tool of your choice." · "Unfortunately, on Cloudflare, range requests in 90 GB files have terrible latency" | 13/11/2026 |
+| GitHub Releases — dimensioni | https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases | "Each file included in a release must be under 2 GiB." · "There is no limit on the total size of a release, nor bandwidth usage." · "Up to 1000 release assets may be associated with a single release." | 13/11/2026 |
+| GitHub — uso eccessivo di banda | https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies (sezione 9) | GitHub può limitare un account se l'uso di banda è "significantly excessive in relation to other users of similar features" (riassunto: la frase completa non è stata copiata) | 13/11/2026 |
+
+Le condizioni di OpenFreeMap **non dicono nulla** sull'estrazione di regioni dal planet né sulla ridistribuzione di estratti: parlano solo del servizio delle tile. I dati sono OpenStreetMap (ODbL) nello schema OpenMapTiles, entrambi ridistribuibili con attribuzione.
 
 Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall'app sulla mappa e nella schermata "Fonti dei dati" (5.5).
 
@@ -1613,7 +1618,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 |---|---|---|---|
 | R1 | Google Drive: l'accesso alle cartelle condivise con il permesso ristretto potrebbe essere scomodo per chi riceve l'invito | Alto (collaborazione) | Prototipo in M1. Piani B: selettore di file di Google per l'invitato, oppure consigliare Dropbox, WebDAV o Sync Server per i gruppi |
 | R2 | Valhalla di FOSSGIS: condizioni d'uso o limiti incompatibili con l'uso da parte di un'app | Alto (percorsi) | Rileggere le condizioni prima del rilascio, cache aggressiva, fornitore configurabile (4.6), documentare come installare un proprio server |
-| R3 | Download regionale delle tile più complesso del previsto (il pacchetto `pmtiles` legge ma non scrive archivi) | Medio (mappe offline) | Prototipo in M1; salvare le tile in un archivio locale semplice (es. MBTiles/SQLite). Piano B: cache delle tile visitate o import di file preparati |
+| R3 | Download regionale delle tile più complesso del previsto (il pacchetto `pmtiles` legge ma non scrive archivi) | Medio (mappe offline) | Prototipo in M1; salvare le tile in un archivio locale semplice (es. MBTiles/SQLite). Piano B: cache delle tile visitate o import di file preparati. **Provato in M1: funziona con limiti** (16.3). Scrivere un archivio MBTiles locale è semplice (pacchetto `mbtiles`); il limite vero sono le condizioni d'uso (50 MB per download) e la lettura di PMTiles nell'app |
 | R4 | Verifica obbligatoria degli sviluppatori Android e futuro di F-Droid | Medio (distribuzione) | Registrare i nomi di pacchetto con l'account Google Play; seguire gli sviluppi di F-Droid |
 | R5 | Notifiche programmate limitate su Windows e Linux | Basso | Verifica in M1; comportamento con app aperta o in area di notifica |
 | R6 | Dati OSM incompleti (orari di apertura, colonnine) | Medio | Etichette di onestà (T4), campi sempre modificabili, invito a contribuire a OSM |
@@ -1625,7 +1630,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R12 | Google Play: trovare 12 tester per 14 giorni | Basso | Cercarli durante la beta (M6) |
 | R13 | Nome "Itinerea" troppo simile a marchi esistenti, in particolare "Itinera" (app di viaggio, marchio registrato negli USA per servizi di viaggio) | Medio | Controllo su TMview (UE e Italia) prima della 1.0; l'app è distribuita in Europa e non negli store Apple |
 | R14 | `vector_map_tiles`: ultima versione stabile dell'agosto 2024, sviluppo attuale solo in beta | Medio (mappa) | **Provato in M1: funziona con limiti** (16.3). Si usa la 9.0.0-beta.13 in modalità `raster`, con versione fissata. Resta il rischio di dipendere da una beta mantenuta da una sola persona; piano B: pacchetto `maplibre` o tile raster per la mappa online |
-| R15 | Schemi di tile diversi tra mappa online e offline | Medio | Usare OpenFreeMap sia online sia offline (stesso schema OpenMapTiles e stesso stile) |
+| R15 | Schemi di tile diversi tra mappa online e offline | Medio | Usare OpenFreeMap sia online sia offline (stesso schema OpenMapTiles e stesso stile). **Verificato in M1** (16.3): con le tile di OpenFreeMap salvate in locale e lo stile `liberty` salvato in locale la mappa offline è identica a quella online. Offline manca solo il rilievo ombreggiato (livello raster visibile sotto lo zoom 7) |
 | R16 | Identificativo dell'app Android (`applicationId`) non modificabile dopo la pubblicazione su Google Play e F-Droid | Medio | Deciso: `io.github.notenjoyingthis.itinerea` (12/11/2026). Non va più cambiato. |
 
 ### 16.2 Domande aperte
@@ -1669,6 +1674,49 @@ Limiti trovati:
 - Dipendenza da una versione beta: va fissata la versione esatta e riprovata a ogni aggiornamento.
 
 Proposta: tenere `flutter_map` + `vector_map_tiles` 9 beta in modalità `raster` per M4; riprovare su un telefono Android reale all'inizio di M4, con il requisito T2 in mente; tenere `maplibre` come piano B.
+
+**Prova 2 — Mappa offline di una piccola regione (R3, R15) — 13/11/2026 — funziona con limiti; strada da decidere**
+
+Zona di prova: Firenze e dintorni, rettangolo di circa 48 × 39 km (1.879 km²), zoom 0–14. La mappa si disegna con le stesse librerie della prova 1, da un file **MBTiles** locale e dallo stile `liberty` salvato in locale.
+
+*Strada A — tile dal server di OpenFreeMap entro i limiti delle condizioni d'uso (5.6):*
+
+| Misura | Windows | Android (emulatore) | Linux (runner CI) |
+|---|---|---|---|
+| Tile scaricate | 891 su 891, nessun errore | 891 su 891 | 891 su 891 |
+| Dati trasferiti (compressi) | 25,25 MB | 25,25 MB | 25,25 MB |
+| File MBTiles su disco | 26,1 MB | 26,1 MB | 26,1 MB |
+| Stile e icone | 57 KB | 57 KB | 57 KB |
+| Tempo (4 richieste parallele) | 15 s | 18 s | 42 s |
+| Mappa disegnata con la rete bloccata | sì, 0 tentativi di rete | sì (tentativi di rete non letti) | sì, 0 tentativi di rete |
+| Stesso aspetto della mappa online (R15) | sì | sì | sì |
+
+Peso per zoom: gli zoom 0–9 valgono circa 3,8 MB **fissi** (10 tile che coprono zone enormi, da scaricare una volta sola); gli zoom 10–14 valgono 21,6 MB, di cui 14,9 MB il solo zoom 14 (644 tile, 23 KB in media). In città si arriva quindi a circa 11,5 KB per km²; la media su tutta la Toscana (strada C) è di circa 4,7 KB per km².
+
+Conseguenza dei limiti (3.000 tile **o** 50 MB): un download copre circa **4.000 km² in zona urbana e fino a circa 7.000 km² in zona poco abitata** (qui il limite diventa quello delle 3.000 tile). È una provincia, non una regione: per il rettangolo della Toscana (23.161 tile) servirebbero circa 8 download, per quello dell'Italia (511.862 tile) più di 170.
+
+*Strada B — richieste parziali HTTP sul planet PMTiles (87 GB), solo misura (16 richieste):* funzionano. Apertura dell'archivio in 0,35 s con 1 richiesta; ogni tile richiede 1–2 richieste e 0,3–1,2 s (mediana per richiesta 0,33 s). Tile per tile è molto più lenta della strada A. Lo strumento `pmtiles extract` però raggruppa le richieste: per tutta la Toscana gliene bastano 98 (vedi strada C).
+
+*Strada C — estratti regionali preparati in una GitHub Action con `pmtiles extract` e pubblicati su GitHub Releases, solo misura (`--dry-run`, nessun dato scaricato):*
+
+| Rettangolo | Tile | Dimensione dell'estratto | Richieste al planet |
+|---|---|---|---|
+| Firenze e dintorni (come sopra) | 891 | 26 MB | 42 |
+| Toscana (9,69–12,37 E; 42,24–44,47 N, mare compreso) | 23.161 | 253 MB | 98 |
+| Italia intera | 511.862 | 3,0 GB | 168 |
+
+Un estratto regionale sta largamente sotto i 2 GiB per file di GitHub Releases; l'Italia intera no, quindi i pacchetti vanno fatti **per regione**. I rettangoli includono mare e territori vicini: con i confini veri (opzione `--region` con un file GeoJSON) i pacchetti sarebbero più piccoli.
+
+Limiti e punti aperti:
+- **PMTiles nell'app oggi non si installa.** `vector_map_tiles_pmtiles` 1.5.2 richiede `pmtiles` ^1.3.0, che richiede `latlong2` ^0.9, mentre `vector_map_tiles` 9.0.0-beta.13 richiede `latlong2` ^0.10.1; `pmtiles` 2.2.0 richiede `protobuf` ^6, incompatibile con `vector_tile_renderer` 6.1.0. `mbtiles` 0.5.1 e `vector_map_tiles_mbtiles` 1.2.2 invece si installano e funzionano. Il PRD e CLAUDE.md §3 indicano PMTiles: **cambiare formato è una decisione dell'utente**.
+- **Condizioni d'uso.** La strada A è esplicitamente ammessa. Le strade B e C non sono né ammesse né vietate dal testo (5.6): prima di automatizzarle conviene chiedere a OpenFreeMap. Lo strumento `pmtiles` non permette di impostare lo User-Agent del progetto.
+- **Fuori dalla zona scaricata** la mappa resta vuota (nessun errore, nessuna richiesta di rete).
+- Offline manca il rilievo ombreggiato dello stile (livello raster online, visibile solo sotto lo zoom 7).
+- Strada C: GitHub non mette limiti di banda alle release, ma può intervenire su usi "significativamente eccessivi" (5.6); i pacchetti vanno rigenerati quando cambia il planet (settimanale) e aggiunti a `LICENSE-DATA.md` (ODbL + attribuzione OpenMapTiles).
+
+Proposte, da decidere:
+1. **Formato locale:** MBTiles (funziona oggi, ma cambia lo stack scritto nel PRD) oppure PMTiles (richiede un lettore scritto da noi o l'attesa di un aggiornamento dei pacchetti).
+2. **Come si ottengono le tile:** strada A per le zone piccole (ammessa, subito disponibile), più eventualmente strada C per regioni intere, dopo aver chiesto a OpenFreeMap.
 
 ---
 

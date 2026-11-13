@@ -1,0 +1,11 @@
+name: pmtiles_probe
+description: "M1 prototype 2, road B: a few range requests on the OpenFreeMap planet PMTiles. Not production code."
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  http: ^1.6.0
+  pmtiles: 2.2.0
