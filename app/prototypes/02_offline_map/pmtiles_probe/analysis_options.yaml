@@ -1,0 +1,4 @@
+# Plain Dart command-line tool: no Flutter lints here.
+linter:
+  rules:
+    avoid_print: true

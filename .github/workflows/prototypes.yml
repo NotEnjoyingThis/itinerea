@@ -61,3 +61,73 @@ jobs:
           name: vector-map-linux
           path: ${{ runner.temp }}/out
           retention-days: 14
+
+  offline-map-linux:
+    name: 02 offline map (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app/prototypes/02_offline_map
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Linux build dependencies and a virtual display
+        working-directory: .
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev liblzma-dev xvfb
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter build linux --release
+      # Road A: one download inside the OpenFreeMap limits (under 3,000 tiles
+      # and 50 MB, 4 parallel requests), then the map with the network blocked.
+      - name: Download a small region, then draw it offline
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          for phase in download offline; do
+            PROTO_PHASE=$phase PROTO_OUT="$RUNNER_TEMP/out" \
+              timeout 300 xvfb-run -a -s "-screen 0 1280x800x24" \
+              build/linux/x64/release/bundle/offline_map
+          done
+          cat "$RUNNER_TEMP"/out/report_*.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: offline-map-linux
+          path: ${{ runner.temp }}/out
+          retention-days: 14
+
+  # Road C, measurement only: how big would a regional extract of the
+  # OpenFreeMap planet PMTiles be? --dry-run reads the directories of the
+  # archive and downloads no tile data.
+  region-extract-size:
+    name: 02 regional extract size (dry run)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PLANET_URL: https://btrfs.openfreemap.com/areas/planet/20261101_080013_pt/tiles.pmtiles
+      PMTILES_VERSION: v1.31.2
+    steps:
+      - name: Build the pmtiles command-line tool from source
+        run: go install "github.com/protomaps/go-pmtiles@${PMTILES_VERSION}"
+      - name: Size of regional extracts
+        run: |
+          pmtiles="$(go env GOPATH)/bin/go-pmtiles"
+          "$pmtiles" extract --help || true
+          # name west,south,east,north
+          while read -r name bbox; do
+            echo "=== $name ($bbox)"
+            "$pmtiles" extract "$PLANET_URL" "$RUNNER_TEMP/$name.pmtiles" \
+              --bbox="$bbox" --dry-run
+          done <<'REGIONS'
+          firenze 10.95,43.60,11.55,43.95
+          toscana 9.69,42.24,12.37,44.47
+          italia 6.63,35.49,18.52,47.09
+          REGIONS
