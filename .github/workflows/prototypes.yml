@@ -1,0 +1,63 @@
+name: Prototypes
+
+# M1 risk prototypes (PRD 15.2). They are not part of the app: this workflow
+# only proves that a prototype builds and runs on Linux, and keeps screenshots.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - app/prototypes/**
+      - .github/workflows/prototypes.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prototypes-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: 3.50.0
+
+jobs:
+  vector-map-linux:
+    name: 01 vector map (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app/prototypes/01_vector_map
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Linux build dependencies and a virtual display
+        working-directory: .
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev liblzma-dev xvfb
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter build linux --release
+      # One unattended run per rendering mode: about a minute each, a few
+      # hundred tile requests in total, with the project User-Agent.
+      - name: Run under a virtual display
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          for mode in raster vector; do
+            PROTO_AUTORUN=1 PROTO_MODE=$mode PROTO_OUT="$RUNNER_TEMP/out" \
+              timeout 240 xvfb-run -a -s "-screen 0 1280x800x24" \
+              build/linux/x64/release/bundle/vector_map
+          done
+          cat "$RUNNER_TEMP"/out/report_*.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: vector-map-linux
+          path: ${{ runner.temp }}/out
+          retention-days: 14

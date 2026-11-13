@@ -231,7 +231,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 | Interfaccia | Pacchetto **material_ui** (team Flutter, BSD-3) | Da Flutter 3.50 Material non fa più parte dell'SDK. I delegati di localizzazione sono quelli di `material_ui` (`GlobalMaterialLocalizations.delegates`), non quelli di `flutter_localizations` (decisione M0) |
 | Gestione dello stato | Riverpod | Senza generatore di codice: provider scritti a mano (decisione M0) |
 | Database locale | SQLite tramite **drift** | Query tipizzate, migrazioni, funziona su tutte le piattaforme |
-| Mappa | **flutter_map** + **vector_map_tiles** (BSD-3) | Tile vettoriali su Android, iOS, Linux, macOS e Windows, con stili in formato JSON (lo stile deve corrispondere allo schema delle tile, 4.6). L'ultima versione stabile è dell'agosto 2024 e lo sviluppo prosegue con versioni beta: da valutare in M1 (R14). Il pacchetto `maplibre` per Flutter oggi **non supporta Linux**, quindi è escluso. |
+| Mappa | **flutter_map** + **vector_map_tiles** (BSD-3) | Tile vettoriali su Android, iOS, Linux, macOS e Windows, con stili in formato JSON (lo stile deve corrispondere allo schema delle tile, 4.6). **Esito M1 (13/11/2026): funziona con limiti** (R14). Versioni provate: `flutter_map` 8.3.2 e `vector_map_tiles` **9.0.0-beta.13** (la stabile 8.0.0 è di due anni fa e richiede `flutter_map` 7; la 10 beta richiede il canale *main* di Flutter ed è esclusa). Si usa **solo la modalità `raster`** del livello (tile vettoriali disegnate in immagini sul dispositivo): la modalità `vector` è troppo lenta. Ogni stile deve ricevere un identificativo proprio, perché gli stili OpenFreeMap non hanno il campo `id`. La versione va fissata esatta nel `pubspec`. Il pacchetto `maplibre` per Flutter resta il piano B (oggi elenca anche Windows e Linux, non provato). |
 | Mappe offline | **pmtiles** (BSD-2, lettura di archivi PMTiles locali o remoti) + **vector_map_tiles_pmtiles** (MIT) | Vedi 4.6 e sezione 9 |
 | Navigazione | Link diretti alle app esterne (Google Maps, Waze, Apple Maps, Sygic, OsmAnd, Organic Maps…) con le tappe intermedie | Il navigatore interno è un non-obiettivo (1.5) |
 | Lingue | Sistema di localizzazione ufficiale Flutter (file ARB) | Italiano e inglese al lancio |
@@ -408,7 +408,7 @@ CLAUDE.md           regole per Claude Code
 
 | Bisogno | Fonte principale | Licenza e costo | Limiti e obblighi | Piano B |
 |---|---|---|---|---|
-| **Mappa base online** | OpenFreeMap (dati OpenStreetMap) | Gratis, nessuna chiave | Servizio a donazioni, senza garanzie. Attribuzione obbligatoria. | Server di tile dell'utente |
+| **Mappa base online** | OpenFreeMap (dati OpenStreetMap) | Gratis, nessuna chiave | Servizio a donazioni, senza garanzie, senza limiti dichiarati sul numero di richieste. Attribuzione obbligatoria, da mostrare sulla mappa (testo esatto in 5.6). | Server di tile dell'utente |
 | **Mappe offline** | Planet **PMTiles** settimanale di **OpenFreeMap** (schema OpenMapTiles, uguale alla mappa online) | ODbL (dati OSM) | Il formato PMTiles permette di leggere solo le parti necessarie di un archivio remoto; il pacchetto Dart `pmtiles` lo supporta in lettura. Salvare le tile scaricate in un archivio locale (PMTiles o MBTiles) va implementato. **Da prototipare** e da verificare con OpenFreeMap che lo scaricamento parziale del planet da parte di un'app sia gradito. **Non mischiare schemi:** le tile Protomaps hanno uno schema diverso e richiederebbero un altro stile. | Importare un file PMTiles/MBTiles preparato dall'utente; cache delle tile già viste |
 | **Percorsi** (auto, moto, bici, a piedi) | **Valhalla pubblico di FOSSGIS** (lo stesso usato da openstreetmap.org) | Gratis, fair use | Opzioni utili: evitare autostrade, pedaggi, traghetti, sterrato; profilo moto. Uso moderato, User-Agent identificativo. **Condizioni d'uso da rileggere prima del rilascio** (pagina FOSSGIS non accessibile durante la verifica). | OSRM pubblico di FOSSGIS (senza preferenze avanzate) oppure server GraphHopper/Valhalla dell'utente |
 | **Curve e panoramico** (mare, lago, montagna) | **Valutazione sul dispositivo**: l'app chiede a Valhalla più percorsi alternativi (parametro `alternates`, anche con punti di passaggio diversi) e li ordina per tortuosità (dalla geometria), vicinanza a coste o laghi (dati OSM via Overpass lungo il corridoio) e quota | — | **Risultato "il meglio possibile"**, non un giudizio umano sulla bellezza | Profilo personalizzato su un GraphHopper dell'utente |
@@ -463,6 +463,21 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 - Tankerkönig / MTS-K (CC BY 4.0)
 - Open Charge Map e i singoli fornitori dei dati
 - Frankfurter / BCE, MIMIT, Agenzia Europea dell'Ambiente, Wikidata, Wikivoyage, Transitous e i fornitori dei loro dati
+
+### 5.6 Condizioni d'uso lette
+
+Per ogni servizio: pagina, frase esatta (in lingua originale) e data in cui è stata letta. Vanno rilette prima di ogni rilascio.
+
+| Servizio | Pagina | Frase esatta | Letta il |
+|---|---|---|---|
+| OpenFreeMap — uso del servizio pubblico | https://openfreemap.org/ | "Using our public instance is completely free: there are no limits on the number of map views or requests. There's no registration, no user database, no API keys, and no cookies." | 13/11/2026 |
+| OpenFreeMap — uso commerciale | https://openfreemap.org/ | "Is commercial usage allowed? Yes." | 13/11/2026 |
+| OpenFreeMap — attribuzione | https://openfreemap.org/ | "Attribution is required. If you are using MapLibre, they are automatically added, you have nothing to do. If you are using alternative clients, or if you are using this in printed media or video, you must add the following attribution: OpenFreeMap © OpenMapTiles Data from OpenStreetMap" | 13/11/2026 |
+| OpenFreeMap — schema delle tile | https://openfreemap.org/ | "The map schema is unmodified OpenMapTiles." | 13/11/2026 |
+| OpenFreeMap — download offline (home) | https://openfreemap.org/ | "Can my app download areas for offline use? Yes, as long as each download is at most 3,000 tiles or 50 MB, uses at most 4 parallel requests, and sends a unique User-Agent identifying your app. For anything larger, please contact us." | 13/11/2026 |
+| OpenFreeMap — download offline e raccolta automatica (condizioni del 14/10/2026) | https://openfreemap.org/tos/ | "You will not: […] Collect data from the service in automated ways, except for offline downloads as described below" · "Your app may let users download areas for offline use if each download is: at most 3,000 tiles or 50 MB; made with at most 4 parallel requests; sent with a unique User-Agent identifying your app. For anything larger, please contact us" | 13/11/2026 |
+
+Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall'app sulla mappa e nella schermata "Fonti dei dati" (5.5).
 
 ---
 
@@ -1560,8 +1575,8 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 
 | Milestone | Contenuto | Risultato |
 |---|---|---|
-| **M0 — Fondamenta** | Repository, licenza, CLAUDE.md, struttura cartelle (4.8), progetto Flutter che parte su 4 piattaforme, CI con test e build, localizzazione it/en, tema chiaro e scuro | Schermata vuota con tema e lingua su tutte le piattaforme |
-| **M1 — Prototipi di rischio** | Prove isolate dei punti incerti (16.1): mappa vettoriale OpenFreeMap con `vector_map_tiles` su Linux e Windows; download regionale dal PMTiles di OpenFreeMap e lettura offline; percorsi Valhalla con opzioni e alternative; altitudine; sync in modalità file su Google Drive tra 2 dispositivi (con registrazione del client OAuth); notifiche programmate su desktop | Per ogni prova: funziona / funziona con limiti / non funziona, e PRD aggiornato |
+| **M0 — Fondamenta** | Repository, licenza, CLAUDE.md, struttura cartelle (4.8), progetto Flutter che parte su 4 piattaforme, CI con test e build, localizzazione it/en, tema chiaro e scuro | Schermata vuota con tema e lingua su tutte le piattaforme. **Completata il 13/11/2026** (PR n. 1): verificata in locale su Android e Windows e in CI su Android, Linux, Windows, macOS e iOS senza firma |
+| **M1 — Prototipi di rischio** | Prove isolate dei punti incerti (16.1): mappa vettoriale OpenFreeMap con `vector_map_tiles` su Linux e Windows; download regionale dal PMTiles di OpenFreeMap e lettura offline; percorsi Valhalla con opzioni e alternative; altitudine; sync in modalità file su Google Drive tra 2 dispositivi (con registrazione del client OAuth); notifiche programmate su desktop | Per ogni prova: funziona / funziona con limiti / non funziona, e PRD aggiornato. **In corso**: esiti in 16.3 |
 | **M2 — Nucleo dei dati** | Modello dati (8), database drift, log delle operazioni e regole CRDT con test | Test che simulano modifiche concorrenti e offline |
 | **M3 — Viaggio, giorni e tappe** | F1.1, F1.2, F1.3, F1.6 (tappe), schermate S01–S04 | Si pianifica un viaggio senza mappa |
 | **M4 — Mappa e percorsi** | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12, S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
@@ -1609,7 +1624,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R11 | Progetto molto grande per una persona sola | Alto | Ordine rigoroso delle fasi, MVP piccolo, CLAUDE.md che vieta di anticipare le fasi |
 | R12 | Google Play: trovare 12 tester per 14 giorni | Basso | Cercarli durante la beta (M6) |
 | R13 | Nome "Itinerea" troppo simile a marchi esistenti, in particolare "Itinera" (app di viaggio, marchio registrato negli USA per servizi di viaggio) | Medio | Controllo su TMview (UE e Italia) prima della 1.0; l'app è distribuita in Europa e non negli store Apple |
-| R14 | `vector_map_tiles`: ultima versione stabile dell'agosto 2024, sviluppo attuale solo in beta | Medio (mappa) | Valutare in M1 la beta più recente; piano B: tile raster per la mappa online e un renderer alternativo |
+| R14 | `vector_map_tiles`: ultima versione stabile dell'agosto 2024, sviluppo attuale solo in beta | Medio (mappa) | **Provato in M1: funziona con limiti** (16.3). Si usa la 9.0.0-beta.13 in modalità `raster`, con versione fissata. Resta il rischio di dipendere da una beta mantenuta da una sola persona; piano B: pacchetto `maplibre` o tile raster per la mappa online |
 | R15 | Schemi di tile diversi tra mappa online e offline | Medio | Usare OpenFreeMap sia online sia offline (stesso schema OpenMapTiles e stesso stile) |
 | R16 | Identificativo dell'app Android (`applicationId`) non modificabile dopo la pubblicazione su Google Play e F-Droid | Medio | Deciso: `io.github.notenjoyingthis.itinerea` (12/11/2026). Non va più cambiato. |
 
@@ -1623,6 +1638,37 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | D4 | Valori di punti, prezzi dello shop e soglie dei badge (11.3–11.5) | Fase 4 |
 | D5 | Ordine delle lingue dopo italiano e inglese (14.1) | Fase 4 |
 | D6 | ~~Nome definitivo e identificativo dell'app~~ — **Deciso:** Itinerea, `io.github.notenjoyingthis.itinerea` (12/11/2026) | — |
+
+### 16.3 Esiti dei prototipi di M1
+
+I prototipi stanno in `app/prototypes/` e non fanno parte dell'app. Le misure sono state prese con esecuzioni automatiche (10 secondi di spostamento e 8 di zoom su Firenze) in build release o profile.
+
+**Prova 1 — Mappa vettoriale OpenFreeMap (R14) — 13/11/2026 — funziona con limiti**
+
+Pacchetti: `flutter_map` 8.3.2, `vector_map_tiles` 9.0.0-beta.13, `vector_tile_renderer` 6.1.0. Stili `liberty` (chiaro) e `dark` di OpenFreeMap.
+
+| Misura | Windows (PC di sviluppo) | Android (emulatore x86_64) | Linux (runner CI, senza scheda grafica) |
+|---|---|---|---|
+| Compila e parte | sì | sì | sì |
+| Stile corretto (strade, etichette, icone, chiaro e scuro) | sì | sì | sì |
+| Tracciato e segnaposto sopra la mappa | sì | sì | sì |
+| Caricamento dello stile | 0,35–0,5 s | 0,5–0,7 s | 0,2–0,6 s |
+| Modalità `raster`: spostamento | 53–55 fps | 38 fps | 23 fps |
+| Modalità `raster`: zoom continuo | 58–61 fps | 39 fps | 32 fps |
+| Modalità `vector`: spostamento | **2 fps** | non misurata | **1 fps** |
+| Modalità `vector`: zoom continuo | 19–20 fps | non misurata | 18 fps |
+| Memoria del processo, `raster` (inizio → fine) | 165 → 220 MB | 277 → 283 MB | 627 → 1.018 MB |
+| Memoria del processo, `vector` (inizio → fine) | 457 → 535 MB | non misurata | 907 → 1.901 MB |
+
+Limiti trovati:
+- **La modalità `vector` non è utilizzabile** (1–2 fps in spostamento). Si usa la modalità `raster`: i dati restano vettoriali, il disegno avviene in immagini per tile.
+- In modalità `raster`, dopo uno spostamento o al primo avvio le tile compaiono prima sfocate (ingrandite dallo zoom precedente) e poi nitide; sull'emulatore Android sono servite parecchi secondi.
+- Gli stili di OpenFreeMap non hanno il campo `id`: il pacchetto li chiama tutti `default` e ne mescola le cache. Ogni stile deve ricevere un identificativo proprio, assegnato **insieme** ai suoi livelli.
+- Durante lo spostamento il pacchetto annulla i caricamenti superati con eccezioni non gestite ("Cancelled") nel log: da intercettare nell'app.
+- I numeri di Linux vengono da un runner senza scheda grafica (disegno via software) e quelli di Android da un emulatore: **mancano misure su un telefono reale e su un PC Linux reale**. Il consumo di memoria su Linux va ricontrollato lì.
+- Dipendenza da una versione beta: va fissata la versione esatta e riprovata a ogni aggiornamento.
+
+Proposta: tenere `flutter_map` + `vector_map_tiles` 9 beta in modalità `raster` per M4; riprovare su un telefono Android reale all'inizio di M4, con il requisito T2 in mente; tenere `maplibre` come piano B.
 
 ---
 
