@@ -22,6 +22,8 @@ env:
 jobs:
   vector-map-linux:
     name: 01 vector map (Linux)
+    # Verified on 2026-11-13: manual runs only, to avoid needless tile requests.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
@@ -64,6 +66,8 @@ jobs:
 
   offline-map-linux:
     name: 02 offline map (Linux)
+    # Verified on 2026-11-13: manual runs only, to avoid needless tile requests.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
@@ -109,6 +113,8 @@ jobs:
   # archive and downloads no tile data.
   region-extract-size:
     name: 02 regional extract size (dry run)
+    # Measured on 2026-11-13: manual runs only.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
