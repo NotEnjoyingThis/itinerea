@@ -1,0 +1,10 @@
+name: routing_probe
+description: "M1 prototype 3: Valhalla routing (FOSSGIS public instance) and elevation. Not production code."
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  http: ^1.6.0
