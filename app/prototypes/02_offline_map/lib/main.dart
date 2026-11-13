@@ -7,6 +7,7 @@
 //   PROTO_PHASE=download   download the region, write report_download.json, exit
 //   PROTO_PHASE=offline    block every network connection, draw the map from
 //                          the local files, write report_offline.json, exit
+//   PROTO_PHASE=both       download, then offline, in one run
 //   PROTO_OUT=<dir>        where reports and screenshots are written
 
 import 'dart:async';
@@ -94,8 +95,14 @@ class _OfflinePageState extends State<OfflinePage> {
     if (phase == 'download') {
       final report = await _download();
       await _finish('report_download.json', report);
-    } else if (phase == 'offline') {
+    } else if (phase == 'offline' || phase == 'both') {
       final report = <String, Object?>{};
+      if (phase == 'both') {
+        // One run for both steps (handy on Android): download, then refuse
+        // the network from here on.
+        report['download'] = await _download();
+        HttpOverrides.global = NoNetwork();
+      }
       try {
         await _openLocal();
         await Future<void>.delayed(const Duration(seconds: 12));
