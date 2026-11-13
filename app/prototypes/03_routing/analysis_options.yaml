@@ -1,0 +1,4 @@
+# Plain Dart command-line tool.
+linter:
+  rules:
+    avoid_print: true
