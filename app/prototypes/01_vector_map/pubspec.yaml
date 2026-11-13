@@ -1,0 +1,24 @@
+name: vector_map
+description: "M1 prototype 1: OpenFreeMap vector map with flutter_map and vector_map_tiles. Not production code."
+publish_to: 'none'
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Exact versions on purpose: the prototype measures these releases.
+  flutter_map: 8.3.2
+  http: ^1.6.0
+  latlong2: ^0.10.1
+  material_ui: ^1.1.0
+  vector_map_tiles: 9.0.0-beta.13
+  vector_tile_renderer: 6.1.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
