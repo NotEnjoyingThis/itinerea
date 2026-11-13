@@ -27,6 +27,10 @@ Ogni decisione presa durante lo sviluppo si scrive qui e nella sezione pertinent
 | 12/11/2026 | **M0 — Fine riga LF** per tutti i file di testo; unica eccezione gli script `.bat`/`.cmd` (CRLF). | Stesso contenuto su Windows, macOS e Linux; gli script batch richiedono CRLF. | — |
 | 12/11/2026 | **M0 — Codice di condotta:** Contributor Covenant 2.1. Vulnerabilità: solo segnalazione privata di GitHub (`SECURITY.md`). | Testo diffuso e riconosciuto; le vulnerabilità non devono comparire in issue pubbliche. | PRD 12.2 |
 | 12/11/2026 | **M0 — La CI gira sulle pull request e sui push a `main`**, non su ogni push. Un branch senza pull request aperta non viene verificato. | Con entrambi i trigger ogni pull request girava due volte e i job macOS/iOS venivano annullati da GitHub per mancanza di runner macOS liberi. | — |
+| 13/11/2026 | **M0 completata** (PR n. 1). Le pull request si uniscono con **"Squash and merge"**, unico metodo attivo nel repository: il titolo della PR diventa il messaggio del commit su `main`, quindi deve essere in stile Conventional Commits; le righe `Signed-off-by` dei commit restano nel corpo del messaggio. | Storia di `main` lineare, un commit per PR. | PRD 15.2 |
+| 13/11/2026 | **M1 — I prototipi stanno in `app/prototypes/`**, un progetto per prova, esclusi dall'analisi e dal controllo del formato dell'app; le loro dipendenze non entrano in `app/pubspec.yaml`. Un workflow separato (`prototypes.yml`) li compila e li avvia su Linux sotto un display virtuale e salva screenshot e misure. | I prototipi non sono codice di produzione; Linux si può verificare solo in CI. | PRD 4.8, 15.2 |
+| 13/11/2026 | **M1 prova 1 — Mappa: `flutter_map` 8.3.2 + `vector_map_tiles` 9.0.0-beta.13 in modalità `raster`**, con versione fissata esatta. Esclusa la 10 beta (richiede il canale *main* di Flutter). Ogni stile riceve un identificativo proprio. | Misurato: `raster` 53–61 fps su Windows, 38 fps su emulatore Android, 23–32 fps su runner Linux senza scheda grafica; `vector` 1–2 fps in spostamento. Stile OpenFreeMap corretto su tutte e tre. | PRD 4.2, 16.3, R14 |
+| 13/11/2026 | **Condizioni d'uso dei servizi esterni nel PRD 5.6**: per ognuna link, frase esatta e data di lettura. | Poter ricontrollare cosa era permesso quando è stata presa una decisione. | PRD 5.6 |
 
 ## Punti aperti
 
@@ -34,4 +38,5 @@ Ogni decisione presa durante lo sviluppo si scrive qui e nella sezione pertinent
 |---|---|---|
 | 12/11/2026 | **Contatto privato per il codice di condotta.** Oggi `CODE_OF_CONDUCT.md` rimanda agli strumenti di segnalazione di GitHub e dichiara che un contatto privato verrà aggiunto più avanti. Va scelto un indirizzo pubblico del progetto (non personale). | Prima della 1.0 (M7) |
 | 12/11/2026 | **Etichette delle issue** usate dai modelli (`data`, `tolls`, `booking-import`, `translation`): vanno create nel repository, altrimenti GitHub le ignora. | Quando si aprono le prime issue |
+| 13/11/2026 | **Mappa su dispositivi reali:** la prova 1 non ha misure su un telefono Android reale né su un PC Linux con scheda grafica (solo emulatore e runner CI). | Inizio di M4 |
 | 12/11/2026 | **Licenza delle tabelle pedaggi** mantenute dalla community (`LICENSE-DATA.md`). | Fase 3 (F3.3) |
