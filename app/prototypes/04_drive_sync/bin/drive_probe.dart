@@ -92,7 +92,9 @@ Future<void> authorize(
       'prompt': picker ? 'consent' : 'consent select_account',
       if (picker) 'trigger_onepick': 'true',
       if (picker) 'allow_folder_selection': 'true',
-      if (picker && fileId != null) 'file_ids': fileId,
+      if (picker) 'allow_multiple': 'true',
+      // `pick <account> none` opens the Picker at the root of Drive.
+      if (picker && fileId != null && fileId != 'none') 'file_ids': fileId,
     },
   );
   stdout.writeln('Open this address in the browser (account $account):\n$url');
@@ -489,6 +491,52 @@ Future<void> main(List<String> args) async {
         await Future<void>.delayed(const Duration(seconds: 2));
       }
       out({'file': name, 'visible': false, 'polls': 30});
+    case 'peek':
+      // Reads one file or folder by id: what does this account's app see?
+      final meta = await drive(
+        account,
+        'GET',
+        '$api/files/${args[2]}'
+            '?fields=name,mimeType,ownedByMe,modifiedTime,capabilities/canEdit',
+      );
+      final metaBody = meta.body;
+      final isFolder = metaBody is Map && metaBody['mimeType'] == folderMime;
+      final content = meta.status == 200 && !isFolder
+          ? await drive(account, 'GET', '$api/files/${args[2]}?alt=media')
+          : null;
+      out({
+        'status': meta.status,
+        'why': reason(meta.body),
+        'ms': meta.ms,
+        'file': meta.status == 200 ? metaBody : null,
+        'contentStatus': content?.status,
+        'contentLength': content == null ? null : '${content.body}'.length,
+      });
+    case 'append':
+      // Rewrites an existing file with one more line (Drive has no append).
+      final id = args[2];
+      final current = await drive(account, 'GET', '$api/files/$id?alt=media');
+      if (current.status != 200) {
+        out({'readStatus': current.status, 'why': reason(current.body)});
+        return;
+      }
+      final old = current.body is String
+          ? current.body! as String
+          : jsonEncode(current.body);
+      final seq = DateTime.now().millisecondsSinceEpoch % 1000000;
+      final result = await drive(
+        account,
+        'PATCH',
+        '$upload/files/$id?uploadType=media&fields=id,modifiedTime',
+        bytes: utf8.encode('$old\n${fakeOperation(device, seq)}'),
+        contentType: 'application/x-ndjson',
+      );
+      out({
+        'status': result.status,
+        'why': reason(result.body),
+        'ms': result.ms,
+        'lengthBefore': old.length,
+      });
     case 'changes':
       final key = 'pageToken$account';
       if (state[key] == null) {
