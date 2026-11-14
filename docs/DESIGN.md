@@ -1,6 +1,6 @@
 # Itinerea — Stile e design
 
-> **Stato:** **proposta del 14/11/2026, in attesa di approvazione** (domanda aperta **D2** del PRD, entro M3). Finché non è approvata, l'app usa il tema provvisorio di M0 (`app/lib/core/theme/app_theme.dart`) e nulla di questo documento è applicato.
+> **Stato:** **approvato dall'utente il 14/11/2026** (domanda **D2** del PRD), dopo una revisione che ha reso evidenti le tratte e la modifica del percorso. L'app usa ancora il tema provvisorio di M0 (`app/lib/core/theme/app_theme.dart`): lo stile si applica a partire da M3, quando esistono le schermate vere.
 > **Riferimento:** Wanderlog (lista + mappa affiancate), da rendere più snello, moderno e veloce (PRD 7.1).
 > **Vincoli:** tema chiaro e scuro (T5), accessibilità (T7), layout adattivo (T8), niente login, numero di tocchi dei flussi FL1–FL9 (PRD 7.5).
 
@@ -82,7 +82,7 @@ Due famiglie con licenza libera (SIL Open Font License 1.1), **incluse nell'app 
 
 Le dimensioni seguono l'impostazione di sistema fino al 200%: le righe crescono in altezza, il testo va a capo, niente viene tagliato. Niente maiuscolo per le etichette: le parole intere si leggono meglio e si traducono meglio.
 
-**Da decidere con l'approvazione:** due famiglie pesano più di una (ordine di grandezza: qualche centinaio di KB ciascuna). L'alternativa è usare solo Inter anche per i titoli.
+**Deciso con l'approvazione (14/11/2026):** si usano entrambe le famiglie. Due famiglie pesano più di una (ordine di grandezza: qualche centinaio di KB ciascuna): il peso reale si misura quando i file entrano nell'app, includendo solo i pesi usati.
 
 ## 4. Spaziature e forme
 
