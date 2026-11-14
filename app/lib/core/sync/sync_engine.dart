@@ -17,7 +17,7 @@ enum OperationType {
 /// One change, as written on one line of an operations file (PRD 8.6).
 ///
 /// Attachments never travel inside operations: only their SHA-256 does.
-// TODO(M2): the CRDT merge rules (PRD 4.3).
+// The merge rules are in merge.dart.
 class SyncOperation {
   /// Creates an operation.
   const SyncOperation({
@@ -131,7 +131,7 @@ enum SyncState {
 
 /// Sends local operations to a sync space and applies the ones of the other
 /// devices (PRD 9.3, 9.4).
-// TODO(M2): operation log and merge, tested with several simulated devices.
+// The operation log and the merge exist since M2 (EntityStore, Merge).
 // TODO(M6 F1.13): the sync cycle in file mode.
 // TODO(Fase 2 F2.1): server mode over WebSocket.
 abstract interface class SyncEngine {

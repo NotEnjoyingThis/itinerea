@@ -4,8 +4,10 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 
+import '../models/entity_kinds.dart';
 import '../models/ids.dart';
 import '../sync/hlc.dart';
+import '../sync/merge.dart';
 import '../sync/sync_engine.dart';
 import 'data_database.dart';
 
@@ -43,12 +45,54 @@ class StoredEntity {
   bool get isDeleted => deletedHlc != null;
 }
 
-/// Writes the changes made on this device (PRD 9.3, step 1).
+/// What happened to an operation received from another device.
+class ReceiveOutcome {
+  /// Creates an outcome.
+  const ReceiveOutcome({
+    required this.alreadyKnown,
+    required this.changedFields,
+    required this.clockSkewed,
+  });
+
+  /// True if the operation had already been received: nothing was done.
+  final bool alreadyKnown;
+
+  /// Fields of the entity the operation changed on this device. Empty when
+  /// a later change was already here, or when the operation is a deletion.
+  final Set<String> changedFields;
+
+  /// True if the clock of the operation is more than 24 hours away from the
+  /// clock of this device: one of the two is wrong, and the app warns the
+  /// user (PRD 9.5). The operation is applied all the same.
+  final bool clockSkewed;
+}
+
+/// One version of the text of a note, as found in the log of operations.
+class NoteTextVersion {
+  /// Creates a version.
+  const NoteTextVersion({
+    required this.text,
+    required this.hlc,
+    required this.deviceId,
+  });
+
+  /// Text of the note in this version.
+  final String text;
+
+  /// Clock value of the change.
+  final Hlc hlc;
+
+  /// Device that wrote this version.
+  final EntityId deviceId;
+}
+
+/// Writes the changes made on this device and applies those received from
+/// the others (PRD 9.3, steps 1 and 4).
 ///
-/// Every change goes, in one transaction, into three places: the entity,
-/// the clock of each changed field, and the log of operations waiting to be
-/// sent. Either all three are written or none is.
-// TODO(M2): applying the operations received from other devices.
+/// Every change, local or received, goes in one transaction into three
+/// places: the entity, the clock of each changed field, and the log of
+/// operations. Either all three are written or none is. Local and received
+/// changes go through the same merge rules ([Merge]).
 class EntityStore {
   EntityStore._(this._db, this._clock);
 
@@ -95,29 +139,21 @@ class EntityStore {
 
   /// Creates an entity of kind [entity] with the given [fields].
   ///
-  /// A trip is its own [tripId]; personal data has none.
+  /// A trip is its own [tripId]; personal data has none. The parent of the
+  /// entity, when its kind has one, is read from the fields
+  /// ([EntityKinds.parentField]).
+  ///
+  /// Throws a [StateError] if an entity with this identifier exists.
   Future<void> create({
     required String entity,
     required EntityId id,
     required Map<String, Object?> fields,
     EntityId? tripId,
-    EntityId? parentId,
   }) => _db.transaction(() async {
-    final hlc = await _nextHlc();
-    await _db
-        .into(_db.entityRows)
-        .insert(
-          EntityRowsCompanion.insert(
-            id: id.value,
-            entity: entity,
-            tripId: Value(tripId?.value),
-            parentId: Value(parentId?.value),
-            fields: jsonEncode(fields),
-          ),
-        );
-    await _stampFields(id, fields.keys, hlc);
-    await _log(
-      hlc: hlc,
+    if (await _row(id) != null) {
+      throw StateError('Entity ${id.value} already exists');
+    }
+    await _applyLocal(
       entity: entity,
       entityId: id,
       type: OperationType.create,
@@ -133,13 +169,7 @@ class EntityStore {
   Future<void> set(EntityId id, Map<String, Object?> changes) =>
       _db.transaction(() async {
         final row = await _existing(id);
-        final hlc = await _nextHlc();
-        final fields = _decode(row.fields)..addAll(changes);
-        await (_db.update(_db.entityRows)..where((t) => t.id.equals(id.value)))
-            .write(EntityRowsCompanion(fields: Value(jsonEncode(fields))));
-        await _stampFields(id, changes.keys, hlc);
-        await _log(
-          hlc: hlc,
+        await _applyLocal(
           entity: row.entity,
           entityId: id,
           type: OperationType.set,
@@ -154,11 +184,7 @@ class EntityStore {
   /// Throws a [StateError] if the entity does not exist or was deleted.
   Future<void> delete(EntityId id) => _db.transaction(() async {
     final row = await _existing(id);
-    final hlc = await _nextHlc();
-    await (_db.update(_db.entityRows)..where((t) => t.id.equals(id.value)))
-        .write(EntityRowsCompanion(deletedHlc: Value(hlc.text.value)));
-    await _log(
-      hlc: hlc,
+    await _applyLocal(
       entity: row.entity,
       entityId: id,
       type: OperationType.delete,
@@ -167,11 +193,41 @@ class EntityStore {
     );
   });
 
+  /// Applies an operation made on another device, read from [space] (the
+  /// identifier of a trip, or [personalSpace]).
+  ///
+  /// The order in which operations arrive does not matter, and receiving the
+  /// same operation twice changes nothing.
+  Future<ReceiveOutcome> receive(
+    SyncOperation operation, {
+    required String space,
+  }) => _db.transaction(() async {
+    final known = await (_db.select(
+      _db.operationRows,
+    )..where((t) => t.id.equals(operation.id.value))).getSingleOrNull();
+    if (known != null) {
+      return const ReceiveOutcome(
+        alreadyKnown: true,
+        changedFields: {},
+        clockSkewed: false,
+      );
+    }
+    final remote = HlcTimestamp.parse(operation.hlc);
+    final skewed = _clock.isSkewed(remote);
+    _clock.receive(remote);
+    await _saveClock();
+    final result = await _merge(operation, space);
+    await _log(operation, space: space, isLocal: false);
+    return ReceiveOutcome(
+      alreadyKnown: false,
+      changedFields: result.changedFields,
+      clockSkewed: skewed,
+    );
+  });
+
   /// Reads an entity, deleted or not; null if it never existed here.
   Future<StoredEntity?> read(EntityId id) async {
-    final row = await (_db.select(
-      _db.entityRows,
-    )..where((t) => t.id.equals(id.value))).getSingleOrNull();
+    final row = await _row(id);
     return row == null ? null : _toStored(row);
   }
 
@@ -205,19 +261,7 @@ class EntityStore {
       ..where((t) => t.isLocal.equals(true) & t.sentAtMillis.isNull())
       ..orderBy([(t) => OrderingTerm.asc(t.hlc)]);
     if (space != null) query.where((t) => t.space.equals(space));
-    return [
-      for (final row in await query.get())
-        SyncOperation(
-          id: EntityId(row.id),
-          deviceId: EntityId(row.deviceId),
-          hlc: Hlc(row.hlc),
-          schemaVersion: row.schemaVersion,
-          entity: row.entity,
-          entityId: EntityId(row.entityId),
-          type: OperationType.values.byName(row.type),
-          fields: _decode(row.fields),
-        ),
-    ];
+    return [for (final row in await query.get()) _toOperation(row)];
   }
 
   /// Records that the given operations reached the sync space at [at].
@@ -231,10 +275,105 @@ class EntityStore {
             ),
           );
 
+  /// Every text a note ever had, oldest first, read from the log of
+  /// operations (PRD 4.3): when two people change a note at the same time
+  /// the last change wins, and the other text is still here.
+  ///
+  /// The history is calculated, not stored, so it is the same on every
+  /// device that has received the same operations.
+  // TODO(Fase 2 F2.1): keep the history when old operations are replaced by
+  // a snapshot, with the configurable maximum of PRD 8.3.
+  Future<List<NoteTextVersion>> noteHistory(EntityId noteId) async {
+    final rows =
+        await (_db.select(_db.operationRows)
+              ..where((t) => t.entityId.equals(noteId.value))
+              ..orderBy([(t) => OrderingTerm.asc(t.hlc)]))
+            .get();
+    return [
+      for (final row in rows)
+        if (_decode(row.fields) case {'text': final String text})
+          NoteTextVersion(
+            text: text,
+            hlc: Hlc(row.hlc),
+            deviceId: EntityId(row.deviceId),
+          ),
+    ];
+  }
+
+  Future<void> _applyLocal({
+    required String entity,
+    required EntityId entityId,
+    required OperationType type,
+    required Map<String, Object?> fields,
+    required String space,
+  }) async {
+    final hlc = _clock.send();
+    await _saveClock();
+    final operation = SyncOperation(
+      id: EntityId.generate(),
+      deviceId: deviceId,
+      hlc: hlc.text,
+      schemaVersion: DataDatabase.currentSchemaVersion,
+      entity: entity,
+      entityId: entityId,
+      type: type,
+      fields: fields,
+    );
+    await _merge(operation, space);
+    await _log(operation, space: space, isLocal: true);
+  }
+
+  /// Merges [operation] into the stored entity and writes the result.
+  Future<MergeResult> _merge(SyncOperation operation, String space) async {
+    final id = operation.entityId;
+    final row = await _row(id);
+    final current = row == null
+        ? null
+        : EntityState(
+            entity: row.entity,
+            fields: _decode(row.fields),
+            clocks: await fieldClocks(id),
+            deletedHlc: row.deletedHlc == null ? null : Hlc(row.deletedHlc!),
+          );
+    final result = Merge.apply(current, operation);
+    final state = result.state;
+    await _db
+        .into(_db.entityRows)
+        .insertOnConflictUpdate(
+          EntityRowsCompanion.insert(
+            id: id.value,
+            entity: state.entity,
+            tripId: Value(
+              row != null
+                  ? row.tripId
+                  : (space == personalSpace ? null : space),
+            ),
+            parentId: Value(EntityKinds.parentOf(state.entity, state.fields)),
+            fields: jsonEncode(state.fields),
+            deletedHlc: Value(state.deletedHlc?.value),
+          ),
+        );
+    if (result.changedFields.isNotEmpty) {
+      await _db.batch((batch) {
+        batch.insertAllOnConflictUpdate(_db.fieldClockRows, [
+          for (final field in result.changedFields)
+            FieldClockRowsCompanion.insert(
+              entityId: id.value,
+              field: field,
+              hlc: operation.hlc.value,
+            ),
+        ]);
+      });
+    }
+    return result;
+  }
+
+  Future<EntityRow?> _row(EntityId id) => (_db.select(
+    _db.entityRows,
+  )..where((t) => t.id.equals(id.value))).getSingleOrNull();
+
   Future<EntityRow> _existing(EntityId id) async {
-    final row = await (_db.select(
-      _db.entityRows,
-    )..where((t) => t.id.equals(id.value))).getSingleOrNull();
+    final row = await _row(id);
     if (row == null) throw StateError('Entity ${id.value} does not exist');
     if (row.deletedHlc != null) {
       throw StateError('Entity ${id.value} was deleted');
@@ -242,56 +381,48 @@ class EntityStore {
     return row;
   }
 
-  /// Takes the next clock value and saves it, so that the clock never goes
-  /// back after a restart.
-  Future<HlcTimestamp> _nextHlc() async {
-    final hlc = _clock.send();
-    await _db
-        .into(_db.metaRows)
-        .insertOnConflictUpdate(
-          MetaRowsCompanion.insert(name: _lastHlcKey, value: hlc.text.value),
-        );
-    return hlc;
-  }
-
-  Future<void> _stampFields(
-    EntityId id,
-    Iterable<String> fields,
-    HlcTimestamp hlc,
-  ) => _db.batch((batch) {
-    batch.insertAllOnConflictUpdate(_db.fieldClockRows, [
-      for (final field in fields)
-        FieldClockRowsCompanion.insert(
-          entityId: id.value,
-          field: field,
-          hlc: hlc.text.value,
+  /// Saves the last clock value, so that the clock never goes back after a
+  /// restart.
+  Future<void> _saveClock() => _db
+      .into(_db.metaRows)
+      .insertOnConflictUpdate(
+        MetaRowsCompanion.insert(
+          name: _lastHlcKey,
+          value: _clock.last.text.value,
         ),
-    ]);
-  });
+      );
 
-  Future<void> _log({
-    required HlcTimestamp hlc,
-    required String entity,
-    required EntityId entityId,
-    required OperationType type,
-    required Map<String, Object?> fields,
+  Future<void> _log(
+    SyncOperation operation, {
     required String space,
+    required bool isLocal,
   }) => _db
       .into(_db.operationRows)
       .insert(
         OperationRowsCompanion.insert(
-          id: EntityId.generate().value,
-          deviceId: deviceId.value,
-          hlc: hlc.text.value,
-          schemaVersion: DataDatabase.currentSchemaVersion,
-          entity: entity,
-          entityId: entityId.value,
-          type: type.name,
-          fields: jsonEncode(fields),
+          id: operation.id.value,
+          deviceId: operation.deviceId.value,
+          hlc: operation.hlc.value,
+          schemaVersion: operation.schemaVersion,
+          entity: operation.entity,
+          entityId: operation.entityId.value,
+          type: operation.type.name,
+          fields: jsonEncode(operation.fields),
           space: space,
-          isLocal: true,
+          isLocal: isLocal,
         ),
       );
+
+  static SyncOperation _toOperation(OperationRow row) => SyncOperation(
+    id: EntityId(row.id),
+    deviceId: EntityId(row.deviceId),
+    hlc: Hlc(row.hlc),
+    schemaVersion: row.schemaVersion,
+    entity: row.entity,
+    entityId: EntityId(row.entityId),
+    type: OperationType.values.byName(row.type),
+    fields: _decode(row.fields),
+  );
 
   static StoredEntity _toStored(EntityRow row) => StoredEntity(
     id: EntityId(row.id),
