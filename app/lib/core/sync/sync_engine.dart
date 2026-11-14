@@ -17,7 +17,7 @@ enum OperationType {
 /// One change, as written on one line of an operations file (PRD 8.6).
 ///
 /// Attachments never travel inside operations: only their SHA-256 does.
-// TODO(M2): serialisation and the CRDT merge rules (PRD 4.3).
+// TODO(M2): the CRDT merge rules (PRD 4.3).
 class SyncOperation {
   /// Creates an operation.
   const SyncOperation({
@@ -54,6 +54,61 @@ class SyncOperation {
 
   /// Fields set by the operation.
   final Map<String, Object?> fields;
+
+  /// Reads an operation from one decoded line of an operations file.
+  ///
+  /// Throws a [FormatException] if the line is not an operation. Keys this
+  /// version does not know are ignored: a line is never rewritten.
+  factory SyncOperation.fromJson(Map<String, Object?> json) {
+    T read<T>(String key) {
+      final value = json[key];
+      if (value is T) return value;
+      throw FormatException('Operation without a valid "$key"', json);
+    }
+
+    final OperationType type;
+    final Map<String, Object?> fields;
+    if (json['delete'] == true) {
+      type = OperationType.delete;
+      fields = const {};
+    } else if (json['create'] case final Map<String, Object?> created) {
+      type = OperationType.create;
+      fields = created;
+    } else if (json['set'] case final Map<String, Object?> changed) {
+      type = OperationType.set;
+      fields = changed;
+    } else {
+      throw FormatException('Operation without create, set or delete', json);
+    }
+    return SyncOperation(
+      id: EntityId(read<String>('op')),
+      deviceId: EntityId(read<String>('dev')),
+      hlc: Hlc(read<String>('hlc')),
+      schemaVersion: read<int>('v'),
+      entity: read<String>('entity'),
+      entityId: EntityId(read<String>('id')),
+      type: type,
+      fields: fields,
+    );
+  }
+
+  /// The operation as one line of an operations file (PRD 8.6), before JSON
+  /// encoding.
+  Map<String, Object?> toJson() => {
+    'op': id.value,
+    'dev': deviceId.value,
+    'hlc': hlc.value,
+    'v': schemaVersion,
+    'entity': entity,
+    'id': entityId.value,
+    switch (type) {
+      OperationType.create => 'create',
+      OperationType.set => 'set',
+      OperationType.delete => 'delete',
+    }: type == OperationType.delete
+        ? true
+        : fields,
+  };
 }
 
 /// What the sync engine is doing, shown in the interface ("Updated 20 s ago").
