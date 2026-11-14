@@ -4,10 +4,6 @@
   "@appTitle": {
     "description": "Name of the app, shown in the title bar and in the task switcher. Do not translate."
   },
-  "placeholderNotice": "Itinerea is under development. This temporary screen only lets you try the language and the theme.",
-  "@placeholderNotice": {
-    "description": "Notice on the temporary screen of milestone M0. It makes clear that the app has no features yet."
-  },
   "languageSectionTitle": "Language",
   "@languageSectionTitle": {
     "description": "Title of the section where the user chooses the language of the app."
@@ -189,5 +185,33 @@
   "screenDataSources": "Data sources",
   "@screenDataSources": {
     "description": "Name of screen S21: the mandatory attributions of PRD 5.5. Short, it is a title."
+  },
+  "tripsEmptyTitle": "No trips yet",
+  "@tripsEmptyTitle": {
+    "description": "Title of the home screen when the user has no trips. Also the first thing a new user sees."
+  },
+  "tripsEmptyBody": "Create your first trip: a name and a destination are enough.",
+  "@tripsEmptyBody": {
+    "description": "Text under the title of the empty home screen. It invites the user to create a trip; no account is needed."
+  },
+  "dataOpenError": "The app could not open its data on this device.",
+  "@dataOpenError": {
+    "description": "Shown when the local database cannot be opened. No technical codes."
+  },
+  "retry": "Try again",
+  "@retry": {
+    "description": "Button that repeats an action that failed."
+  },
+  "settingsNotSavedNotice": "Language and theme are not saved yet: they go back to the system settings when you close the app.",
+  "@settingsNotSavedNotice": {
+    "description": "Notice in the settings screen while settings are not stored. It must be honest about what happens."
+  },
+  "settingsLicenses": "Open source licences",
+  "@settingsLicenses": {
+    "description": "Entry of the settings screen that opens the list of licences."
+  },
+  "settingsLicensesSubtitle": "Licences of the app, of its fonts and of the libraries it uses",
+  "@settingsLicensesSubtitle": {
+    "description": "Short explanation under the licences entry."
   }
 }

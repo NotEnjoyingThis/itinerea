@@ -84,6 +84,8 @@ Le dimensioni seguono l'impostazione di sistema fino al 200%: le righe crescono 
 
 **Deciso con l'approvazione (14/11/2026):** si usano entrambe le famiglie. Due famiglie pesano più di una (ordine di grandezza: qualche centinaio di KB ciascuna): il peso reale si misura quando i file entrano nell'app, includendo solo i pesi usati.
 
+**Come entrano nell'app (14/11/2026):** come file in `app/assets/fonts/` (caratteri variabili, un file per famiglia), **mai con il pacchetto `google_fonts`**, che li scaricherebbe a runtime. Il testo della licenza OFL di ciascuno sta accanto ai file ed è registrato nell'app (`LicenseRegistry`), così compare nella pagina delle licenze. Pesi usati: 400, 500 e 600 per Inter; 600 e 700 per Manrope. Peso aggiunto all'app: 877 KB (Inter) più 165 KB (Manrope).
+
 ## 4. Spaziature e forme
 
 - **Griglia a passi di 4 px.** Spazi usati: 4, 8, 12, 16, 24, 32.

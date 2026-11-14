@@ -30,3 +30,16 @@ flutter:
   # Generates lib/l10n/generated/ from the ARB files (see l10n.yaml).
   generate: true
   uses-material-design: true
+  # Licence texts of the bundled fonts, shown in the licences page.
+  assets:
+    - assets/fonts/Inter-OFL.txt
+    - assets/fonts/Manrope-OFL.txt
+  # Variable fonts (one file per family, every weight), bundled with the app:
+  # nothing is downloaded at run time. See docs/DESIGN.md, section 3.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Variable.ttf
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Variable.ttf

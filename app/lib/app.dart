@@ -5,7 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'core/settings/app_settings.dart';
 import 'core/theme/app_theme.dart';
-import 'features/settings/placeholder_screen.dart';
+import 'features/trips/trips_home_screen.dart';
 import 'l10n/generated/app_localizations.dart';
 
 /// Root widget: wires language, theme and the first screen.
@@ -31,7 +31,7 @@ class ItinereaApp extends ConsumerWidget {
       themeMode: ref.watch(themeModeProvider),
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      home: const PlaceholderScreen(),
+      home: const TripsHomeScreen(),
     );
   }
 }
