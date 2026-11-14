@@ -137,3 +137,90 @@ jobs:
           toscana 9.69,42.24,12.37,44.47
           italia 6.63,35.49,18.52,47.09
           REGIONS
+
+  notifications-linux:
+    name: 05 notifications (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app/prototypes/05_notifications
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Linux build dependencies, a virtual display and a notification server
+        working-directory: .
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev liblzma-dev xvfb dbus dunst
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter build linux --release
+      # No network requests. First with a notification server (dunst) on a
+      # private session bus, then without one, to see how the calls fail.
+      - name: Run with a notification server
+        run: |
+          mkdir -p "$RUNNER_TEMP/out/with-server"
+          export PROTO_AUTORUN=1 PROTO_OUT="$RUNNER_TEMP/out/with-server"
+          timeout 120 xvfb-run -a -s "-screen 0 1280x800x24" dbus-run-session -- bash -c '
+            dunst -print > "$PROTO_OUT/dunst.log" 2>&1 &
+            sleep 2
+            build/linux/x64/release/bundle/notif_probe
+          ' || echo "exit code $?"
+          cat "$PROTO_OUT/report.json" || true
+          echo "--- notifications received by the server"
+          cat "$PROTO_OUT/dunst.log" || true
+      - name: Run without a notification server
+        run: |
+          mkdir -p "$RUNNER_TEMP/out/without-server"
+          export PROTO_AUTORUN=1 PROTO_OUT="$RUNNER_TEMP/out/without-server"
+          timeout 120 xvfb-run -a -s "-screen 0 1280x800x24" dbus-run-session -- \
+            build/linux/x64/release/bundle/notif_probe || echo "exit code $?"
+          cat "$PROTO_OUT/report.json" || true
+          cat "$PROTO_OUT/itinerea_notif_probe.log" || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: notifications-linux
+          path: ${{ runner.temp }}/out
+          retention-days: 14
+
+  notifications-windows:
+    name: 05 notifications (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: app/prototypes/05_notifications
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter build windows --release
+      # Only what the calls return: nobody can see the toasts on a runner.
+      - name: Run unattended
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          PROTO_AUTORUN=1 PROTO_OUT="$RUNNER_TEMP/out" \
+            timeout 120 build/windows/x64/runner/Release/notif_probe.exe || echo "exit code $?"
+          cat "$RUNNER_TEMP/out/report.json" || true
+          cat "$RUNNER_TEMP/out/itinerea_notif_probe.log" || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: notifications-windows
+          path: ${{ runner.temp }}/out
+          retention-days: 14
