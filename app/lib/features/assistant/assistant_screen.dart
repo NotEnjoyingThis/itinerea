@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import 'package:material_ui/material_ui.dart';
+
+import '../../core/widgets/scaffold_placeholder.dart';
+import '../../l10n/generated/app_localizations.dart';
+
+/// Placeholder of screen S17 (PRD 7.3). Scaffolding only: it has no
+/// features and says so.
+// TODO(Fase 3 F3.1): the planning assistant.
+class AssistantScreen extends StatelessWidget {
+  /// Creates the placeholder of screen S17.
+  const AssistantScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => ScaffoldPlaceholder(
+    code: 'S17',
+    title: AppLocalizations.of(context).screenAssistant,
+    target: const ScaffoldTarget.phase(3),
+  );
+}

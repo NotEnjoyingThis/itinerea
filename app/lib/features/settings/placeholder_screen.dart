@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/settings/app_settings.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../scaffold/scaffold_catalog_screen.dart';
 
 /// Temporary screen of milestone M0: shows the current language and theme and
 /// lets the user change them. It is not a finished feature.
@@ -22,7 +23,23 @@ class PlaceholderScreen extends ConsumerWidget {
     final selectedThemeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.appTitle)),
+      appBar: AppBar(
+        title: Text(l10n.appTitle),
+        actions: [
+          // Debug builds only: the list of placeholder screens (PRD 15.1).
+          if (ref.watch(scaffoldCatalogEnabledProvider))
+            IconButton(
+              key: const Key('openScaffoldCatalog'),
+              icon: const Icon(Icons.construction_rounded),
+              tooltip: l10n.scaffoldCatalogOpen,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const ScaffoldCatalogScreen(),
+                ),
+              ),
+            ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
