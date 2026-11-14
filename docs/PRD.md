@@ -1071,7 +1071,11 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | **Durate e distanze** | Minuti interi, metri interi |
 | **Orari di apertura** | Stringa nel formato `opening_hours` di OpenStreetMap, interpretata da un parser dedicato |
 | **Enumerazioni** | Valori in inglese nel codice (es. `train`), tradotti nell'interfaccia |
-| **Versione dello schema** | Ogni database e ogni file di sincronizzazione riporta `schemaVersion` (4.9, migrazioni) |
+| **Versione dello schema** | Ogni database e ogni file di sincronizzazione riporta `schemaVersion` (4.9, migrazioni). Per ogni versione si conserva nel repository un'**istantanea dello schema** (`app/drift_schemas/`), e ogni migrazione ha un test che parte dall'istantanea precedente. Il codice generato da drift non è versionato: lo rigenera la build |
+| **Formato dell'ID** | UUID v7 secondo RFC 9562: 48 bit di tempo in millisecondi, versione e variante, e il resto **casuale da un generatore sicuro** (`Random.secure()`), mai dal generatore ordinario |
+| **Formato dell'HLC** | Stringa `<tempo in ms, 12 cifre esadecimali>:<contatore, 4 cifre esadecimali>:<ID del dispositivo>`. L'ordine alfabetico delle stringhe coincide con l'ordine degli HLC: prima il tempo, poi il contatore, poi il dispositivo. Due HLC non sono mai uguali |
+| **Ordine delle liste** | Indice frazionario (`orderKey`): una stringa tra quella dell'elemento precedente e quella del successivo. Due dispositivi offline che inseriscono nello stesso punto ottengono **lo stesso indice**: per questo l'ordine è sempre dato dalla coppia (indice, ID), e a parità di indice decide l'ID. Tutti i dispositivi vedono così lo stesso ordine |
+| **Oggetti incorporati** | Un oggetto incorporato in un'entità (`PlaceSnapshot`, `RouteProfile`, `Route`, `Split`, `VehicleSnapshot`, `TransitSolution`, `details` di una prenotazione) conta come **un solo campo**: se due persone ne cambiano parti diverse, vince l'ultima modifica sull'oggetto intero. Chi riscrive un oggetto **conserva i campi che non conosce**, così un'app più vecchia non cancella i dati scritti da una più nuova |
 
 ### 8.2 I tre contenitori di dati
 
@@ -1080,6 +1084,16 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | **Dati del viaggio** | Tutto ciò che appartiene a un viaggio (8.3) | Spazio di sincronizzazione del viaggio, condiviso con i partecipanti |
 | **Dati personali** | Profilo, veicoli, impostazioni, badge, punti, valutazioni, pedaggi pagati (8.4) | Spazio personale dell'utente (facoltativo), **mai** condiviso con altri |
 | **Cache** | Luoghi, mappe, meteo, cambi, pacchetti dati (8.5) | Non si sincronizza: si riscarica quando serve |
+
+**Dove stanno i dati sul dispositivo** (deciso il 14/11/2026):
+
+| Che cosa | Dove | Si può cancellare senza perdere nulla? |
+|---|---|---|
+| Database dei **dati**: viaggi e dati personali, log delle operazioni | Cartella dei dati dell'app | No |
+| **Allegati**: biglietti, codici QR, PDF, foto degli scontrini | Cartella dei dati dell'app, in `attachments/<sha256>` | No |
+| Database della **cache**: luoghi, meteo, cambi, prezzi, pacchetti | Cartella della cache dell'app | Sì: si riscarica |
+
+Biglietti, QR e allegati **non stanno mai nella cache**: il sistema operativo può svuotare la cache quando vuole, e un biglietto deve aprirsi anche offline (F1.8).
 
 ### 8.3 Entità del viaggio
 
@@ -1335,6 +1349,7 @@ Scelte possibili: tutto, solo con Wi-Fi, oppure scelta manuale. In **Impostazion
 2. **Invio:** le operazioni non ancora inviate si raccolgono in un file `.jsonl` (al massimo ogni 5 secondi, oppure subito quando l'app va in background) e si caricano in `ops/<mioDispositivo>/`.
 3. **Ricezione:** si elencano le cartelle `ops/` degli altri dispositivi e si scaricano solo i file nuovi, grazie a un indice locale di quelli già letti.
 4. **Unione:** le operazioni ricevute si applicano con le regole CRDT (4.3). Il risultato non dipende dall'ordine in cui arrivano.
+   Dopo l'unione si fa un **controllo di coerenza** tra campi diversi della stessa entità, che il "vince l'ultimo" per campo non può garantire (9.5, spese). Il controllo è un calcolo, **non scrive nulla**: così dà lo stesso esito su tutti i dispositivi e non genera altre modifiche da sincronizzare.
 5. **Allegati:** si scaricano quelli nuovi citati nelle operazioni.
 6. **Istantanee:** quando i file di operazioni superano una soglia (es. 500 operazioni), un dispositivo scrive un'istantanea completa. Un dispositivo nuovo parte dall'istantanea più recente e legge solo le operazioni successive. I file di operazioni coperti da un'istantanea si possono cancellare dopo 30 giorni.
 
@@ -1352,6 +1367,9 @@ Stesso formato delle operazioni (8.6), ma trasportate via WebSocket. Il server c
 | Una persona elimina una tappa che un'altra stava modificando | Vince l'eliminazione. Chi modificava vede "Questa tappa è stata eliminata da Marco", con "Ripristina". |
 | Tappe spostate da due persone nello stesso giorno | Gli indici frazionari mantengono un ordine coerente. Se due indici coincidono, decide l'ID. |
 | Spesa con divisione non più valida (partecipante rimosso) | La spesa resta, segnata "Da rivedere" nel budget |
+| Una persona cambia l'**importo** di una spesa e un'altra ne cambia la **divisione** | Restano entrambe le modifiche (sono campi diversi). Le divisioni in parti uguali, a percentuale o a quote **si adattano** al nuovo importo, perché le parti si calcolano dall'importo. Una divisione a **importi esatti** la cui somma non coincide più con l'importo viene segnata "Da ricontrollare" e non entra nel saldo finché qualcuno non la corregge. Il segno è calcolato, non salvato |
+| Un'app più vecchia riscrive un oggetto incorporato che contiene campi nuovi | Conserva i campi che non conosce e li riscrive così come sono (8.1) |
+| Due dispositivi offline inseriscono una tappa nello stesso punto | Ottengono lo stesso indice; l'ordine tra le due lo decide l'ID, uguale su tutti i dispositivi (8.1) |
 | Orologio di un dispositivo sbagliato | L'HLC corregge le piccole differenze. Se lo scarto supera 24 ore l'app avvisa l'utente. |
 | Spazio pieno o permessi revocati | Messaggio chiaro e sync sospesa. I dati locali restano. |
 | Partecipante con app più vecchia | Ignora i campi che non conosce senza cancellarli e mostra "Aggiorna Itinerea" (4.9) |
