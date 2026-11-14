@@ -14,3 +14,14 @@ Licences expected for the planned data packs (PRD 12.1):
 | Car data | European Environment Agency (EU open data) | To be confirmed when the pack is built |
 | Toll tables | Community contributions in this repository | To be decided before the first pack |
 | Original graphics and icons | Itinerea contributors | CC BY-SA 4.0 |
+
+## Fonts
+
+The app bundles two typefaces as files in `app/assets/fonts/`. They are not downloaded at run time.
+
+| Font | Copyright | Licence | Licence text |
+|---|---|---|---|
+| Inter | The Inter Project Authors (https://github.com/rsms/inter) | SIL Open Font License 1.1 | [`app/assets/fonts/Inter-OFL.txt`](app/assets/fonts/Inter-OFL.txt) |
+| Manrope | The Manrope Project Authors (https://github.com/googlefonts/manrope) | SIL Open Font License 1.1 | [`app/assets/fonts/Manrope-OFL.txt`](app/assets/fonts/Manrope-OFL.txt) |
+
+Both licence texts are also shown inside the app, in the licences page.

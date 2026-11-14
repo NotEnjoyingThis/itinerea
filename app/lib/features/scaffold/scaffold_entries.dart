@@ -21,9 +21,7 @@ import '../profile/profile_screen.dart';
 import '../routes/edit_route_screen.dart';
 import '../routes/leg_details_screen.dart';
 import '../settings/data_sources_screen.dart';
-import '../settings/settings_screen.dart';
 import '../trips/new_trip_screen.dart';
-import '../trips/trips_home_screen.dart';
 import '../vehicle/vehicle_screen.dart';
 
 /// One placeholder screen of the scaffolding.
@@ -49,14 +47,10 @@ class ScaffoldEntry {
   final WidgetBuilder builder;
 }
 
-/// Every screen of PRD 7.3, in order. Scaffolding only.
+/// The screens of PRD 7.3 that are still placeholders, in order. A screen
+/// leaves this list when its real version exists: S01 (home) and S20
+/// (settings, in a minimal form) left it with milestone M3.
 final List<ScaffoldEntry> scaffoldEntries = [
-  ScaffoldEntry(
-    code: 'S01',
-    title: (l10n) => l10n.screenTripsHome,
-    target: const ScaffoldTarget.milestone('M3'),
-    builder: (_) => const TripsHomeScreen(),
-  ),
   ScaffoldEntry(
     code: 'S02',
     title: (l10n) => l10n.screenNewTrip,
@@ -164,12 +158,6 @@ final List<ScaffoldEntry> scaffoldEntries = [
     title: (l10n) => l10n.screenExplore,
     target: const ScaffoldTarget.phase(4),
     builder: (_) => const ExploreScreen(),
-  ),
-  ScaffoldEntry(
-    code: 'S20',
-    title: (l10n) => l10n.screenSettings,
-    target: const ScaffoldTarget.milestone('M6'),
-    builder: (_) => const SettingsScreen(),
   ),
   ScaffoldEntry(
     code: 'S21',

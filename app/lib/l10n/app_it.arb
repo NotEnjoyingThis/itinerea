@@ -1,7 +1,6 @@
 {
   "@@locale": "it",
   "appTitle": "Itinerea",
-  "placeholderNotice": "Itinerea è in sviluppo. Questa schermata provvisoria serve solo a provare la lingua e il tema.",
   "languageSectionTitle": "Lingua",
   "currentLanguage": "{languageCode, select, it{Lingua attuale: Italiano} other{Lingua attuale: English}}",
   "languageSystem": "Sistema",
@@ -39,5 +38,12 @@
   "screenProfile": "Profilo",
   "screenExplore": "Esplora",
   "screenSettings": "Impostazioni",
-  "screenDataSources": "Fonti dei dati"
+  "screenDataSources": "Fonti dei dati",
+  "tripsEmptyTitle": "Nessun viaggio",
+  "tripsEmptyBody": "Crea il tuo primo viaggio: bastano un nome e una destinazione.",
+  "dataOpenError": "L'app non è riuscita ad aprire i suoi dati su questo dispositivo.",
+  "retry": "Riprova",
+  "settingsNotSavedNotice": "Lingua e tema non vengono ancora salvati: tornano alle impostazioni di sistema quando chiudi l'app.",
+  "settingsLicenses": "Licenze open source",
+  "settingsLicensesSubtitle": "Licenze dell'app, dei suoi caratteri e delle librerie che usa"
 }

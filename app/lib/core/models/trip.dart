@@ -58,6 +58,22 @@ enum StopPlanning {
   manual,
 }
 
+/// Where a time zone comes from (PRD 8.3).
+///
+/// A zone taken from the device is only a guess and may later be replaced by
+/// the zone of the place; a zone chosen by the user is never changed.
+enum TimezoneSource {
+  /// The zone of the device the trip or the day was created on.
+  device,
+
+  /// Chosen by hand.
+  user,
+
+  /// Worked out from the main place.
+  // TODO(M5 F1.9): zone from the coordinates of the place, for flights.
+  place,
+}
+
 /// Reference from a trip to the place where it is synchronised (PRD 8.3).
 // TODO(M6 F1.13): the real reference to a SyncSpace.
 class SyncSpaceRef {
@@ -86,6 +102,7 @@ class Trip extends SyncedEntity {
     required this.currency,
     required this.defaultRouteProfile,
     required this.ownerParticipantId,
+    required this.timezone,
     super.deletedAt,
     this.startDate,
     this.endDate,
@@ -94,6 +111,7 @@ class Trip extends SyncedEntity {
     this.budgetTotal,
     this.syncSpace,
     this.encrypted = false,
+    this.timezoneSource = TimezoneSource.device,
   });
 
   /// Name of the trip.
@@ -134,6 +152,12 @@ class Trip extends SyncedEntity {
 
   /// True if the trip uses end-to-end encryption (PRD 4.3).
   final bool encrypted;
+
+  /// IANA time zone the days of the trip start with.
+  final String timezone;
+
+  /// Where [timezone] comes from.
+  final TimezoneSource timezoneSource;
 
   /// Participant that owns the trip.
   final EntityId ownerParticipantId;
@@ -242,6 +266,7 @@ class Day extends SyncedEntity {
     this.budget,
     this.startTime,
     this.noteId,
+    this.timezoneSource = TimezoneSource.device,
   });
 
   /// Trip the day belongs to.
@@ -253,8 +278,12 @@ class Day extends SyncedEntity {
   /// Date, or null while the trip has no dates.
   final LocalDate? date;
 
-  /// IANA time zone of the day; stop times are in this zone.
+  /// IANA time zone of the day; stop times are in this zone. By default
+  /// it is the zone of the trip.
   final String timezone;
+
+  /// Where [timezone] comes from.
+  final TimezoneSource timezoneSource;
 
   /// Main place of the day, used for weather and time zone (F1.11).
   final PlaceSnapshot? mainPlace;

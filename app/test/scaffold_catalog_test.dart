@@ -1,35 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:itinerea/app.dart';
 import 'package:itinerea/features/scaffold/scaffold_catalog_screen.dart';
 import 'package:itinerea/features/scaffold/scaffold_entries.dart';
 import 'package:itinerea/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'support/test_app.dart';
 
 void main() {
   Future<void> pumpApp(
     WidgetTester tester, {
     required bool catalogEnabled,
     Locale locale = const Locale('en'),
-  }) async {
-    tester.platformDispatcher.localesTestValue = [locale];
-    addTearDown(tester.platformDispatcher.clearAllTestValues);
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          scaffoldCatalogEnabledProvider.overrideWithValue(catalogEnabled),
-        ],
-        child: const ItinereaApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-  }
+  }) => pumpItinerea(
+    tester,
+    systemLocale: locale,
+    scaffoldCatalog: catalogEnabled,
+  );
 
-  test('the scaffolding lists every screen of PRD 7.3 once, in order', () {
+  test('the scaffolding lists the screens that are still placeholders', () {
+    // S01 (home) and S20 (settings) are real since milestone M3.
     expect(scaffoldEntries.map((entry) => entry.code), [
-      for (var n = 1; n <= 21; n++) 'S${n.toString().padLeft(2, '0')}',
+      for (var n = 2; n <= 21; n++)
+        if (n != 20) 'S${n.toString().padLeft(2, '0')}',
     ]);
   });
 
@@ -66,6 +60,8 @@ void main() {
     await tester.tap(find.byKey(const Key('openScaffoldCatalog')));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.byKey(const Key('scaffold-S13')), 200);
+    await tester.ensureVisible(find.byKey(const Key('scaffold-S13')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('scaffold-S13')));
     await tester.pumpAndSettle();
 

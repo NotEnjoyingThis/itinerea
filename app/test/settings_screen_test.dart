@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:itinerea/app.dart';
-import 'package:itinerea/features/settings/placeholder_screen.dart';
+import 'package:itinerea/core/theme/font_licenses.dart';
+import 'package:itinerea/features/settings/settings_screen.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'support/test_app.dart';
 
 void main() {
   Future<void> pumpApp(
@@ -12,15 +13,16 @@ void main() {
     Locale systemLocale = const Locale('en'),
     Brightness systemBrightness = Brightness.light,
   }) async {
-    tester.platformDispatcher.localesTestValue = [systemLocale];
-    tester.platformDispatcher.platformBrightnessTestValue = systemBrightness;
-    addTearDown(tester.platformDispatcher.clearAllTestValues);
-    await tester.pumpWidget(const ProviderScope(child: ItinereaApp()));
-    await tester.pumpAndSettle();
+    await pumpItinerea(
+      tester,
+      systemLocale: systemLocale,
+      systemBrightness: systemBrightness,
+    );
+    await openSettings(tester);
   }
 
   Brightness currentBrightness(WidgetTester tester) =>
-      Theme.of(tester.element(find.byType(PlaceholderScreen))).brightness;
+      Theme.of(tester.element(find.byType(SettingsScreen))).brightness;
 
   String textOf(WidgetTester tester, String key) =>
       tester.widget<Text>(find.byKey(Key(key))).data!;
@@ -95,10 +97,26 @@ void main() {
     });
   });
 
-  testWidgets('says clearly that the screen is temporary', (tester) async {
+  testWidgets('says that language and theme are not saved yet', (tester) async {
     await pumpApp(tester);
 
-    expect(find.textContaining('under development'), findsOneWidget);
+    expect(find.byKey(const Key('settingsNotSavedNotice')), findsOneWidget);
+    expect(find.textContaining('not saved yet'), findsOneWidget);
+  });
+
+  testWidgets('opens the licences page, which lists the bundled fonts', (
+    tester,
+  ) async {
+    registerFontLicenses();
+    await pumpApp(tester);
+
+    await tester.scrollUntilVisible(find.byKey(const Key('openLicenses')), 200);
+    await tester.tap(find.byKey(const Key('openLicenses')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LicensePage), findsOneWidget);
+    expect(find.text('Inter'), findsOneWidget);
+    expect(find.text('Manrope'), findsOneWidget);
   });
 
   testWidgets('fits a small phone with large system text', (tester) async {
