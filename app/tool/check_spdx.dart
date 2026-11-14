@@ -2,6 +2,7 @@
 
 // Checks that every Dart source file starts with the SPDX licence header.
 // Run from the app/ folder: dart run tool/check_spdx.dart
+// Generated files without the header are skipped: see _isGenerated.
 
 import 'dart:io';
 
@@ -20,7 +21,8 @@ void main() {
     final files = directory
         .listSync(recursive: true)
         .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'));
+        .where((file) => file.path.endsWith('.dart'))
+        .where((file) => !_isGenerated(file.path));
     for (final file in files) {
       checked++;
       final lines = file.readAsLinesSync();
@@ -40,4 +42,13 @@ void main() {
     stderr.writeln('  $path');
   }
   exitCode = 1;
+}
+
+/// Files written by code generators that cannot add the header themselves:
+/// the drift database code and the helpers of the migration tests. They are
+/// not committed (see tool/generate.dart).
+bool _isGenerated(String path) {
+  final normalized = path.replaceAll(r'\', '/');
+  return normalized.endsWith('.g.dart') ||
+      normalized.contains('test/generated_migrations/');
 }
