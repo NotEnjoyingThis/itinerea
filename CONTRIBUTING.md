@@ -34,11 +34,14 @@ This appends a line like `Signed-off-by: Your Name <you@example.com>` to the com
 
    ```sh
    flutter pub get
+   dart run tool/generate.dart
    dart format .
    flutter analyze
    dart run tool/check_spdx.dart
    flutter test
    ```
+
+   `dart run tool/generate.dart` creates the files that are not committed: translations, the drift database code (`*.g.dart`) and the helpers of the migration tests. Run it again after changing an ARB file or a database table.
 
    `flutter analyze` must report no errors, warnings or infos. Do not disable or delete a failing test to make CI pass: report the problem instead.
 5. **Pull requests** explain what changed and why, and tick the checklist in the template. CI builds the app for Android, Windows, macOS, Linux and (unsigned) iOS.
@@ -53,6 +56,24 @@ This appends a line like `Signed-off-by: Your Name <you@example.com>` to the com
 - No user-visible string in the code: every text goes in the ARB files (see below).
 - Pure logic needs unit tests; every bug fix comes with a test that reproduces the bug.
 - No keys, tokens or other secrets in the repository.
+
+### Database changes
+
+The app has two SQLite databases, written with [drift](https://drift.simonbinder.eu/): one for trips and personal data, one for the cache. Each version of a schema has a snapshot committed in `app/drift_schemas/`, and the tests check the real schema against it.
+
+When you change a table of `app/lib/core/database/`:
+
+1. raise `currentSchemaVersion` of that database and add the migration step;
+2. write the new snapshot, from the `app/` folder:
+
+   ```sh
+   dart run drift_dev schema dump lib/core/database/data_database.dart drift_schemas/data/
+   ```
+
+   (use `cache_database.dart` and `drift_schemas/cache/` for the cache);
+3. run `dart run tool/generate.dart` and add a test of the migration to `test/core/database/migration_test.dart`, starting from the previous version with real rows.
+
+Never edit a snapshot of a version that was already released.
 
 ### Dependencies
 

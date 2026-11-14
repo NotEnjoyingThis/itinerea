@@ -5,7 +5,7 @@
 
 ## Dove siamo
 
-**M0 e M1 sono concluse. Il prossimo lavoro è M2 (nucleo dei dati).**
+**M0 e M1 sono concluse. È in corso M2 (nucleo dei dati):** fatti la logica pura (ID, orologio logico, indici frazionari, operazioni) e il database; resta il motore di unione con i test su più dispositivi simulati.
 
 Tra M1 e M2 è stata preparata l'**impalcatura** di tutto il progetto (PRD 15.1): cartelle, modelli senza logica, interfacce, schermate segnaposto e test segnaposto. L'impalcatura **non è funzionalità**: ogni elemento porta un commento `TODO` con la milestone o la fase in cui diventa vero.
 
@@ -25,7 +25,7 @@ Si procede in ordine: le funzioni di una milestone successiva non si iniziano pr
 |---|---|---|---|---|
 | **M0 — Fondamenta** | **Conclusa** il 13/11/2026 | Progetto Flutter, CI, localizzazione it/en, tema chiaro e scuro | segnaposto iniziale | App vuota che parte su tutte le piattaforme |
 | **M1 — Prototipi di rischio** | **Conclusa** il 14/11/2026 | Cinque prove isolate (esiti in PRD 16.3) | — | Per ogni rischio: funziona, funziona con limiti o non funziona |
-| **M2 — Nucleo dei dati** | Da fare | Modello dati (PRD 8), database drift, log delle operazioni, regole CRDT | — | Test che simulano modifiche concorrenti e offline |
+| **M2 — Nucleo dei dati** | **In corso** | Modello dati (PRD 8), database drift, log delle operazioni, regole CRDT | — | Test che simulano modifiche concorrenti e offline |
 | **M3 — Viaggio, giorni e tappe** | Da fare | F1.1, F1.2, F1.3, F1.6 (tappe) | S01–S04 | Si pianifica un viaggio senza mappa |
 | **M4 — Mappa e percorsi** | Da fare | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12 | S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
 | **M5 — Prenotazioni, biglietti, budget, meteo** | Da fare | F1.8, F1.9, F1.10, F1.11 | S08–S12 | Un viaggio completo da usare davvero |

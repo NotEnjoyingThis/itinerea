@@ -230,7 +230,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 | Framework | **Flutter** (canale stable), linguaggio Dart | Un solo codice: Android, Windows, macOS, Linux distribuiti; iOS compilabile |
 | Interfaccia | Pacchetto **material_ui** (team Flutter, BSD-3) | Da Flutter 3.50 Material non fa più parte dell'SDK. I delegati di localizzazione sono quelli di `material_ui` (`GlobalMaterialLocalizations.delegates`), non quelli di `flutter_localizations` (decisione M0) |
 | Gestione dello stato | Riverpod | Senza generatore di codice: provider scritti a mano (decisione M0) |
-| Database locale | SQLite tramite **drift** | Query tipizzate, migrazioni, funziona su tutte le piattaforme |
+| Database locale | SQLite tramite **drift** | Query tipizzate, migrazioni, funziona su tutte le piattaforme. Due database: dati e cache (8.2). Il codice generato non è versionato: lo crea `dart run tool/generate.dart` |
 | Mappa | **flutter_map** + **vector_map_tiles** (BSD-3) | Tile vettoriali su Android, iOS, Linux, macOS e Windows, con stili in formato JSON (lo stile deve corrispondere allo schema delle tile, 4.6). **Esito M1 (13/11/2026): funziona con limiti** (R14). Versioni provate: `flutter_map` 8.3.2 e `vector_map_tiles` **9.0.0-beta.13** (la stabile 8.0.0 è di due anni fa e richiede `flutter_map` 7; la 10 beta richiede il canale *main* di Flutter ed è esclusa). Si usa **solo la modalità `raster`** del livello (tile vettoriali disegnate in immagini sul dispositivo): la modalità `vector` è troppo lenta. Ogni stile deve ricevere un identificativo proprio, perché gli stili OpenFreeMap non hanno il campo `id`. La versione va fissata esatta nel `pubspec`. Il pacchetto `maplibre` per Flutter resta il piano B (oggi elenca anche Windows e Linux, non provato). |
 | Mappe offline | **pmtiles** (BSD-2, lettura di archivi PMTiles locali o remoti) + **vector_map_tiles_pmtiles** (MIT) | Vedi 4.6 e sezione 9 |
 | Navigazione | Link diretti alle app esterne (Google Maps, Waze, Apple Maps, Sygic, OsmAnd, Organic Maps…) con le tappe intermedie | Il navigatore interno è un non-obiettivo (1.5) |
@@ -1094,6 +1094,17 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | Database della **cache**: luoghi, meteo, cambi, prezzi, pacchetti | Cartella della cache dell'app | Sì: si riscarica |
 
 Biglietti, QR e allegati **non stanno mai nella cache**: il sistema operativo può svuotare la cache quando vuole, e un biglietto deve aprirsi anche offline (F1.8).
+
+**Come sono salvati nel database dei dati** (deciso il 14/11/2026):
+
+| Tabella | Contenuto |
+|---|---|
+| Entità | **Una sola tabella per tutte le entità** di 8.3 e 8.4: tipo, ID, viaggio, entità genitore, i campi come oggetto JSON e l'eventuale HLC di eliminazione (tombstone). Indici su tipo e viaggio e su tipo e genitore |
+| HLC per campo | Per ogni campo di ogni entità, l'HLC dell'ultima modifica (8.1) |
+| Log delle operazioni | Ogni modifica locale e ogni modifica ricevuta, nel formato di 8.6, con lo spazio a cui appartiene (il viaggio, oppure i dati personali) e se è già stata inviata |
+| Dati di servizio | L'ID di questo dispositivo e l'ultimo valore del suo HLC, così l'orologio non torna indietro dopo un riavvio |
+
+Una modifica locale scrive entità, HLC dei campi e operazione **in un'unica transazione**: o tutte e tre, o nessuna. I campi che una versione dell'app non conosce restano nell'oggetto JSON e non vengono mai cancellati (9.5). Le tabelle di 8.3–8.5 descrivono quindi i **campi** di ogni entità, non tabelle del database.
 
 ### 8.3 Entità del viaggio
 
