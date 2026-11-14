@@ -279,6 +279,8 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 - Algoritmi standard (es. XChaCha20-Poly1305) tramite una libreria crittografica affermata, mai implementazioni fatte in casa.
 
 > **Da validare con un prototipo:** modalità file con 2–5 dispositivi sullo stesso viaggio, modifiche offline e riconnessione. In M1 si prova **Google Drive** (il caso più incerto, R1); OneDrive e Dropbox si provano prima di iniziare la Fase 2.
+>
+> **Esito della prova su Google Drive (14/11/2026, dettagli in 16.3):** con il permesso `drive.file` il formato "una cartella per dispositivo, tanti file di operazioni" (8.6) **non funziona tra account diversi**: i file creati dall'app di un partecipante sono invisibili all'app degli altri. Funziona invece un **file con identificativo fisso**, scelto una volta sola da ogni partecipante con il selettore di Google: lo leggono e lo scrivono tutti. Per Google Drive serve quindi una disposizione dei file diversa, **da decidere**. Su Android non esiste oggi un modo ammesso di fare il login a Google senza Google Play Services.
 
 ### 4.4 Partecipanti, inviti e ruoli senza server
 
@@ -289,7 +291,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 - **Ruoli in modalità server:** applicati dal Sync Server.
 
 > **Rischi tecnici da verificare con il prototipo:**
-> - Google Drive: con il permesso più ristretto (`drive.file`, accesso solo ai file creati o aperti dall'app) l'accesso a una cartella **condivisa da un altro utente** potrebbe richiedere che l'invitato la apra tramite il selettore di file di Google. Va provato. Il client OAuth va registrato presso Google, Microsoft e Dropbox a nome del progetto.
+> - Google Drive: con il permesso più ristretto (`drive.file`, accesso solo ai file creati o aperti dall'app) l'accesso a una cartella **condivisa da un altro utente** potrebbe richiedere che l'invitato la apra tramite il selettore di file di Google. Va provato. Il client OAuth va registrato presso Google, Microsoft e Dropbox a nome del progetto. **Provato il 14/11/2026 (16.3):** senza selettore l'invitato non vede nulla (la cartella risponde 404 e l'elenco "condivisi con me" è vuoto); con il selettore ottiene accesso **solo agli elementi scelti, non al contenuto delle cartelle scelte**. L'invito deve quindi contenere l'identificativo della cartella, e i ruoli non si sono potuti cambiare dall'app dopo che l'invitato aveva scritto nella cartella.
 > - Microsoft OneDrive: condivisione di cartelle tra account personali via Microsoft Graph.
 > - Dropbox: condivisione di cartelle tra account e permessi di sola lettura tramite API.
 
@@ -491,6 +493,16 @@ Per ogni servizio: pagina, frase esatta (in lingua originale) e data in cui è s
 | Open-Meteo — uso gratuito | https://open-meteo.com/en/terms | "Less than 10'000 API calls per day, 5'000 per hour and 600 per minute." · "You may only use the free API services for non-commercial purposes." · "You accept to the CC-BY 4.0 licence" | 13/11/2026 |
 | Open-Meteo — cosa è non commerciale | https://open-meteo.com/en/terms | "Non-commercial use is defined as elaborated by creative commons." · "Private or non-profit websites or apps that do not have subscriptions or advertising." · "Voluntary donations, including contributions through a tip jar, are permitted." | 13/11/2026 |
 | Open-Meteo — API dell'altitudine | https://open-meteo.com/en/docs/elevation-api | "Up to 100 coordinates can be requested at once." · "Data is based on the Copernicus DEM 2021 release GLO-90 with 90 meters resolution." · "All users of Open-Meteo data must provide a clear attribution to the Copernicus program as well as a reference to Open-Meteo." | 13/11/2026 |
+| Google — schema URI personalizzato | https://developers.google.com/identity/protocols/oauth2/native-app | "Custom URI schemes are no longer supported due to the risk of app impersonation." · "Custom URI schemes are no longer supported on Android and Chrome apps." | 13/11/2026 |
+| Google — redirect su indirizzo locale | https://developers.google.com/identity/protocols/oauth2/resources/loopback-migration | "The loopback IP address redirect option is DEPRECATED for Android, Chrome app and iOS OAuth client types." Resta ammesso per i client di tipo "Desktop app" (riassunto) | 13/11/2026 |
+| Google — app desktop e segreto del client | https://developers.google.com/identity/protocols/oauth2/native-app | "Desktop apps are public clients and cannot keep secrets confidential. Always use PKCE" | 13/11/2026 |
+| Google — regole OAuth | https://developers.google.com/identity/protocols/oauth2/policies | Va usato il tipo di client che corrisponde alla piattaforma, con un client distinto per piattaforma; vietate le finestre web incorporate per il login (riassunto: le frasi non sono state copiate) | 13/11/2026 |
+| Google — stato "Testing" | https://support.google.com/cloud/answer/15549945 | "Projects configured with a publishing status of Testing are limited to up to 100 test users listed in the OAuth consent screen." I permessi concessi in questo stato scadono dopo 7 giorni (riassunto) | 13/11/2026 |
+| Google Drive — ambiti | https://developers.google.com/workspace/drive/api/guides/api-specific-auth | `drive.file` e `drive.appdata` sono "non-sensitive"; `drive`, `drive.readonly` e `drive.metadata` sono "restricted" (riassunto) | 13/11/2026 |
+| Google — verifica degli ambiti "restricted" | https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification | Serve la verifica di Google e, se i dati passano o restano su server, una valutazione di sicurezza annuale (CASA). Non è stata trovata un'esenzione esplicita per le app che tengono i dati solo sul dispositivo (riassunto) | 13/11/2026 |
+| Google Picker per app desktop e mobile | https://developers.google.com/workspace/drive/picker/guides/overview-desktop | Il selettore si apre nel browser durante il consenso, con i parametri `trigger_onepick=true`, `allow_folder_selection`, `allow_multiple`, `file_ids`; il reindirizzamento riporta `picked_file_ids`. È ammesso solo l'ambito `drive.file` e va attivata la "Google Picker API" (riassunto) | 13/11/2026 |
+
+**Google:** le righe segnate "riassunto" vanno rilette e citate alla lettera prima di registrare il client definitivo (R10). Non è stato letto che cosa chiede Google per passare da "Testing" a "In produzione" con il solo ambito `drive.file` (verifica del marchio, pagina della privacy, dominio).
 
 **Obblighi che ne derivano per Itinerea verso FOSSGIS/Valhalla:** al massimo una richiesta al secondo per dispositivo e una sola connessione; User-Agent `Itinerea/<versione> (+<url del repository>)` e intestazione `X-Client-Id`; attribuzione a OpenStreetMap con link a `https://www.openstreetmap.org/fixthemap` nella schermata "Fonti dei dati"; un'**email di contatto pubblica** nella pagina del progetto e nelle schede degli store; un **avviso su GitHub Discussions di Valhalla** prima della pubblicazione; indirizzo del servizio non fisso nel codice ma modificabile (il fornitore configurabile del PRD 4.6 lo soddisfa; l'indirizzo predefinito può stare in un pacchetto dati aggiornabile senza rilasciare l'app).
 
@@ -1630,7 +1642,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 
 | # | Rischio | Impatto | Mitigazione |
 |---|---|---|---|
-| R1 | Google Drive: l'accesso alle cartelle condivise con il permesso ristretto potrebbe essere scomodo per chi riceve l'invito | Alto (collaborazione) | Prototipo in M1. Piani B: selettore di file di Google per l'invitato, oppure consigliare Dropbox, WebDAV o Sync Server per i gruppi |
+| R1 | Google Drive: l'accesso alle cartelle condivise con il permesso ristretto potrebbe essere scomodo per chi riceve l'invito | Alto (collaborazione) | Prototipo in M1. Piani B: selettore di file di Google per l'invitato, oppure consigliare Dropbox, WebDAV o Sync Server per i gruppi. **Provato in M1 (14/11/2026, 16.3): funziona solo con limiti pesanti.** Su desktop il selettore di Google funziona, ma dà accesso ai soli file scelti: il formato a più file di 8.6 non è utilizzabile, serve un file a identificativo fisso scelto una volta. **Su Android non c'è un login ammesso senza Google Play Services.** Come procedere è da decidere |
 | R2 | Valhalla di FOSSGIS: condizioni d'uso o limiti incompatibili con l'uso da parte di un'app | Alto (percorsi) | Rileggere le condizioni prima del rilascio, cache aggressiva, fornitore configurabile (4.6), documentare come installare un proprio server. **Condizioni lette il 13/11/2026 (5.6): l'uso da parte di un'app non commerciale è compatibile**, con obblighi precisi: una richiesta al secondo, User-Agent dell'app, `X-Client-Id`, avviso su GitHub Discussions di Valhalla, email di contatto pubblica, attribuzione con link a "fixthemap". Il permesso può essere revocato in qualsiasi momento e dietro al servizio c'è un solo server: il rischio resta alto se l'app diventa popolare (R9) |
 | R3 | Download regionale delle tile più complesso del previsto (il pacchetto `pmtiles` legge ma non scrive archivi) | Medio (mappe offline) | Prototipo in M1; salvare le tile in un archivio locale semplice (es. MBTiles/SQLite). Piano B: cache delle tile visitate o import di file preparati. **Provato in M1: funziona con limiti** (16.3). Scrivere un archivio MBTiles locale è semplice (pacchetto `mbtiles`); il limite vero sono le condizioni d'uso (50 MB per download) e la lettura di PMTiles nell'app |
 | R4 | Verifica obbligatoria degli sviluppatori Android e futuro di F-Droid | Medio (distribuzione) | Registrare i nomi di pacchetto con l'account Google Play; seguire gli sviluppi di F-Droid |
@@ -1639,7 +1651,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R7 | Qualità del percorso panoramico calcolato sul dispositivo | Medio | Etichetta "il meglio possibile", modifica manuale sempre disponibile |
 | R8 | Estrarre consigli dal testo di Wikivoyage | Medio | Partire dai dati strutturati (Wikidata, OSM) e aggiungere Wikivoyage solo dove la struttura delle pagine lo permette |
 | R9 | Servizi pubblici sovraccarichi se l'app diventa popolare | Medio | Regole 5.4, fornitori configurabili, guide al self-hosting |
-| R10 | Registrazione delle app OAuth presso Google, Microsoft e Dropbox (verifiche, schermate di consenso) | Medio | Avviare le registrazioni in M1, usare permessi non sensibili |
+| R10 | Registrazione delle app OAuth presso Google, Microsoft e Dropbox (verifiche, schermate di consenso) | Medio | Avviare le registrazioni in M1, usare permessi non sensibili. **Google (14/11/2026):** registrato un client di prova di tipo "Desktop app" in stato "Testing" (100 utenti, permessi che scadono dopo 7 giorni). `drive.file` è non sensibile; l'ambito `drive` completo è "restricted" e richiede verifica e valutazione di sicurezza annuale: da evitare. Il client Android è legato a nome del pacchetto e impronta SHA-1 della firma, diversa tra F-Droid, Google Play e GitHub. Restano da leggere i requisiti per uscire da "Testing" (5.6) |
 | R11 | Progetto molto grande per una persona sola | Alto | Ordine rigoroso delle fasi, MVP piccolo, CLAUDE.md che vieta di anticipare le fasi |
 | R12 | Google Play: trovare 12 tester per 14 giorni | Basso | Cercarli durante la beta (M6) |
 | R13 | Nome "Itinerea" troppo simile a marchi esistenti, in particolare "Itinera" (app di viaggio, marchio registrato negli USA per servizi di viaggio) | Medio | Controllo su TMview (UE e Italia) prima della 1.0; l'app è distribuita in Europa e non negli store Apple |
@@ -1767,6 +1779,50 @@ Proposta:
 - Altitudine da `/height` di Valhalla, con Open-Meteo come piano B.
 - Per "con curve" e "panoramico" non si può contare su `alternates`: i candidati si ottengono con richieste diverse (opzioni o punti di passaggio), in sequenza.
 - Prima del rilascio: avviso su GitHub Discussions di Valhalla ed email di contatto pubblica (5.6).
+
+**Prova 4 — Sincronizzazione su Google Drive tra due account (R1, R10) — 14/11/2026 — funziona solo con limiti pesanti (desktop); non praticabile su Android**
+
+Programma Dart da riga di comando su Windows, due account Google diversi sullo stesso PC, client OAuth di tipo "Desktop app" in stato "Testing", solo ambito `drive.file`, login nel browser di sistema con PKCE e reindirizzamento su `127.0.0.1`. Circa 60 chiamate all'API in tutto, nessun errore di quota. A è chi crea il viaggio, B l'invitato con ruolo di editor.
+
+| Passo | Risultato |
+|---|---|
+| Login di A e di B (browser, PKCE, indirizzo locale) | riuscito; ambito concesso `drive.file`; scambio del codice in 0,27–0,29 s |
+| A crea le cartelle e i file del viaggio (formato 8.6) | riuscito; caricamento di un file in 1,6–2,1 s |
+| A condivide la cartella del viaggio con B dall'API, senza email di avviso | riuscito (1,9 s) |
+| B legge la cartella condivisa **senza selettore** | **404** sulla cartella; elenco "condivisi con me" visto dall'app: 0 elementi |
+| Selettore di Google aperto con l'identificativo della cartella del viaggio | si apre **dentro** la cartella e ne mostra il contenuto; la cartella stessa non si può scegliere; chiudendo la finestra il login fallisce (`access_denied`) |
+| B sceglie nel selettore la sottocartella `ops` e il file `manifest.json` (pulsante "Inserisci") | riuscito; il reindirizzamento riporta i due identificativi |
+| B, dopo la scelta: cartella del viaggio | ancora 404 |
+| B, dopo la scelta: contenuto di `ops` (la cartella di A con i suoi file) | **non visibile**: elenco vuoto, 404 chiedendo la cartella di A per identificativo |
+| B crea la propria cartella e un file dentro `ops` | riuscito (2,0 s) |
+| A vede la cartella e il file creati da B | **no**: assenti dall'elenco dopo 60 s (30 letture), 404 per identificativo, nessuna voce in `changes` |
+| B legge e riscrive `manifest.json` (file di A, scelto nel selettore) | riuscito (1,7 s) |
+| A vede la modifica di B a `manifest.json` | sì, alla prima lettura (0,4 s) e in `changes` (0,5 s) |
+| A riscrive `manifest.json`; B vede la modifica | sì, alla prima lettura e in `changes` |
+| A porta B a sola lettura dall'API | **rifiutato**: 403 `appNotAuthorizedToChild` (la cartella contiene elementi di B che l'app di A non vede) |
+| B in sola lettura prova a scrivere | **non misurato** (il ruolo non si è potuto cambiare dall'app) |
+
+Che cosa significa:
+- **Con `drive.file` l'accesso è per singolo elemento e per singolo utente.** Scegliere una cartella dà accesso alla cartella (ci si può scrivere), non a ciò che contiene. Ogni file nuovo creato da un partecipante resta invisibile agli altri finché non lo scelgono a mano. Il formato di 8.6, in cui ogni dispositivo aggiunge file, **non è utilizzabile su Google Drive tra account diversi**.
+- **Un file già esistente e scelto una volta resta accessibile:** tutti i partecipanti lo leggono e lo riscrivono, e `changes` segnala le modifiche. Le modifiche arrivano alla prima lettura successiva: con il ciclo di 30 secondi di 9.3 il ritardo è quello del ciclo.
+- L'app non può scoprire da sola le cartelle condivise: **l'invito deve contenere l'identificativo** da passare al selettore.
+- Il selettore passa ogni volta dalla schermata di consenso di Google nel browser.
+- Drive non ha l'aggiunta in coda: un file si riscrive per intero.
+
+Risposte alle domande poste prima della prova:
+- **Modo reale di aprire una cartella condivisa con `drive.file`:** su desktop sì, con il selettore nel browser, ma con i limiti sopra. Su Android la strada ufficiale passa da Google Play Services.
+- **Android:** gli schemi URI personalizzati non sono più ammessi per i client Android e il reindirizzamento su indirizzo locale è deprecato per Android e iOS (5.6). La strada indicata da Google è la libreria `play-services-auth`, **vietata dai principi del progetto** (CLAUDE.md §2). `flutter_appauth` si basa sullo schema personalizzato: **non viene proposto**. Il login su emulatore Android non è stato tentato e il client Android non è stato creato.
+- **Ambito `drive` completo:** risolverebbe la visibilità dei file, ma è "restricted": verifica di Google e valutazione di sicurezza annuale (5.6). Sproporzionato per un progetto senza fondi.
+- **Impronta SHA-1:** un client Android vale per un nome di pacchetto e un'impronta di firma; F-Droid, Google Play e le build di GitHub firmano con chiavi diverse, quindi servirebbe un client per canale. Se un client possa accettare più impronte non risulta dalle pagine lette.
+- **Identificativo del client nelle build compilate dal sorgente (F-Droid):** per le app desktop Google scrive che il client non può tenere segreti (5.6), quindi identificativo e "segreto" non proteggono nulla; restano però valori che nel repository non vogliamo. Proposta: nelle build ufficiali si inseriscono al momento della compilazione (`--dart-define` da un segreto di GitHub Actions); nelle build dal sorgente Google Drive compare solo se l'utente inserisce un proprio client nelle impostazioni avanzate.
+- **Uscire da "Testing":** con il solo `drive.file` non servono la verifica degli ambiti sensibili né la valutazione di sicurezza; i requisiti restanti non sono stati letti (5.6).
+
+Non misurato: scrittura con ruolo di sola lettura; due partecipanti che riscrivono lo stesso file nello stesso momento; più di due account; limiti di frequenza; cambio dei ruoli quando l'invitato non ha creato nulla nella cartella.
+
+Proposte, **da decidere** (cambiano F1.13 e F2.1, quindi la scelta spetta all'utente):
+1. **Google Drive solo su desktop, con una disposizione dei file dedicata:** alla creazione del viaggio l'app del proprietario crea un numero fisso di file, uno per partecipante possibile; l'invitato apre l'invito, il selettore si apre dentro la cartella e li sceglie tutti in una volta; ognuno scrive solo nel proprio file. Nessuno crea file nuovi, quindi tutti vedono tutto. Si fonda su ciò che è stato misurato (file di A scelto da B, scritto da entrambi), ma lo schema completo va provato prima di F2.1.
+2. **Google Drive fuori dall'elenco degli spazi consigliati**, a favore di WebDAV, cartella locale, Dropbox, OneDrive e Sync Server (da provare prima della Fase 2). Google Drive resterebbe, se si vuole, solo per la sincronizzazione personale e i backup su desktop: lì i file sono tutti creati dallo stesso account e `drive.file` dovrebbe bastare (non provato).
+3. **Android:** nessun Google Drive finché Google non offre un login senza Play Services. Chi usa Android sincronizza con WebDAV, cartella locale o Sync Server.
 
 ---
 

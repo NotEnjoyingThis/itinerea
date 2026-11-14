@@ -1,0 +1,3 @@
+.dart_tool/
+# OAuth client file, tokens and account addresses: never commit.
+.secrets/

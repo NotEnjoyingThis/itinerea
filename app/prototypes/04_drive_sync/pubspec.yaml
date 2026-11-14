@@ -1,0 +1,11 @@
+name: drive_probe
+description: "M1 prototype 4: file-mode sync on Google Drive with the drive.file scope. Not production code."
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  crypto: ^3.0.6
+  http: ^1.6.0
