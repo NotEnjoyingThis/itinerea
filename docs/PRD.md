@@ -62,7 +62,7 @@ Chi organizza viaggi finisce per fare tutto a mano, unendo i pezzi con documenti
 | O2 | Pianificare velocemente | Viaggio base (destinazione, date, primo giorno) creato in meno di 2 minuti. Azioni frequenti in massimo 2–3 tocchi |
 | O3 | Gestire gli imprevisti | Ogni tappa e ogni percorso può avere alternative (piano A, B, C, D) attivabili con un tocco |
 | O4 | Funzionare in viaggio anche senza internet | Mappa, biglietti, itinerario e budget consultabili e modificabili offline |
-| O5 | Viaggiare in gruppo senza attriti | Modifica condivisa (tramite Google Drive, OneDrive, Dropbox, WebDAV o un server self-hosted), ruoli, spese divise con saldo finale |
+| O5 | Viaggiare in gruppo senza attriti | Modifica condivisa (tramite OneDrive, Dropbox, WebDAV o un server self-hosted), ruoli, spese divise con saldo finale |
 | O6 | Roadtrip fatti bene | Percorsi non solo veloci (panoramici, con curve, senza autostrade o sterrato), soste carburante e ricarica pianificate, costi stimati |
 | O7 | Tutto gratis e aperto | Codice open source, nessun pagamento, nessuna pubblicità, nessuna funzione bloccata |
 
@@ -71,7 +71,7 @@ Chi organizza viaggi finisce per fare tutto a mano, unendo i pezzi con documenti
 Ogni decisione di design e di sviluppo deve rispettare questi principi. In caso di conflitto valgono nell'ordine in cui sono elencati.
 
 1. **Gratis, open source, senza pubblicità né pagamenti.** Nessun acquisto di alcun tipo, né l'app né dentro l'app. I punti viaggio dello shop si guadagnano solo viaggiando.
-2. **Solo locale, nessun server centrale.** Il viaggio vive sul dispositivo. L'app funziona senza account e senza internet. Per condividere e sincronizzare si usa uno spazio scelto dall'utente (Google Drive, OneDrive, Dropbox, WebDAV, cartella locale o un server self-hosted). Il progetto non gestisce alcun server.
+2. **Solo locale, nessun server centrale.** Il viaggio vive sul dispositivo. L'app funziona senza account e senza internet. Per condividere e sincronizzare si usa uno spazio scelto dall'utente (OneDrive, Dropbox, WebDAV, cartella locale o un server self-hosted; Google Drive solo per i propri dispositivi e i backup, su desktop). Il progetto non gestisce alcun server.
 3. **Privacy di default.** Il progetto non raccoglie nessun dato: nessuna telemetria, nessun account Itinerea. I dati vanno solo dove l'utente decide (il suo spazio di sincronizzazione e i servizi esterni necessari per mappe, percorsi, meteo…).
 4. **Pochi tocchi.** Se un'azione frequente richiede più di 3 tocchi, il design va rivisto.
 5. **Onestà sui dati.** Quando un dato può essere vecchio o impreciso, l'app lo dice. Esempi: orari dei mezzi scaricati offline, stime dei consumi, percorsi panoramici calcolati, legalità del campeggio libero.
@@ -129,7 +129,7 @@ L'utente crea un viaggio "Itinerario" di 4 giorni. Condivide con l'app l'email d
 
 **S2 — Due settimane in Giappone in gruppo (P1 + P2)**
 *Nota: il Giappone è fuori dalla copertura iniziale (solo Europa). Lo scenario descrive l'esperienza completa a cui tendere.*
-L'organizzatore crea il viaggio nel suo Google Drive e invita 3 amici: due come editor e uno solo in visualizzazione. Le modifiche arrivano agli altri in pochi secondi o minuti; se il gruppo usa un Itinerea Sync Server installato da uno di loro, in tempo reale. Le spese si registrano in yen e la conversione usa il cambio del giorno della spesa. Un amico presta soldi a un altro, e il prestito entra nel saldo. A fine viaggio l'app mostra chi deve quanto a chi, con pochi pagamenti (F2.2).
+L'organizzatore crea il viaggio in uno spazio condiviso (es. Dropbox o una cartella WebDAV) e invita 3 amici: due come editor e uno solo in visualizzazione. Le modifiche arrivano agli altri in pochi secondi o minuti; se il gruppo usa un Itinerea Sync Server installato da uno di loro, in tempo reale. Le spese si registrano in yen e la conversione usa il cambio del giorno della spesa. Un amico presta soldi a un altro, e il prestito entra nel saldo. A fine viaggio l'app mostra chi deve quanto a chi, con pochi pagamenti (F2.2).
 
 **S3 — Roma e Firenze in 7 giorni (assistente consigli)**
 L'utente vuole vedere il Colosseo e gli Uffizi e ha 7 giorni. Chiede aiuto all'assistente, che gli fa alcune domande: approfondire Roma, approfondire Firenze, fare tappe a metà strada o vedere subito le due cose e poi altre regioni; ritmo; interessi; budget. Poi propone una distribuzione dei giorni e dei luoghi, che l'utente può accettare o modificare in parte.
@@ -169,7 +169,7 @@ Questi termini vanno usati in modo coerente nel codice, nell'interfaccia e nei d
 | **Alloggio** | `Lodging` | Dove si dorme una notte: hotel/B&B, campeggio, area sosta, notte in auto. Collegato ai giorni corrispondenti, con check-in e check-out. |
 | **Partecipante** | `Participant` | Persona che partecipa al viaggio: ha l'app installata e accesso allo spazio di sincronizzazione del viaggio. Non esistono account Itinerea: è identificata da un profilo locale (nome + ID) collegato all'account del servizio usato. |
 | **Ruolo** | `Role` | Permessi di un partecipante: **Proprietario** (tutto, compresi inviti ed eliminazione), **Editor** (modifica itinerario e spese), **Visualizzatore** (solo lettura). In modalità file coincidono con i permessi di condivisione della cartella (4.4). |
-| **Spazio di sincronizzazione** | `SyncSpace` | Dove si salvano e si scambiano i dati di un viaggio: Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (**modalità file**) oppure Itinerea Sync Server (**modalità server**). iCloud Drive è escluso. |
+| **Spazio di sincronizzazione** | `SyncSpace` | Dove si salvano e si scambiano i dati di un viaggio: OneDrive, Dropbox, WebDAV, cartella locale (**modalità file**) oppure Itinerea Sync Server (**modalità server**). **Google Drive** vale solo per la sincronizzazione personale e i backup, e solo su desktop (deciso il 14/11/2026, 16.3). iCloud Drive è escluso. |
 | **Fornitore** | `Provider` | Il servizio esterno usato per un tipo di dato (mappa, percorsi, ricerca, mezzi, meteo…). Di default è un servizio pubblico, sostituibile con un server dell'utente. |
 | **Pacchetto dati** | `DataPack` | File scaricato e usato offline: regione di mappa (PMTiles o MBTiles), luoghi di una zona, database veicoli, liste dei badge, tabelle pedaggi. |
 | **Budget** | campi `budgetMode`, `budgetTotal` (Trip) e `budget` (Day) | Limite di spesa del viaggio: generale oppure per giorno. |
@@ -212,7 +212,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
                 ▼                    ┌───────────────────────────────┐
 ┌─────────────────────────────────┐  │ Servizi pubblici esterni      │
 │ Spazio di sincronizzazione      │  │ (fornitori intercambiabili):  │
-│ • Google Drive                  │  │ mappa, percorsi, ricerca,     │
+│ • Google Drive (solo personale) │  │ mappa, percorsi, ricerca,     │
 │ • Microsoft OneDrive · Dropbox  │  │ mezzi, meteo, cambi,          │
 │ • WebDAV (Nextcloud, NAS…)      │  │ carburante, POI OSM           │
 │ • Cartella locale (Syncthing…)  │  │ + pacchetti dati statici      │
@@ -236,7 +236,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 | Navigazione | Link diretti alle app esterne (Google Maps, Waze, Apple Maps, Sygic, OsmAnd, Organic Maps…) con le tappe intermedie | Il navigatore interno è un non-obiettivo (1.5) |
 | Lingue | Sistema di localizzazione ufficiale Flutter (file ARB) | Italiano e inglese al lancio |
 | Notifiche | flutter_local_notifications | **Solo notifiche locali**, calcolate sul dispositivo. Niente notifiche push: richiederebbero un server. |
-| Sincronizzazione | Client REST per Google Drive, Microsoft Graph (OneDrive) e Dropbox, client WebDAV, accesso a cartella locale, client WebSocket per il Sync Server | Login OAuth con PKCE nel browser di sistema. iCloud Drive escluso (l'app non è distribuita sugli store Apple). |
+| Sincronizzazione | Client REST per Google Drive, Microsoft Graph (OneDrive) e Dropbox, client WebDAV, accesso a cartella locale, client WebSocket per il Sync Server | Login OAuth con PKCE nel browser di sistema. Google Drive: solo sincronizzazione personale e backup, solo su desktop (16.3). iCloud Drive escluso (l'app non è distribuita sugli store Apple). |
 | Dipendenze | **Preferire librerie open source** | Evitare SDK proprietari (es. Google Play Services, Firebase), così l'app può entrare in F-Droid |
 | Altre librerie | Scelte durante lo sviluppo | PDF (F1.14), posizione, condivisione, apertura di link, selettore di file e simili: le propone Claude Code rispettando le regole di CLAUDE.md (licenza, piattaforme, manutenzione) |
 
@@ -261,7 +261,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 
 | | **Modalità file** | **Modalità server** |
 |---|---|---|
-| Spazi | Google Drive, OneDrive, Dropbox, WebDAV, cartella locale (es. sincronizzata da Syncthing) | Itinerea Sync Server installato dall'utente |
+| Spazi | OneDrive, Dropbox, WebDAV, cartella locale (es. sincronizzata da Syncthing). Google Drive solo per i dispositivi di una stessa persona, su desktop | Itinerea Sync Server installato dall'utente |
 | Come funziona | Ogni viaggio è una cartella. Ogni dispositivo scrive i propri file di operazioni in una sua sottocartella (`ops/<idDispositivo>/`) e legge quelli degli altri. Periodicamente si scrive un'istantanea completa per velocizzare l'apertura. | Le operazioni passano dal server via WebSocket e arrivano subito agli altri |
 | Tempo di arrivo delle modifiche | **Da pochi secondi a qualche minuto**: l'app controlla le novità all'apertura, ogni 30 secondi mentre è in primo piano e con "Aggiorna" | **Entro 2 secondi** |
 | Presenza ("chi sta guardando") | No | Sì |
@@ -280,18 +280,18 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 
 > **Da validare con un prototipo:** modalità file con 2–5 dispositivi sullo stesso viaggio, modifiche offline e riconnessione. In M1 si prova **Google Drive** (il caso più incerto, R1); OneDrive e Dropbox si provano prima di iniziare la Fase 2.
 >
-> **Esito della prova su Google Drive (14/11/2026, dettagli in 16.3):** con il permesso `drive.file` il formato "una cartella per dispositivo, tanti file di operazioni" (8.6) **non funziona tra account diversi**: i file creati dall'app di un partecipante sono invisibili all'app degli altri. Funziona invece un **file con identificativo fisso**, scelto una volta sola da ogni partecipante con il selettore di Google: lo leggono e lo scrivono tutti. Per Google Drive serve quindi una disposizione dei file diversa, **da decidere**. Su Android non esiste oggi un modo ammesso di fare il login a Google senza Google Play Services.
+> **Esito della prova su Google Drive (14/11/2026, dettagli in 16.3):** con il permesso `drive.file` il formato "una cartella per dispositivo, tanti file di operazioni" (8.6) **non funziona tra account diversi**: i file creati dall'app di un partecipante sono invisibili all'app degli altri. Funziona invece un **file con identificativo fisso**, scelto una volta sola da ogni partecipante con il selettore di Google: lo leggono e lo scrivono tutti. **Deciso il 14/11/2026:** Google Drive non è uno spazio per i gruppi; resta per la sincronizzazione personale e i backup, solo su desktop. Su Android non esiste oggi un modo ammesso di fare il login a Google senza Google Play Services. La sincronizzazione tra dispositivi dello stesso account non è ancora stata provata: va verificata prima di implementarla (F1.13).
 
 ### 4.4 Partecipanti, inviti e ruoli senza server
 
-- **Nessun account Itinerea.** Ogni installazione ha un **profilo locale** (nome visualizzato + ID generato). Nel viaggio, il partecipante è identificato da questo profilo e dall'account del servizio usato (es. l'account Google).
-- **Tutti i partecipanti di un viaggio usano lo stesso spazio**, scelto da chi crea il viaggio. Con Google Drive, ognuno deve avere un account Google; con il Sync Server, le credenziali di quel server.
+- **Nessun account Itinerea.** Ogni installazione ha un **profilo locale** (nome visualizzato + ID generato). Nel viaggio, il partecipante è identificato da questo profilo e dall'account del servizio usato (es. l'account Dropbox).
+- **Tutti i partecipanti di un viaggio usano lo stesso spazio**, scelto da chi crea il viaggio. Con Dropbox, ognuno deve avere un account Dropbox; con il Sync Server, le credenziali di quel server.
 - **Invito:** il proprietario condivide la cartella del viaggio (o lo invita sul Sync Server) e l'app genera un **link o codice di invito** che, aperto in Itinerea, collega il viaggio.
 - **Ruoli in modalità file:** sono i **permessi della cartella**. Chi ha accesso in sola lettura è **Visualizzatore**: il servizio stesso gli impedisce di scrivere. Chi può scrivere è **Editor**. Il **Proprietario** è chi possiede la cartella. L'app mostra e modifica i ruoli attraverso le funzioni di condivisione del servizio, dove l'API lo permette; dove non lo permette, spiega passo passo come cambiarli dal sito del servizio.
 - **Ruoli in modalità server:** applicati dal Sync Server.
 
 > **Rischi tecnici da verificare con il prototipo:**
-> - Google Drive: con il permesso più ristretto (`drive.file`, accesso solo ai file creati o aperti dall'app) l'accesso a una cartella **condivisa da un altro utente** potrebbe richiedere che l'invitato la apra tramite il selettore di file di Google. Va provato. Il client OAuth va registrato presso Google, Microsoft e Dropbox a nome del progetto. **Provato il 14/11/2026 (16.3):** senza selettore l'invitato non vede nulla (la cartella risponde 404 e l'elenco "condivisi con me" è vuoto); con il selettore ottiene accesso **solo agli elementi scelti, non al contenuto delle cartelle scelte**. L'invito deve quindi contenere l'identificativo della cartella, e i ruoli non si sono potuti cambiare dall'app dopo che l'invitato aveva scritto nella cartella.
+> - Google Drive: con il permesso più ristretto (`drive.file`, accesso solo ai file creati o aperti dall'app) l'accesso a una cartella **condivisa da un altro utente** potrebbe richiedere che l'invitato la apra tramite il selettore di file di Google. Va provato. Il client OAuth va registrato presso Google, Microsoft e Dropbox a nome del progetto. **Provato il 14/11/2026 (16.3):** senza selettore l'invitato non vede nulla (la cartella risponde 404 e l'elenco "condivisi con me" è vuoto); con il selettore ottiene accesso **solo agli elementi scelti, non al contenuto delle cartelle scelte**. L'invito deve quindi contenere l'identificativo della cartella, e i ruoli non si sono potuti cambiare dall'app dopo che l'invitato aveva scritto nella cartella. **Deciso il 14/11/2026:** Google Drive non si usa per i gruppi.
 > - Microsoft OneDrive: condivisione di cartelle tra account personali via Microsoft Graph.
 > - Dropbox: condivisione di cartelle tra account e permessi di sola lettura tramite API.
 
@@ -300,7 +300,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 Il backup serve a **non perdere i dati** e a spostarli tra dispositivi senza spazio di sincronizzazione. Lo spazio di sincronizzazione, quando c'è, fa già anche da backup.
 
 - **Formato:** un file `.itinerea` per viaggio (JSON + allegati in un unico pacchetto compresso), con password facoltativa per cifrarlo. Lo stesso formato serve per condividere itinerari (F4.3).
-- **Destinazioni:** Google Drive, OneDrive, Dropbox, WebDAV oppure un file salvato dove vuole l'utente.
+- **Destinazioni:** Google Drive (solo su desktop), OneDrive, Dropbox, WebDAV oppure un file salvato dove vuole l'utente.
 - **Automatico:** l'utente sceglie la frequenza (a ogni modifica / giornaliero / manuale).
 - **Ripristino:** si importa il file e il viaggio torna com'era.
 
@@ -364,7 +364,7 @@ CLAUDE.md           regole per Claude Code
 |---|---|---|---|
 | **GitHub Releases** | Android (APK), Windows (installer, formato da scegliere in M7), macOS (DMG), Linux (AppImage) | Controllo nell'app (vedi sotto) | Sempre disponibile, è il canale di riferimento |
 | **Google Play** | Android | Automatici dallo store | Iscrizione sviluppatore una tantum. Per i nuovi account personali Google chiede un **test chiuso con almeno 12 tester per 14 giorni consecutivi** prima della pubblicazione: vanno trovati per tempo (amici, compagni di corso). |
-| **F-Droid** | Android | Automatici dallo store | Compila l'app dal codice sorgente. Richiede solo dipendenze open source. Segnalerà probabilmente l'"anti-funzione" *NonFreeNet*, perché l'app può usare servizi non liberi (Google Drive, OneDrive, Dropbox): è normale e non impedisce la pubblicazione. |
+| **F-Droid** | Android | Automatici dallo store | Compila l'app dal codice sorgente. Richiede solo dipendenze open source. Segnalerà probabilmente l'"anti-funzione" *NonFreeNet*, perché l'app può usare servizi non liberi (OneDrive, Dropbox; Google Drive su Android non è disponibile): è normale e non impedisce la pubblicazione. |
 | **Flathub** | Linux | Automatici | Gratuito |
 | *Non usati* | iOS (App Store), Microsoft Store, Mac App Store | — | Decisione presa |
 
@@ -701,8 +701,8 @@ Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall
 #### F1.13 Spazio di sincronizzazione personale e backup
 **Requisiti**
 - L'app si usa **senza alcun account**.
-- Facoltativo: collegare uno spazio di sincronizzazione (Google Drive, OneDrive, Dropbox, WebDAV o cartella locale) per avere i propri viaggi su tutti i propri dispositivi (modalità file, 4.3).
-- Backup su Google Drive, OneDrive, Dropbox, WebDAV o file locale, manuale o automatico (sezione 4.5).
+- Facoltativo: collegare uno spazio di sincronizzazione (OneDrive, Dropbox, WebDAV, cartella locale; Google Drive solo su desktop) per avere i propri viaggi su tutti i propri dispositivi (modalità file, 4.3).
+- Backup su Google Drive (solo su desktop), OneDrive, Dropbox, WebDAV o file locale, manuale o automatico (sezione 4.5).
 
 **CA**
 - Un viaggio creato offline e senza spazio collegato si sincronizza correttamente quando l'utente collega uno spazio.
@@ -726,12 +726,12 @@ Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall
 
 #### F2.1 Collaborazione
 **Requisiti**
-- Il proprietario sceglie lo spazio del viaggio: **modalità file** (Google Drive, OneDrive, Dropbox, WebDAV) o **modalità server** (Itinerea Sync Server self-hosted). Vedi 4.3 e 4.4.
-- Invito tramite link o codice generato dall'app. Chi lo riceve deve avere l'app e accesso allo stesso spazio (es. un account Google).
+- Il proprietario sceglie lo spazio del viaggio: **modalità file** (OneDrive, Dropbox, WebDAV) o **modalità server** (Itinerea Sync Server self-hosted). Vedi 4.3 e 4.4.
+- Invito tramite link o codice generato dall'app. Chi lo riceve deve avere l'app e accesso allo stesso spazio (es. un account Dropbox). Google Drive non è tra gli spazi per i gruppi (16.3).
 - Ruoli: **Proprietario**, **Editor**, **Visualizzatore**.
 - Tempi: in modalità file le modifiche arrivano in pochi secondi o minuti (controllo all'apertura, ogni 30 secondi in primo piano e con "Aggiorna"); in modalità server entro 2 secondi, con presenza e blocco morbido delle note.
 - Cronologia delle versioni delle note in entrambe le modalità.
-- Cifratura end-to-end facoltativa per viaggio (4.3), consigliata con Google Drive, OneDrive e Dropbox.
+- Cifratura end-to-end facoltativa per viaggio (4.3), consigliata con OneDrive e Dropbox.
 - Modifiche offline unite senza conflitti al ritorno online.
 - L'interfaccia indica sempre la modalità e l'ultimo aggiornamento ("Aggiornato 20 s fa").
 
@@ -1105,7 +1105,7 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | `profileId` | ID | Profilo locale della persona |
 | `displayName` | testo | |
 | `role` | `owner` \| `editor` \| `viewer` | In modalità file è un riflesso dei permessi della cartella. In Fase 1 c'è un solo partecipante, l'utente (`owner`). |
-| `providerAccount` | testo? | Es. email dell'account Google, solo per gestire la condivisione |
+| `providerAccount` | testo? | Es. email dell'account del servizio, solo per gestire la condivisione |
 | `color` | colore | Per distinguere le persone nell'interfaccia |
 
 **Segment** (Segmento)
@@ -1642,7 +1642,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 
 | # | Rischio | Impatto | Mitigazione |
 |---|---|---|---|
-| R1 | Google Drive: l'accesso alle cartelle condivise con il permesso ristretto potrebbe essere scomodo per chi riceve l'invito | Alto (collaborazione) | Prototipo in M1. Piani B: selettore di file di Google per l'invitato, oppure consigliare Dropbox, WebDAV o Sync Server per i gruppi. **Provato in M1 (14/11/2026, 16.3): funziona solo con limiti pesanti.** Su desktop il selettore di Google funziona, ma dà accesso ai soli file scelti: il formato a più file di 8.6 non è utilizzabile, serve un file a identificativo fisso scelto una volta. **Su Android non c'è un login ammesso senza Google Play Services.** Come procedere è da decidere |
+| R1 | Google Drive: l'accesso alle cartelle condivise con il permesso ristretto potrebbe essere scomodo per chi riceve l'invito | Alto (collaborazione) | Prototipo in M1. Piani B: selettore di file di Google per l'invitato, oppure consigliare Dropbox, WebDAV o Sync Server per i gruppi. **Provato in M1 (14/11/2026, 16.3): funziona solo con limiti pesanti.** Su desktop il selettore di Google funziona, ma dà accesso ai soli file scelti: il formato a più file di 8.6 non è utilizzabile, serve un file a identificativo fisso scelto una volta. **Su Android non c'è un login ammesso senza Google Play Services.** **Deciso il 14/11/2026:** Google Drive solo per sincronizzazione personale e backup, solo su desktop; per i gruppi OneDrive, Dropbox, WebDAV, cartella locale o Sync Server |
 | R2 | Valhalla di FOSSGIS: condizioni d'uso o limiti incompatibili con l'uso da parte di un'app | Alto (percorsi) | Rileggere le condizioni prima del rilascio, cache aggressiva, fornitore configurabile (4.6), documentare come installare un proprio server. **Condizioni lette il 13/11/2026 (5.6): l'uso da parte di un'app non commerciale è compatibile**, con obblighi precisi: una richiesta al secondo, User-Agent dell'app, `X-Client-Id`, avviso su GitHub Discussions di Valhalla, email di contatto pubblica, attribuzione con link a "fixthemap". Il permesso può essere revocato in qualsiasi momento e dietro al servizio c'è un solo server: il rischio resta alto se l'app diventa popolare (R9) |
 | R3 | Download regionale delle tile più complesso del previsto (il pacchetto `pmtiles` legge ma non scrive archivi) | Medio (mappe offline) | Prototipo in M1; salvare le tile in un archivio locale semplice (es. MBTiles/SQLite). Piano B: cache delle tile visitate o import di file preparati. **Provato in M1: funziona con limiti** (16.3). Scrivere un archivio MBTiles locale è semplice (pacchetto `mbtiles`); il limite vero sono le condizioni d'uso (50 MB per download) e la lettura di PMTiles nell'app |
 | R4 | Verifica obbligatoria degli sviluppatori Android e futuro di F-Droid | Medio (distribuzione) | Registrare i nomi di pacchetto con l'account Google Play; seguire gli sviluppi di F-Droid |
@@ -1651,7 +1651,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R7 | Qualità del percorso panoramico calcolato sul dispositivo | Medio | Etichetta "il meglio possibile", modifica manuale sempre disponibile |
 | R8 | Estrarre consigli dal testo di Wikivoyage | Medio | Partire dai dati strutturati (Wikidata, OSM) e aggiungere Wikivoyage solo dove la struttura delle pagine lo permette |
 | R9 | Servizi pubblici sovraccarichi se l'app diventa popolare | Medio | Regole 5.4, fornitori configurabili, guide al self-hosting |
-| R10 | Registrazione delle app OAuth presso Google, Microsoft e Dropbox (verifiche, schermate di consenso) | Medio | Avviare le registrazioni in M1, usare permessi non sensibili. **Google (14/11/2026):** registrato un client di prova di tipo "Desktop app" in stato "Testing" (100 utenti, permessi che scadono dopo 7 giorni). `drive.file` è non sensibile; l'ambito `drive` completo è "restricted" e richiede verifica e valutazione di sicurezza annuale: da evitare. Il client Android è legato a nome del pacchetto e impronta SHA-1 della firma, diversa tra F-Droid, Google Play e GitHub. Restano da leggere i requisiti per uscire da "Testing" (5.6) |
+| R10 | Registrazione delle app OAuth presso Google, Microsoft e Dropbox (verifiche, schermate di consenso) | Medio | Avviare le registrazioni in M1, usare permessi non sensibili. **Google (14/11/2026):** registrato un client di prova di tipo "Desktop app" in stato "Testing" (100 utenti, permessi che scadono dopo 7 giorni). `drive.file` è non sensibile; l'ambito `drive` completo è "restricted" e richiede verifica e valutazione di sicurezza annuale: da evitare. Il client Android è legato a nome del pacchetto e impronta SHA-1 della firma, diversa tra F-Droid, Google Play e GitHub. Dopo la decisione su R1 serve solo il client desktop. Restano da leggere i requisiti per uscire da "Testing" (5.6) |
 | R11 | Progetto molto grande per una persona sola | Alto | Ordine rigoroso delle fasi, MVP piccolo, CLAUDE.md che vieta di anticipare le fasi |
 | R12 | Google Play: trovare 12 tester per 14 giorni | Basso | Cercarli durante la beta (M6) |
 | R13 | Nome "Itinerea" troppo simile a marchi esistenti, in particolare "Itinera" (app di viaggio, marchio registrato negli USA per servizi di viaggio) | Medio | Controllo su TMview (UE e Italia) prima della 1.0; l'app è distribuita in Europa e non negli store Apple |
@@ -1819,10 +1819,12 @@ Risposte alle domande poste prima della prova:
 
 Non misurato: scrittura con ruolo di sola lettura; due partecipanti che riscrivono lo stesso file nello stesso momento; più di due account; limiti di frequenza; cambio dei ruoli quando l'invitato non ha creato nulla nella cartella.
 
-Proposte, **da decidere** (cambiano F1.13 e F2.1, quindi la scelta spetta all'utente):
+Proposte presentate all'utente (cambiano F1.13 e F2.1):
 1. **Google Drive solo su desktop, con una disposizione dei file dedicata:** alla creazione del viaggio l'app del proprietario crea un numero fisso di file, uno per partecipante possibile; l'invitato apre l'invito, il selettore si apre dentro la cartella e li sceglie tutti in una volta; ognuno scrive solo nel proprio file. Nessuno crea file nuovi, quindi tutti vedono tutto. Si fonda su ciò che è stato misurato (file di A scelto da B, scritto da entrambi), ma lo schema completo va provato prima di F2.1.
 2. **Google Drive fuori dall'elenco degli spazi consigliati**, a favore di WebDAV, cartella locale, Dropbox, OneDrive e Sync Server (da provare prima della Fase 2). Google Drive resterebbe, se si vuole, solo per la sincronizzazione personale e i backup su desktop: lì i file sono tutti creati dallo stesso account e `drive.file` dovrebbe bastare (non provato).
 3. **Android:** nessun Google Drive finché Google non offre un login senza Play Services. Chi usa Android sincronizza con WebDAV, cartella locale o Sync Server.
+
+**Deciso dall'utente il 14/11/2026: proposta 2**, con la 3 come conseguenza. Google Drive resta per la sincronizzazione personale e i backup, solo su desktop; non è uno spazio per i gruppi. La proposta 1 è scartata. Prima di implementare F1.13 su Google Drive va provata la sincronizzazione tra due dispositivi dello stesso account.
 
 ---
 
