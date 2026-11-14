@@ -18,3 +18,28 @@ It will ship as a Docker image and as a single executable, with minimal configur
 ## Technology
 
 Proposed: Dart (the same language as the app, with shared models) and SQLite. Alternative: PocketBase. The final choice is made at the start of phase 2 (PRD 4.7).
+
+## Planned layout
+
+Nothing below exists yet. It is the shape the folder will take in phase 2, so that the rest of the repository can refer to it.
+
+| Path | Content |
+|---|---|
+| `README.md` | This file, then the installation guide (one Docker command, PRD F2.1) |
+| `PROTOCOL.md` | The protocol between the app and the server |
+| `bin/` | Entry point of the single executable |
+| `lib/` | Relay, storage, users and roles, presence |
+| `test/` | Tests with several simulated devices (CLAUDE.md, section 5) |
+| `Dockerfile` | Image published with the releases |
+
+A Dockerfile is deliberately not included yet: an empty one would look like something that can be installed.
+
+## What the app already assumes
+
+The app side of the contract is scaffolded in `app/lib/core/sync/`:
+
+- `SyncSpace` with `SyncMode.server` and `SyncSpaceKind.syncServer`;
+- `SyncOperation`, the same operation format used in file mode (PRD 8.6);
+- `SyncEngine`, which queues operations while offline and sends them when the connection is back (PRD 9.4).
+
+See [PROTOCOL.md](PROTOCOL.md) for the outline of the protocol.

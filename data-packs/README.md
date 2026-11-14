@@ -14,3 +14,16 @@ Scripts that turn open data into **static files** the app downloads and uses off
 | Shop items | Defined in this repository | F4.2 Points and shop | 4 |
 
 Data keeps the licence of its source: see [LICENSE-DATA.md](../LICENSE-DATA.md).
+
+## Layout
+
+One folder per pack, each with its own README. None contains scripts or data yet.
+
+| Folder | Pack | Phase |
+|---|---|---|
+| [`vehicles/`](vehicles/README.md) | Cars | 2 |
+| [`tolls/`](tolls/README.md) | Tolls and vignettes | 3 |
+| [`badges/`](badges/README.md) | Badge place lists | 4 |
+| [`shop/`](shop/README.md) | Shop items | 4 |
+
+In the app, a downloaded pack is a `DataPack` (`app/lib/core/models/cache.dart`) and packs are fetched through `DataPackProvider` (`app/lib/core/providers/providers.dart`).
