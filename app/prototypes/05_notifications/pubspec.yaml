@@ -1,0 +1,23 @@
+name: notif_probe
+description: "M1 prototype 5: scheduled notifications on Windows and Linux with flutter_local_notifications. Not production code."
+publish_to: 'none'
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Exact versions on purpose: the prototype measures these releases.
+  flutter_local_notifications: 23.0.2
+  material_ui: ^1.1.0
+  timezone: 0.11.2
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon.png
