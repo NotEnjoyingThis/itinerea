@@ -1397,7 +1397,8 @@ Le notifiche configurabili arrivano con F2.9. In Fase 1 c'è solo l'avviso di nu
 
 - **Android:** notifiche programmate affidabili. Per gli orari esatti serve il permesso di allarmi esatti (Android 12+). Se l'utente lo nega, le notifiche possono arrivare con qualche minuto di ritardo.
 - **macOS:** notifiche programmate supportate.
-- **Windows e Linux:** il supporto alle notifiche **programmate** è limitato e va verificato con `flutter_local_notifications` all'avvio dello sviluppo. Se manca, le notifiche funzionano solo con l'app aperta, anche ridotta a icona o nell'area di notifica. Nelle impostazioni l'app dice chiaramente cosa è garantito su quel sistema.
+- **Windows** (provato in M1, 16.3): le notifiche programmate sono affidate al sistema e arrivano anche con l'app chiusa e dopo un riavvio; si possono annullare finché non sono state mostrate. Condizione: l'app deve avere una **voce nel menu Start** (la crea l'installazione; una versione portatile deve crearla da sola), altrimenti Windows accetta le notifiche ma non le mostra. Non esistono notifiche ripetute: ogni occorrenza va programmata. Il clic sulla notifica non ha riaperto l'app nella prova: da risolvere prima di usarlo.
+- **Linux** (provato in M1, 16.3): il pacchetto **non programma** notifiche. L'app le mostra con un proprio timer, quindi **solo mentre è in esecuzione**, anche ridotta a icona o nell'area di notifica. Nelle impostazioni l'app dice chiaramente cosa è garantito su quel sistema.
 - Le notifiche sulle **modifiche dei compagni** dipendono da quando l'app riesce a sincronizzare: su mobile, in background, possono arrivare in ritardo.
 
 ---
@@ -1607,7 +1608,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 | Milestone | Contenuto | Risultato |
 |---|---|---|
 | **M0 — Fondamenta** | Repository, licenza, CLAUDE.md, struttura cartelle (4.8), progetto Flutter che parte su 4 piattaforme, CI con test e build, localizzazione it/en, tema chiaro e scuro | Schermata vuota con tema e lingua su tutte le piattaforme. **Completata il 13/11/2026** (PR n. 1): verificata in locale su Android e Windows e in CI su Android, Linux, Windows, macOS e iOS senza firma |
-| **M1 — Prototipi di rischio** | Prove isolate dei punti incerti (16.1): mappa vettoriale OpenFreeMap con `vector_map_tiles` su Linux e Windows; download regionale dal PMTiles di OpenFreeMap e lettura offline; percorsi Valhalla con opzioni e alternative; altitudine; sync in modalità file su Google Drive tra 2 dispositivi (con registrazione del client OAuth); notifiche programmate su desktop | Per ogni prova: funziona / funziona con limiti / non funziona, e PRD aggiornato. **In corso**: esiti in 16.3 |
+| **M1 — Prototipi di rischio** | Prove isolate dei punti incerti (16.1): mappa vettoriale OpenFreeMap con `vector_map_tiles` su Linux e Windows; download regionale dal PMTiles di OpenFreeMap e lettura offline; percorsi Valhalla con opzioni e alternative; altitudine; sync in modalità file su Google Drive tra 2 dispositivi (con registrazione del client OAuth); notifiche programmate su desktop | Per ogni prova: funziona / funziona con limiti / non funziona, e PRD aggiornato. **Le cinque prove sono state eseguite (13–14/11/2026)**: esiti in 16.3 |
 | **M2 — Nucleo dei dati** | Modello dati (8), database drift, log delle operazioni e regole CRDT con test | Test che simulano modifiche concorrenti e offline |
 | **M3 — Viaggio, giorni e tappe** | F1.1, F1.2, F1.3, F1.6 (tappe), schermate S01–S04 | Si pianifica un viaggio senza mappa |
 | **M4 — Mappa e percorsi** | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12, S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
@@ -1646,7 +1647,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R2 | Valhalla di FOSSGIS: condizioni d'uso o limiti incompatibili con l'uso da parte di un'app | Alto (percorsi) | Rileggere le condizioni prima del rilascio, cache aggressiva, fornitore configurabile (4.6), documentare come installare un proprio server. **Condizioni lette il 13/11/2026 (5.6): l'uso da parte di un'app non commerciale è compatibile**, con obblighi precisi: una richiesta al secondo, User-Agent dell'app, `X-Client-Id`, avviso su GitHub Discussions di Valhalla, email di contatto pubblica, attribuzione con link a "fixthemap". Il permesso può essere revocato in qualsiasi momento e dietro al servizio c'è un solo server: il rischio resta alto se l'app diventa popolare (R9) |
 | R3 | Download regionale delle tile più complesso del previsto (il pacchetto `pmtiles` legge ma non scrive archivi) | Medio (mappe offline) | Prototipo in M1; salvare le tile in un archivio locale semplice (es. MBTiles/SQLite). Piano B: cache delle tile visitate o import di file preparati. **Provato in M1: funziona con limiti** (16.3). Scrivere un archivio MBTiles locale è semplice (pacchetto `mbtiles`); il limite vero sono le condizioni d'uso (50 MB per download) e la lettura di PMTiles nell'app |
 | R4 | Verifica obbligatoria degli sviluppatori Android e futuro di F-Droid | Medio (distribuzione) | Registrare i nomi di pacchetto con l'account Google Play; seguire gli sviluppi di F-Droid |
-| R5 | Notifiche programmate limitate su Windows e Linux | Basso | Verifica in M1; comportamento con app aperta o in area di notifica |
+| R5 | Notifiche programmate limitate su Windows e Linux | Basso | Verifica in M1; comportamento con app aperta o in area di notifica. **Provato in M1 (14/11/2026, 16.3): funziona con limiti.** Windows: programmate affidabili anche ad app chiusa e dopo un riavvio, purché l'app abbia una voce nel menu Start. Linux: solo con l'app in esecuzione |
 | R6 | Dati OSM incompleti (orari di apertura, colonnine) | Medio | Etichette di onestà (T4), campi sempre modificabili, invito a contribuire a OSM |
 | R7 | Qualità del percorso panoramico calcolato sul dispositivo | Medio | Etichetta "il meglio possibile", modifica manuale sempre disponibile |
 | R8 | Estrarre consigli dal testo di Wikivoyage | Medio | Partire dai dati strutturati (Wikidata, OSM) e aggiungere Wikivoyage solo dove la struttura delle pagine lo permette |
@@ -1825,6 +1826,43 @@ Proposte presentate all'utente (cambiano F1.13 e F2.1):
 3. **Android:** nessun Google Drive finché Google non offre un login senza Play Services. Chi usa Android sincronizza con WebDAV, cartella locale o Sync Server.
 
 **Deciso dall'utente il 14/11/2026: proposta 2**, con la 3 come conseguenza. Google Drive resta per la sincronizzazione personale e i backup, solo su desktop; non è uno spazio per i gruppi. La proposta 1 è scartata. Prima di implementare F1.13 su Google Drive va provata la sincronizzazione tra due dispositivi dello stesso account.
+
+**Prova 5 — Notifiche programmate su Windows e Linux (R5) — 14/11/2026 — funziona con limiti**
+
+Pacchetti: `flutter_local_notifications` 23.0.2 (con `flutter_local_notifications_windows` 4.0.1 e `flutter_local_notifications_linux` 9.0.0) e `timezone` 0.11.2. Piccola app Flutter con un pulsante per chiamata e un registro su file. Windows: PC di sviluppo (Windows 11 Pro 25H2), app non impacchettata, osservazione a vista e orari letti dal registro di Windows delle notifiche. Linux: runner CI con schermo virtuale e servizio di notifiche `dunst`, senza osservazione a vista.
+
+| Prova su Windows | Esito |
+|---|---|
+| Compilazione | richiede il componente **C++ ATL** di Visual Studio Build Tools (`atlbase.h`); senza, la build fallisce. Il README del pacchetto non lo dice. Sul runner Windows di GitHub è già presente |
+| Notifica immediata e programmata, app **senza** voce nel menu Start | le chiamate riescono e Windows registra la consegna, ma **non compare nulla**, né a schermo né nel centro notifiche |
+| Stesse notifiche dopo aver creato un collegamento nel menu Start con l'identificativo dell'app | **compaiono** |
+| Programmata tra 30 s, app aperta | comparsa, 0,13 s dopo l'ora chiesta |
+| Programmata tra 30 s, app ridotta a icona | comparsa, 0,48 s dopo |
+| Programmata tra 2 min, app **chiusa** | comparsa, 0,43 s dopo |
+| Programmata tra 10 min, app chiusa e **Windows riavviato** subito dopo | comparsa, 0,05 s dopo l'ora chiesta, senza riaprire l'app |
+| Programmata e annullata 1,5 s dopo (`cancel`), senza pacchetto MSIX | non consegnata: l'annullamento delle notifiche **in attesa** funziona |
+| Elenco delle notifiche in attesa | corretto (1 dopo la programmazione, 0 dopo l'annullamento) |
+| Clic sulla notifica, app chiusa | **l'app non si riapre** |
+| Clic sulla notifica, app aperta | nessuna chiamata ricevuta dall'app |
+
+| Prova su Linux (CI) | Esito |
+|---|---|
+| Notifica immediata (`show`) | ricevuta dal servizio di notifiche |
+| Notifica programmata (`zonedSchedule`) | **`UnimplementedError`** |
+| Elenco delle notifiche in attesa, dettagli di avvio da notifica | `UnimplementedError` |
+| Timer interno all'app + `show` | ricevuta dopo i 5 s chiesti |
+| `cancel`, `cancelAll` | nessun errore |
+
+Che cosa significa:
+- **Windows:** le notifiche programmate sono gestite dal sistema e non dipendono dall'app in esecuzione. Il limite dichiarato dal pacchetto su `cancel` senza MSIX riguarda le notifiche già mostrate, non quelle in attesa. Il requisito vero, non documentato, è la voce nel menu Start: il pacchetto registra l'app solo nel registro di sistema e su Windows 11 25H2 non è bastato.
+- **Linux:** niente programmazione. Resta il timer dentro l'app, valido solo mentre il processo è vivo.
+
+Non misurato: notifica la cui ora cade mentre il PC è spento o sospeso; perché il clic non arriva all'app (il gestore del clic non risultava registrato; il collegamento di prova non lo indicava); app impacchettata MSIX; Linux su un PC reale con GNOME o KDE; Linux senza servizio di notifiche (in CI il servizio è partito da solo); macOS.
+
+Proposta:
+- Tenere `flutter_local_notifications`. Su Windows e macOS programmare con il sistema; su Linux con un timer interno, dichiarando nelle impostazioni che gli avvisi arrivano solo con l'app aperta (PRD 10.3).
+- Windows: distribuire con un'installazione che crea la voce nel menu Start; la versione portatile, se ci sarà, la crea al primo avvio. Aggiungere C++ ATL ai requisiti di compilazione in CONTRIBUTING quando l'app userà il pacchetto.
+- Prima di F2.9 (o di F1.3 se gli avvisi entrano prima): risolvere il clic sulla notifica e provare il caso del PC spento all'ora prevista.
 
 ---
 

@@ -13,6 +13,14 @@ flutter build windows --release   # or: flutter build linux --release
 
 On Windows the plugin needs the **C++ ATL** component of the Visual Studio Build Tools ("C++ ATL for latest v143 build tools"): without it the build stops at `atlbase.h`.
 
+## Start menu shortcut (Windows)
+
+Windows shows the notifications of an unpackaged app only if the app has a Start menu shortcut that carries its AppUserModelID. Without it every call succeeds and nothing appears. Create it once (and delete the `.lnk` file when done):
+
+```powershell
+.\tool\make_shortcut.ps1 -Target "$PWD\build\windows\x64\runner\Release\notif_probe.exe" -Aumid io.github.notenjoyingthis.itinerea.notifprobe -LinkPath "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Itinerea notification probe.lnk"
+```
+
 ## Run
 
 Start `build/windows/x64/runner/Release/notif_probe.exe` (or `build/linux/x64/release/bundle/notif_probe`) and use the buttons.

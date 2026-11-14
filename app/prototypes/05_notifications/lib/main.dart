@@ -61,13 +61,18 @@ const NotificationDetails details = NotificationDetails(
 Future<String> initialize() => attempt(
   'initialize',
   () => plugin.initialize(
-    settings: const InitializationSettings(
-      linux: LinuxInitializationSettings(defaultActionName: 'Open'),
+    settings: InitializationSettings(
+      linux: const LinuxInitializationSettings(defaultActionName: 'Open'),
       windows: WindowsInitializationSettings(
         appName: 'Itinerea notification probe',
         appUserModelId: 'io.github.notenjoyingthis.itinerea.notifprobe',
         // Random GUID made for this prototype only.
         guid: '6f1d2c1e-8a57-4c0b-9a3e-5d2b7c4e9f10',
+        // PROTO_NO_ICON=1 leaves the icon out, to compare.
+        iconPath: Platform.environment['PROTO_NO_ICON'] == '1'
+            ? null
+            : '${File(Platform.resolvedExecutable).parent.path}'
+                  r'\data\flutter_assets\assets\icon.png',
       ),
     ),
     onDidReceiveNotificationResponse: (response) =>
