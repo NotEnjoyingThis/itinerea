@@ -1665,7 +1665,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | # | Domanda | Serve entro |
 |---|---|---|
 | D1 | ~~Licenza GPL-3.0 "or-later" oppure "only"~~ — **Deciso:** GPL-3.0-or-later (12/11/2026) | — |
-| D2 | Approvare lo stile proposto da Claude Code in `docs/DESIGN.md` (partendo da Wanderlog) | M3 |
+| D2 | ~~Approvare lo stile proposto da Claude Code in `docs/DESIGN.md` (partendo da Wanderlog)~~ — **Deciso:** stile approvato il 14/11/2026, con i caratteri Inter e Manrope. Si applica all'app a partire da M3 | — |
 | D3 | Conferma dei default delle notifiche (10.2) | Fase 2 |
 | D4 | Valori di punti, prezzi dello shop e soglie dei badge (11.3–11.5) | Fase 4 |
 | D5 | Ordine delle lingue dopo italiano e inglese (14.1) | Fase 4 |
