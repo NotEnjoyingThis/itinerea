@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import 'ids.dart';
+import 'json_object.dart';
 import 'money.dart';
 import 'synced_entity.dart';
 import 'time.dart';
@@ -50,7 +51,24 @@ enum SplitType {
 /// The part of one participant in a split (PRD 8.3).
 class SplitEntry {
   /// Creates the part of [participantId].
-  const SplitEntry({required this.participantId, required this.value});
+  const SplitEntry({
+    required this.participantId,
+    required this.value,
+    this.unknown = const {},
+  });
+
+  /// Reads the part of one participant from its JSON object.
+  factory SplitEntry.fromJson(Map<String, Object?> json) {
+    final object = JsonObject(json);
+    return SplitEntry(
+      participantId: EntityId(object.read<String>(_participantId)),
+      value: object.read<int>(_value),
+      unknown: object.unknownExcept(const {_participantId, _value}),
+    );
+  }
+
+  static const String _participantId = 'participantId';
+  static const String _value = 'value';
 
   /// Participant the part belongs to.
   final EntityId participantId;
@@ -58,19 +76,67 @@ class SplitEntry {
   /// Percentage in hundredths, number of shares, or amount in minor units,
   /// depending on the split type. Always an integer.
   final int value;
+
+  /// Keys written by a newer version of the app, kept as they are.
+  final Map<String, Object?> unknown;
+
+  /// The part as a JSON object, unknown keys included.
+  Map<String, Object?> toJson() => {
+    ...unknown,
+    _participantId: participantId.value,
+    _value: value,
+  };
 }
 
 /// How an expense is divided, embedded in the expense (PRD 8.3).
-// TODO(Fase 2 F2.2): validate the sum (100% or the exact total).
+///
+/// Whether a split still fits the amount of its expense is checked by
+/// `ExpenseCheck`, after every sync.
+// TODO(Fase 2 F2.2): the amount each participant owes, with rounding.
 class Split {
   /// Creates a split.
-  const Split({required this.type, this.entries = const []});
+  const Split({
+    required this.type,
+    this.entries = const [],
+    this.unknown = const {},
+  });
+
+  /// Reads a split from its JSON object.
+  ///
+  /// Throws a [FormatException] if the kind of split is one this version of
+  /// the app does not know.
+  factory Split.fromJson(Map<String, Object?> json) {
+    final object = JsonObject(json);
+    final type = SplitType.values.asNameMap()[object.read<String>(_type)];
+    if (type == null) throw FormatException('Unknown kind of split', json);
+    return Split(
+      type: type,
+      entries: [
+        for (final entry in object.objects(_entries))
+          SplitEntry.fromJson(entry.json),
+      ],
+      unknown: object.unknownExcept(const {_type, _entries}),
+    );
+  }
+
+  static const String _type = 'type';
+  static const String _entries = 'entries';
 
   /// Kind of split.
   final SplitType type;
 
   /// Part of each participant.
   final List<SplitEntry> entries;
+
+  /// Keys written by a newer version of the app, kept as they are.
+  final Map<String, Object?> unknown;
+
+  /// The split as a JSON object, unknown keys included.
+  Map<String, Object?> toJson() => {
+    ...unknown,
+    _type: type.name,
+    _entries: [for (final entry in entries) entry.toJson()],
+  };
 }
 
 /// An expense (PRD 8.3).

@@ -1264,7 +1264,7 @@ I `LegSlot` seguono le coppie di posizioni vicine: quando le tappe si riordinano
 Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, prestiti e rimborsi.
 
 **Note** e **NoteVersion** (Nota e versioni)
-`Note`: `text`. `NoteVersion`: `noteId`, `text`, `author`, `hlc`. Si crea una versione a ogni salvataggio, con un massimo configurabile (es. ultime 50).
+`Note`: `text`. `NoteVersion`: `noteId`, `text`, `author`, `hlc`. Si crea una versione a ogni salvataggio, con un massimo configurabile (es. ultime 50). **Da M2 la cronologia si ricava dal log delle operazioni**: ogni testo che la nota ha avuto è in un'operazione, quindi è uguale su tutti i dispositivi senza salvare altro. `NoteVersion` come dato salvato servirà quando le operazioni vecchie verranno sostituite da un'istantanea (Fase 2).
 
 ### 8.4 Dati personali
 
@@ -1638,7 +1638,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 |---|---|---|
 | **M0 — Fondamenta** | Repository, licenza, CLAUDE.md, struttura cartelle (4.8), progetto Flutter che parte su 4 piattaforme, CI con test e build, localizzazione it/en, tema chiaro e scuro | Schermata vuota con tema e lingua su tutte le piattaforme. **Completata il 13/11/2026** (PR n. 1): verificata in locale su Android e Windows e in CI su Android, Linux, Windows, macOS e iOS senza firma |
 | **M1 — Prototipi di rischio** | Prove isolate dei punti incerti (16.1): mappa vettoriale OpenFreeMap con `vector_map_tiles` su Linux e Windows; download regionale dal PMTiles di OpenFreeMap e lettura offline; percorsi Valhalla con opzioni e alternative; altitudine; sync in modalità file su Google Drive tra 2 dispositivi (con registrazione del client OAuth); notifiche programmate su desktop | Per ogni prova: funziona / funziona con limiti / non funziona, e PRD aggiornato. **Le cinque prove sono state eseguite (13–14/11/2026)**: esiti in 16.3 |
-| **M2 — Nucleo dei dati** | Modello dati (8), database drift, log delle operazioni e regole CRDT con test | Test che simulano modifiche concorrenti e offline |
+| **M2 — Nucleo dei dati** | Modello dati (8), database drift, log delle operazioni e regole CRDT con test | Test che simulano modifiche concorrenti e offline. **Scritta il 14/11/2026** (PR n. 14, 15 e 16): ID, orologio logico, indici frazionari, due database, unione delle modifiche e controllo di coerenza, con test su 2 e 5 dispositivi simulati |
 | **M3 — Viaggio, giorni e tappe** | F1.1, F1.2, F1.3, F1.6 (tappe), schermate S01–S04 | Si pianifica un viaggio senza mappa |
 | **M4 — Mappa e percorsi** | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12, S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
 | **M5 — Prenotazioni, biglietti, budget, meteo** | F1.8, F1.9, F1.10, F1.11, S08–S12 | Un viaggio completo da usare davvero |

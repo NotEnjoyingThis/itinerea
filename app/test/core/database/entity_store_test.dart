@@ -30,13 +30,7 @@ void main() {
     Map<String, Object?> fields = const {'name': 'Uffizi', 'durationMin': 120},
   }) async {
     final id = EntityId.generate();
-    await store.create(
-      entity: 'Stop',
-      id: id,
-      tripId: trip,
-      parentId: day,
-      fields: fields,
-    );
+    await store.create(entity: 'Stop', id: id, tripId: trip, fields: fields);
     return id;
   }
 
@@ -68,21 +62,18 @@ void main() {
   });
 
   group('a local change', () {
-    test(
-      'creates the entity with its trip, its parent and its fields',
-      () async {
-        final id = await createStop();
+    test('creates the entity with its trip and its fields', () async {
+      final id = await createStop();
 
-        final stored = await store.read(id);
+      final stored = await store.read(id);
 
-        expect(stored, isNotNull);
-        expect(stored!.entity, 'Stop');
-        expect(stored.tripId, trip);
-        expect(stored.parentId, day);
-        expect(stored.fields, {'name': 'Uffizi', 'durationMin': 120});
-        expect(stored.isDeleted, isFalse);
-      },
-    );
+      expect(stored, isNotNull);
+      expect(stored!.entity, 'Stop');
+      expect(stored.tripId, trip);
+      expect(stored.parentId, isNull);
+      expect(stored.fields, {'name': 'Uffizi', 'durationMin': 120});
+      expect(stored.isDeleted, isFalse);
+    });
 
     test(
       'stamps every field of a new entity with the same clock value',
@@ -175,14 +166,15 @@ void main() {
   group('listing', () {
     test('filters by kind, trip and parent', () async {
       final otherDay = EntityId.generate();
-      final inDay = await createStop();
+      final inDay = await createStop(
+        fields: {'name': 'Uffizi', 'slotId': day.value},
+      );
       final elsewhere = EntityId.generate();
       await store.create(
         entity: 'Stop',
         id: elsewhere,
         tripId: trip,
-        parentId: otherDay,
-        fields: const {'name': 'Duomo'},
+        fields: {'name': 'Duomo', 'slotId': otherDay.value},
       );
       await store.create(
         entity: 'Note',
@@ -196,6 +188,11 @@ void main() {
 
       expect(ofTrip.map((e) => e.id), unorderedEquals([inDay, elsewhere]));
       expect(ofDay.map((e) => e.id), [inDay]);
+      expect((await store.read(inDay))!.parentId, day);
+      // Moving the stop to another position moves it in the index too.
+      await store.set(inDay, {'slotId': otherDay.value});
+      expect(await store.list('Stop', parentId: day), isEmpty);
+      expect(await store.list('Stop', parentId: otherDay), hasLength(2));
     });
   });
 
@@ -282,30 +279,47 @@ void main() {
       ]);
     });
 
-    test('a change that fails leaves no trace anywhere', () async {
+    test('the same identifier cannot be created twice', () async {
       final id = await createStop();
-      final operationsBefore = await store.pendingOperations();
 
-      // The same identifier cannot be created twice: the whole transaction
-      // is undone, including the operation and the clocks.
       await expectLater(
         store.create(
           entity: 'Stop',
           id: id,
           tripId: trip,
-          fields: const {'name': 'Twice', 'extra': true},
+          fields: const {'name': 'Twice'},
         ),
-        throwsA(isA<Exception>()),
+        throwsStateError,
       );
 
       expect((await store.read(id))!.fields['name'], 'Uffizi');
-      expect((await store.fieldClocks(id)).containsKey('extra'), isFalse);
-      expect(
-        await store.pendingOperations(),
-        hasLength(operationsBefore.length),
+      expect(await store.pendingOperations(), hasLength(1));
+    });
+
+    test('a change that fails halfway leaves no trace anywhere', () async {
+      final existing = await createStop();
+      // Break the last of the three writes of a change: the log.
+      await db.customStatement('DROP TABLE operation_rows');
+      final id = EntityId.generate();
+
+      await expectLater(
+        store.create(
+          entity: 'Stop',
+          id: id,
+          tripId: trip,
+          fields: const {'name': 'Half written'},
+        ),
+        throwsA(isA<Exception>()),
       );
-      final logged = await db.select(db.operationRows).get();
-      expect(logged, hasLength(operationsBefore.length));
+      await expectLater(
+        store.set(existing, {'name': 'Half changed'}),
+        throwsA(isA<Exception>()),
+      );
+
+      // The entity and the clocks written before the failure were undone.
+      expect(await store.read(id), isNull);
+      expect(await store.fieldClocks(id), isEmpty);
+      expect((await store.read(existing))!.fields['name'], 'Uffizi');
     });
 
     test('is stored as text that reads back as the same operation', () async {

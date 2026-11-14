@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 /// A calendar date without time or zone (PRD 8.1).
-// TODO(M2): validation, comparison and serialisation.
+// TODO(M3 F1.1): validation, comparison and serialisation.
 class LocalDate {
   /// Creates the date [year]-[month]-[day].
   const LocalDate(this.year, this.month, this.day);
@@ -17,7 +17,7 @@ class LocalDate {
 }
 
 /// A wall-clock time without date or zone (PRD 8.1).
-// TODO(M2): validation, comparison and serialisation.
+// TODO(M3 F1.1): validation, comparison and serialisation.
 class LocalTime {
   /// Creates the time [hour]:[minute].
   const LocalTime(this.hour, this.minute);
@@ -31,7 +31,7 @@ class LocalTime {
 
 /// A local date and time together with the IANA time zone of the place
 /// (PRD 8.1), for example 2026-03-12T09:30 in Europe/Dublin.
-// TODO(M2): conversion to and from absolute instants (PRD 9.6).
+// TODO(M3 F1.3): conversion to and from absolute instants (PRD 9.6).
 class ZonedLocalDateTime {
   /// Creates a local date and time in [timezone].
   const ZonedLocalDateTime({
