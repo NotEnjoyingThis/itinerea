@@ -59,5 +59,135 @@
   "themeDark": "Dark",
   "@themeDark": {
     "description": "Theme option: always use the dark appearance. Button label."
+  },
+  "scaffoldNoticeMilestone": "Milestone {milestone} – not available yet",
+  "@scaffoldNoticeMilestone": {
+    "description": "Shown on a placeholder screen of phase 1. It tells in which development milestone the screen will become real.",
+    "placeholders": {
+      "milestone": {
+        "type": "String",
+        "example": "M3"
+      }
+    }
+  },
+  "scaffoldNoticePhase": "Phase {phase} – not available yet",
+  "@scaffoldNoticePhase": {
+    "description": "Shown on a placeholder screen of a later phase of the project. Visible only in debug builds.",
+    "placeholders": {
+      "phase": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "scaffoldScreenCode": "Screen {code}",
+  "@scaffoldScreenCode": {
+    "description": "Small label with the code of the screen in the project documents, for developers.",
+    "placeholders": {
+      "code": {
+        "type": "String",
+        "example": "S03"
+      }
+    }
+  },
+  "scaffoldExplanation": "This is a placeholder: the screen has no features yet.",
+  "@scaffoldExplanation": {
+    "description": "Explains that the screen is an empty placeholder and not a finished feature."
+  },
+  "scaffoldCatalogTitle": "Scaffolding (debug)",
+  "@scaffoldCatalogTitle": {
+    "description": "Title of the developer list of placeholder screens. Exists only in debug builds."
+  },
+  "scaffoldCatalogIntro": "Placeholder screens of every milestone and phase. This list exists only in debug builds.",
+  "@scaffoldCatalogIntro": {
+    "description": "Text above the developer list of placeholder screens."
+  },
+  "scaffoldCatalogOpen": "Open the scaffolding list",
+  "@scaffoldCatalogOpen": {
+    "description": "Tooltip and screen reader label of the button that opens the developer list of placeholder screens."
+  },
+  "screenTripsHome": "Trips",
+  "@screenTripsHome": {
+    "description": "Name of screen S01: the home with the current, upcoming and past trips. Short, it is a title."
+  },
+  "screenNewTrip": "New trip",
+  "@screenNewTrip": {
+    "description": "Name of screen S02: the three-step creation of a trip. Short, it is a title."
+  },
+  "screenDay": "Day",
+  "@screenDay": {
+    "description": "Name of screen S03: the day with its stops, legs, warnings and the quick-add button. Short, it is a title."
+  },
+  "screenStopDetails": "Stop details",
+  "@screenStopDetails": {
+    "description": "Name of screen S04: the panel with the details and the plans of a stop. Short, it is a title."
+  },
+  "screenLegDetails": "Leg details",
+  "@screenLegDetails": {
+    "description": "Name of screen S05: the panel with the means, route options and alternatives of a leg. Short, it is a title."
+  },
+  "screenMap": "Map",
+  "@screenMap": {
+    "description": "Name of screen S06: the map with stops, routes and layers. Short, it is a title."
+  },
+  "screenEditRoute": "Edit route",
+  "@screenEditRoute": {
+    "description": "Name of screen S07: the route with draggable points on the map. Short, it is a title."
+  },
+  "screenBudget": "Budget",
+  "@screenBudget": {
+    "description": "Name of screen S08: the budget summary and the list of expenses. Short, it is a title."
+  },
+  "screenNewExpense": "New expense",
+  "@screenNewExpense": {
+    "description": "Name of screen S09: the panel that records an expense. Short, it is a title."
+  },
+  "screenBookings": "Bookings",
+  "@screenBookings": {
+    "description": "Name of screen S10: the list of bookings and tickets by date. Short, it is a title."
+  },
+  "screenTicket": "Ticket",
+  "@screenTicket": {
+    "description": "Name of screen S11: the full-screen view of a ticket. Short, it is a title."
+  },
+  "screenNewBooking": "New booking",
+  "@screenNewBooking": {
+    "description": "Name of screen S12: the form of a booking, by kind. Short, it is a title."
+  },
+  "screenParticipants": "Participants",
+  "@screenParticipants": {
+    "description": "Name of screen S13: the sync space of the trip, invitations and roles. Short, it is a title."
+  },
+  "screenVehicle": "Vehicle",
+  "@screenVehicle": {
+    "description": "Name of screen S14: the choice of the vehicle, its range and the stop planning. Short, it is a title."
+  },
+  "screenOfflineMaps": "Offline maps",
+  "@screenOfflineMaps": {
+    "description": "Name of screen S15: the map and place packs of a trip. Short, it is a title."
+  },
+  "screenNotifications": "Notifications",
+  "@screenNotifications": {
+    "description": "Name of screen S16: the notification settings by kind. Short, it is a title."
+  },
+  "screenAssistant": "Assistant",
+  "@screenAssistant": {
+    "description": "Name of screen S17: the planning assistant. Short, it is a title."
+  },
+  "screenProfile": "Profile",
+  "@screenProfile": {
+    "description": "Name of screen S18: badges, statistics, points and shop. Short, it is a title."
+  },
+  "screenExplore": "Explore",
+  "@screenExplore": {
+    "description": "Name of screen S19: the import and sharing of itineraries. Short, it is a title."
+  },
+  "screenSettings": "Settings",
+  "@screenSettings": {
+    "description": "Name of screen S20: language, theme, units, sync spaces, backups and providers. Short, it is a title."
+  },
+  "screenDataSources": "Data sources",
+  "@screenDataSources": {
+    "description": "Name of screen S21: the mandatory attributions of PRD 5.5. Short, it is a title."
   }
 }
