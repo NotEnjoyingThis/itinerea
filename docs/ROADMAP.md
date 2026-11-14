@@ -106,7 +106,8 @@ L'elenco completo, con il motivo di ognuna, è nei **punti aperti** di [`DECISIO
 | Entro | Che cosa |
 |---|---|
 | Prime issue | Creare nel repository le etichette usate dai modelli di issue |
-| Inizio di M4 | Misurare la mappa su un telefono Android reale e su un PC Linux con scheda grafica |
+| M3 | Includere nell'app i caratteri Inter e Manrope e applicare lo stile approvato |
+| Inizio di M4 | Misurare la mappa su un telefono Android reale e su un PC Linux con scheda grafica; allineare `CLAUDE.md` al nome `ServiceProvider` |
 | M4 (F1.5) | Trovare un caso reale per "evita sterrato", oppure presentarlo come "segnala lo sterrato" |
 | Milestone che introduce le notifiche | Scrivere in CONTRIBUTING il requisito C++ ATL per compilare su Windows; risolvere il clic sulla notifica |
 | M6 (F1.13) | Provare Google Drive tra due dispositivi dello stesso account; registrare il client OAuth definitivo |
