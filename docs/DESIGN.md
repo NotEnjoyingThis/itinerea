@@ -109,11 +109,12 @@ Un'icona non compare mai da sola quando il significato non è ovvio: ha un testo
 ## 6. Componenti
 
 - **Riga della tappa.** A sinistra l'orario (colonna di larghezza fissa), poi nome e una riga secondaria (durata, costo stimato, nota breve); a destra gli indicatori: biglietto, alternative, avviso. Un lucchetto piccolo accanto all'orario quando è fissato (`timeFixed`). Tappa visitata: segno di spunta e testo secondario.
-- **Riga della tratta.** Sta sulla linea verticale che unisce due tappe: icona del mezzo, durata, distanza. È più bassa e più leggera di una tappa, ma toccabile (apre S05). Se la durata è inserita a mano o stimata, porta l'etichetta.
+- **Riga della tratta.** Sta sulla linea verticale che unisce due tappe: icona del mezzo, durata, distanza. È più leggera di una tappa ma alta 48 px e **chiaramente toccabile**: a destra ha sempre una freccia, e toccandola si apre il dettaglio della tratta (S05). Le tratte in auto, moto o bici hanno in più il pulsante **"Percorso"**, che porta direttamente alla modifica del percorso (S07): FL7 scende da 3 a 2 tocchi più il trascinamento. Se la durata è inserita a mano o stimata, porta l'etichetta.
+- **Pannello della tratta (S05).** Titolo "da → a", mezzo, durata e distanza; preferenze del percorso come chip (evita autostrade, pedaggi, sterrato…); elenco dei percorsi alternativi con quello attivo evidenziato; due azioni grandi: **"Modifica percorso"** (principale) e "Apri nel navigatore". Sulla mappa il percorso attivo è color lampone, gli alternativi grigi tratteggiati, i punti trascinabili sono cerchi bianchi con bordo lampone.
 - **Pulsante "+".** In basso a destra su telefono, in fondo alla colonna del giorno su desktop. Toccandolo si aprono tre scelte: Tappa, Spesa, Prenotazione (PRD 7.1, FL1 e FL3 restano a 3 tocchi).
 - **Pannello di dettaglio.** Dal basso su telefono (metà schermo, trascinabile a schermo intero); laterale su desktop, al posto della colonna del giorno o sopra la mappa. Si chiude con un gesto o con Esc.
 - **Etichette di onestà (T4).** Un chip con bordo tratteggiato e testo secondario: "Stima", "Inserito a mano", "Orari salvati il 12/03". Stesso aspetto in tutta l'app. Per i dati offline il chip usa il colore "Offline".
-- **Indicatore dei piani A–D.** Un chip "+2" con l'icona delle alternative sulla riga; toccandolo si apre l'elenco dei piani e il piano attivo ha l'accento tenue (FL2 resta a 2 tocchi).
+- **Indicatore dei piani A–D.** Un chip "+2" con l'icona delle **due frecce di scambio** sulla riga della tappa; toccandolo si apre l'elenco dei piani e il piano attivo ha l'accento tenue (FL2 resta a 2 tocchi). Non si usa un'icona a forma di biforcazione, che farebbe pensare al percorso: i piani alternativi di una tappa e i percorsi alternativi di una tratta sono due cose diverse e hanno segni diversi.
 - **Avvisi del giorno.** Una fascia in cima alla lista con il colore "Avviso": una frase, un'azione ("Mostra", "Sistema").
 - **Stati vuoti ed errori (PRD 7.7).** Un'icona, una frase che dice cosa manca, un'azione. Mai una schermata bianca, mai un errore senza indicare cosa fare.
 
@@ -146,7 +147,9 @@ La mappa non si ricarica passando da un layout all'altro: ridimensionando la fin
 
 ## 10. Esempio: schermata Giorno
 
-L'anteprima visiva (telefono e desktop, tema chiaro e scuro) è stata mostrata all'utente insieme a questa proposta; non fa parte del repository.
+L'anteprima visiva (telefono e desktop, tema chiaro e scuro, con il pannello della tratta) è stata mostrata all'utente insieme a questa proposta; non fa parte del repository.
+
+Lo schema qui sotto è semplificato: nell'interfaccia ogni tratta ha a destra la freccia che apre il dettaglio, la tratta in moto ha anche il pulsante "Percorso", e "+2" è preceduto dalle due frecce di scambio dei piani alternativi.
 
 ```
 TELEFONO                               DESKTOP
