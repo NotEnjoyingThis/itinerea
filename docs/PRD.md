@@ -231,6 +231,7 @@ L'architettura è **interamente locale, senza server centrale** (decisione dell'
 | Interfaccia | Pacchetto **material_ui** (team Flutter, BSD-3) | Da Flutter 3.50 Material non fa più parte dell'SDK. I delegati di localizzazione sono quelli di `material_ui` (`GlobalMaterialLocalizations.delegates`), non quelli di `flutter_localizations` (decisione M0) |
 | Gestione dello stato | Riverpod | Senza generatore di codice: provider scritti a mano (decisione M0) |
 | Database locale | SQLite tramite **drift** | Query tipizzate, migrazioni, funziona su tutte le piattaforme. Due database: dati e cache (8.2). Il codice generato non è versionato: lo crea `dart run tool/generate.dart` |
+| Fusi orari | **timezone** (elenco dei fusi IANA, incluso nell'app) e **flutter_timezone** (fuso del dispositivo) | Nessuna richiesta di rete. Il fuso si salva con la sua origine (8.3) |
 | Mappa | **flutter_map** + **vector_map_tiles** (BSD-3) | Tile vettoriali su Android, iOS, Linux, macOS e Windows, con stili in formato JSON (lo stile deve corrispondere allo schema delle tile, 4.6). **Esito M1 (13/11/2026): funziona con limiti** (R14). Versioni provate: `flutter_map` 8.3.2 e `vector_map_tiles` **9.0.0-beta.13** (la stabile 8.0.0 è di due anni fa e richiede `flutter_map` 7; la 10 beta richiede il canale *main* di Flutter ed è esclusa). Si usa **solo la modalità `raster`** del livello (tile vettoriali disegnate in immagini sul dispositivo): la modalità `vector` è troppo lenta. Ogni stile deve ricevere un identificativo proprio, perché gli stili OpenFreeMap non hanno il campo `id`. La versione va fissata esatta nel `pubspec`. Il pacchetto `maplibre` per Flutter resta il piano B (oggi elenca anche Windows e Linux, non provato). |
 | Mappe offline | **pmtiles** (BSD-2, lettura di archivi PMTiles locali o remoti) + **vector_map_tiles_pmtiles** (MIT) | Vedi 4.6 e sezione 9 |
 | Navigazione | Link diretti alle app esterne (Google Maps, Waze, Apple Maps, Sygic, OsmAnd, Organic Maps…) con le tappe intermedie | Il navigatore interno è un non-obiettivo (1.5) |
@@ -1298,7 +1299,7 @@ Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, presti
 | **FuelPrices** | Prezzi per distributore, con data | 24 ore |
 | **DataPack** | Veicoli, badge, pedaggi, shop | Fino alla versione successiva |
 
-`PlaceSnapshot` (dentro tappe e prenotazioni) è una **copia** dei dati essenziali del luogo (nome, coordinate, indirizzo, ID OSM e Wikidata, `opening_hours`). Così il viaggio resta completo anche senza cache e per i compagni di viaggio.
+`PlaceSnapshot` (dentro tappe e prenotazioni) è una **copia** dei dati essenziali del luogo (nome, coordinate, indirizzo, ID OSM e Wikidata, `opening_hours`). Così il viaggio resta completo anche senza cache e per i compagni di viaggio. Le **coordinate sono facoltative**: un luogo scritto a mano, come una destinazione o una tappa libera, ha solo il nome.
 
 ### 8.6 Formato dei file di sincronizzazione
 

@@ -213,5 +213,227 @@
   "settingsLicensesSubtitle": "Licences of the app, of its fonts and of the libraries it uses",
   "@settingsLicensesSubtitle": {
     "description": "Short explanation under the licences entry."
+  },
+  "newTripStep": "Step {current} of {total}",
+  "@newTripStep": {
+    "description": "Progress of the steps that create a trip.",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "newTripKindQuestion": "What kind of trip is it?",
+  "@newTripKindQuestion": {
+    "description": "Title of the first step of a new trip: itinerary or roadtrip."
+  },
+  "tripKindItinerary": "Itinerary",
+  "@tripKindItinerary": {
+    "description": "Kind of trip: places to visit, mostly on foot or by public transport."
+  },
+  "tripKindItineraryHint": "Cities and visits, on foot or by public transport",
+  "@tripKindItineraryHint": {
+    "description": "Short explanation of the itinerary kind of trip."
+  },
+  "tripKindRoadtrip": "Roadtrip",
+  "@tripKindRoadtrip": {
+    "description": "Kind of trip: travelling by road with a car or a motorbike."
+  },
+  "tripKindRoadtripHint": "On the road, by car or motorbike",
+  "@tripKindRoadtripHint": {
+    "description": "Short explanation of the roadtrip kind of trip."
+  },
+  "tripKindChangeLater": "You can change it later, even for only some days.",
+  "@tripKindChangeLater": {
+    "description": "Reassures that the kind of trip is not a final choice."
+  },
+  "vehicleCar": "Car",
+  "@vehicleCar": {
+    "description": "Vehicle of a roadtrip. Button label, keep it short."
+  },
+  "vehicleMotorbike": "Motorbike",
+  "@vehicleMotorbike": {
+    "description": "Vehicle of a roadtrip. Button label, keep it short."
+  },
+  "vehicleQuestion": "With which vehicle?",
+  "@vehicleQuestion": {
+    "description": "Label above the choice between car and motorbike."
+  },
+  "tripName": "Trip name",
+  "@tripName": {
+    "description": "Label of the field with the name of the trip."
+  },
+  "tripNameMissing": "Give the trip a name",
+  "@tripNameMissing": {
+    "description": "Error under the name field when it is empty."
+  },
+  "tripDestinations": "Destinations",
+  "@tripDestinations": {
+    "description": "Label of the field with the destinations of the trip."
+  },
+  "tripDestinationsHint": "For example: Florence, Siena",
+  "@tripDestinationsHint": {
+    "description": "Hint of the destinations field: several places separated by commas."
+  },
+  "tripDatesKnown": "With dates",
+  "@tripDatesKnown": {
+    "description": "Option: the dates of the trip are decided. Button label, keep it short."
+  },
+  "tripDatesUnknown": "Number of days only",
+  "@tripDatesUnknown": {
+    "description": "Option: the dates are not decided, only how many days. Button label, keep it short."
+  },
+  "tripStartDate": "First day",
+  "@tripStartDate": {
+    "description": "Label of the start date of the trip."
+  },
+  "tripEndDate": "Last day",
+  "@tripEndDate": {
+    "description": "Label of the end date of the trip."
+  },
+  "tripDateChoose": "Choose",
+  "@tripDateChoose": {
+    "description": "Shown in place of a date that is not chosen yet."
+  },
+  "tripDatesMissing": "Choose the first and the last day",
+  "@tripDatesMissing": {
+    "description": "Error when the dates option is selected but the dates are missing."
+  },
+  "tripDayCount": "{count, plural, =1{1 day} other{{count} days}}",
+  "@tripDayCount": {
+    "description": "Length of a trip in days.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "tripDayCountLabel": "How many days",
+  "@tripDayCountLabel": {
+    "description": "Label of the number of days of a trip without dates."
+  },
+  "tripFewerDays": "One day less",
+  "@tripFewerDays": {
+    "description": "Tooltip and screen reader label of the minus button of the number of days."
+  },
+  "tripMoreDays": "One day more",
+  "@tripMoreDays": {
+    "description": "Tooltip and screen reader label of the plus button of the number of days."
+  },
+  "tripDatesLater": "You can set the dates later: every day will get its date.",
+  "@tripDatesLater": {
+    "description": "Explains that a trip can be planned without dates."
+  },
+  "tripDeparture": "Starting from",
+  "@tripDeparture": {
+    "description": "Label of the place the trip starts from."
+  },
+  "tripReturn": "Returning to",
+  "@tripReturn": {
+    "description": "Label of the place the trip returns to."
+  },
+  "tripReturnSame": "Return to the same place",
+  "@tripReturnSame": {
+    "description": "Checkbox: the trip ends where it started."
+  },
+  "tripOptionalHint": "Optional",
+  "@tripOptionalHint": {
+    "description": "Hint of a field that can be left empty."
+  },
+  "timezoneLabel": "Time zone",
+  "@timezoneLabel": {
+    "description": "Label of the time zone of a trip or of a day."
+  },
+  "timezoneFromDevice": "From this device. Change it if you travel to another time zone.",
+  "@timezoneFromDevice": {
+    "description": "Says that the time zone shown was taken from the device and is only a guess."
+  },
+  "timezoneChosen": "Chosen by you",
+  "@timezoneChosen": {
+    "description": "Says that the time zone shown was chosen by hand."
+  },
+  "timezoneChange": "Change",
+  "@timezoneChange": {
+    "description": "Button that opens the list of time zones."
+  },
+  "timezoneSearch": "Search a city or a region",
+  "@timezoneSearch": {
+    "description": "Hint of the search field in the list of time zones."
+  },
+  "timezoneNone": "No time zone found",
+  "@timezoneNone": {
+    "description": "Shown when the search in the list of time zones finds nothing."
+  },
+  "actionBack": "Back",
+  "@actionBack": {
+    "description": "Button that goes to the previous step."
+  },
+  "actionNext": "Next",
+  "@actionNext": {
+    "description": "Button that goes to the next step."
+  },
+  "tripCreate": "Create trip",
+  "@tripCreate": {
+    "description": "Button that creates the trip at the end of the steps."
+  },
+  "tripCreateError": "The trip could not be saved. Try again.",
+  "@tripCreateError": {
+    "description": "Shown when saving a new trip fails. No technical codes."
+  },
+  "tripCreated": "\"{name}\" created",
+  "@tripCreated": {
+    "description": "Confirmation shown after a trip is created.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Tuscany by motorbike"
+      }
+    }
+  },
+  "tripsCurrent": "Now",
+  "@tripsCurrent": {
+    "description": "Heading of the trips happening today."
+  },
+  "tripsUpcoming": "Upcoming",
+  "@tripsUpcoming": {
+    "description": "Heading of the trips that have not started yet."
+  },
+  "tripsUndated": "Without dates",
+  "@tripsUndated": {
+    "description": "Heading of the trips whose dates are not decided."
+  },
+  "tripsPast": "Past",
+  "@tripsPast": {
+    "description": "Heading of the trips that are over."
+  },
+  "tripDateRange": "{start} – {end}",
+  "@tripDateRange": {
+    "description": "First and last day of a trip, already formatted.",
+    "placeholders": {
+      "start": {
+        "type": "String",
+        "example": "12 Mar 2026"
+      },
+      "end": {
+        "type": "String",
+        "example": "15 Mar 2026"
+      }
+    }
+  },
+  "tripDatesToDecide": "{count, plural, =1{1 day, dates to decide} other{{count} days, dates to decide}}",
+  "@tripDatesToDecide": {
+    "description": "Shown under a trip that has a number of days but no dates.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
   }
 }

@@ -3,36 +3,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/database/database_providers.dart';
-import '../../core/models/entity_kinds.dart';
-import '../../core/models/ids.dart';
+import 'trip_repository.dart';
 
-/// What the home screen shows of a trip.
-// TODO(M3 F1.1): dates, destinations and the "current, upcoming, past"
-// grouping, once trips can be created.
-class TripSummary {
-  /// Creates the summary of a trip.
-  const TripSummary({required this.id, required this.name});
+export 'trip_repository.dart' show TripPhase, TripSummary;
 
-  /// Identifier of the trip.
-  final EntityId id;
+/// Reads and writes trips on the database of this device.
+final tripRepositoryProvider = FutureProvider<TripRepository>(
+  (ref) async => TripRepository(await ref.watch(entityStoreProvider.future)),
+);
 
-  /// Name of the trip.
-  final String name;
-}
-
-/// The trips on this device, by name.
-final tripSummariesProvider = FutureProvider<List<TripSummary>>((ref) async {
-  final store = await ref.watch(entityStoreProvider.future);
-  final trips = [
-    for (final trip in await store.list(EntityKinds.trip))
-      TripSummary(
-        id: trip.id,
-        name: switch (trip.fields['name']) {
-          final String name => name,
-          _ => '',
-        },
-      ),
-  ];
-  return trips
-    ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-});
+/// The trips on this device, by name. Refreshed after every change with
+/// `ref.invalidate`.
+final tripSummariesProvider = FutureProvider<List<TripSummary>>(
+  (ref) async => (await ref.watch(tripRepositoryProvider.future)).trips(),
+);

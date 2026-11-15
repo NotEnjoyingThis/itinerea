@@ -43,7 +43,7 @@ class PlaceSnapshot {
   /// Creates a place snapshot.
   const PlaceSnapshot({
     required this.name,
-    required this.coordinates,
+    this.coordinates,
     this.address,
     this.osmId,
     this.wikidataId,
@@ -56,7 +56,14 @@ class PlaceSnapshot {
     final object = JsonObject(json);
     return PlaceSnapshot(
       name: object.read<String>(_name),
-      coordinates: Coordinates.fromJson(object.object(_coordinates).json),
+      coordinates: switch (object.readOptional<Map<Object?, Object?>>(
+        _coordinates,
+      )) {
+        final Map<Object?, Object?> value => Coordinates.fromJson(
+          value.cast<String, Object?>(),
+        ),
+        null => null,
+      },
       address: object.readOptional<String>(_address),
       osmId: object.readOptional<String>(_osmId),
       wikidataId: object.readOptional<String>(_wikidataId),
@@ -82,8 +89,9 @@ class PlaceSnapshot {
   /// Name of the place.
   final String name;
 
-  /// Position of the place.
-  final Coordinates coordinates;
+  /// Position of the place; null for a place the user only typed the name
+  /// of, without picking it from a search.
+  final Coordinates? coordinates;
 
   /// Postal address, if known.
   final String? address;
@@ -115,7 +123,7 @@ class PlaceSnapshot {
   Map<String, Object?> toJson() => {
     ...unknown,
     _name: name,
-    _coordinates: coordinates.toJson(),
+    if (coordinates != null) _coordinates: coordinates!.toJson(),
     if (address != null) _address: address,
     if (osmId != null) _osmId: osmId,
     if (wikidataId != null) _wikidataId: wikidataId,
