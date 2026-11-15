@@ -156,8 +156,14 @@ class Booking extends SyncedEntity {
   final List<EntityId> attachmentIds;
 }
 
-/// A place to sleep (PRD 8.3).
-// TODO(M5 F1.9): the days covered are calculated from check-in and check-out.
+/// A place to sleep for one or more nights (PRD 8.3, F1.2).
+///
+/// Always optional: a day without a lodging is normal ("to be decided") and
+/// never raises a warning. Only the name is required; it can be added by
+/// hand in a few taps, without a booking and offline. The times of a day
+/// never depend on it.
+// TODO(M5 F1.2): adding a lodging by hand and showing it in the day header.
+// TODO(M5 F1.9): lodgings created from bookings.
 class Lodging extends SyncedEntity {
   /// Creates a lodging.
   const Lodging({
@@ -165,12 +171,14 @@ class Lodging extends SyncedEntity {
     required super.createdAt,
     required super.createdBy,
     required this.tripId,
-    required this.type,
     required this.name,
-    required this.checkIn,
-    required this.checkOut,
+    required this.firstDayId,
     super.deletedAt,
+    this.nights = 1,
+    this.type = LodgingType.other,
     this.place,
+    this.checkIn,
+    this.checkOut,
     this.bookingId,
     this.cost,
   });
@@ -181,17 +189,24 @@ class Lodging extends SyncedEntity {
   /// Kind of lodging.
   final LodgingType type;
 
-  /// Name of the lodging.
+  /// Name of the lodging: the only thing the user must give.
   final String name;
 
   /// Where it is.
   final PlaceSnapshot? place;
 
-  /// Check-in, local time with its zone.
-  final ZonedLocalDateTime checkIn;
+  /// Day of the first night. It refers to a day, not to a date, so that it
+  /// also works in a trip without dates.
+  final EntityId firstDayId;
 
-  /// Check-out, local time with its zone.
-  final ZonedLocalDateTime checkOut;
+  /// Number of consecutive nights, at least one.
+  final int nights;
+
+  /// Time of arrival on the first day, if known.
+  final LocalTime? checkIn;
+
+  /// Time of departure after the last night, if known.
+  final LocalTime? checkOut;
 
   /// Booking tied to the lodging.
   final EntityId? bookingId;

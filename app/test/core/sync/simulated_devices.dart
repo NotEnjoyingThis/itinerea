@@ -73,6 +73,7 @@ class Device {
             row.parentId,
             _sorted(jsonDecode(row.fields)),
             row.deletedHlc,
+            row.restoredHlc,
           ],
       ],
       'clocks': [

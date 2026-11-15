@@ -28,7 +28,7 @@ Si procede in ordine: le funzioni di una milestone successiva non si iniziano pr
 | **M2 — Nucleo dei dati** | **Conclusa** il 14/11/2026 | Modello dati (PRD 8), database drift, log delle operazioni, regole CRDT | — | Test che simulano modifiche concorrenti e offline |
 | **M3 — Viaggio, giorni e tappe** | **In corso** | F1.1, F1.2, F1.3, F1.6 (tappe) | S01–S04 | Si pianifica un viaggio senza mappa |
 | **M4 — Mappa e percorsi** | Da fare | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12 | S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
-| **M5 — Prenotazioni, biglietti, budget, meteo** | Da fare | F1.8, F1.9, F1.10, F1.11 | S08–S12 | Un viaggio completo da usare davvero |
+| **M5 — Prenotazioni, biglietti, budget, meteo** | Da fare | F1.8, F1.9, F1.10, F1.11, alloggio della notte (da F1.2) | S08–S12 | Un viaggio completo da usare davvero |
 | **M6 — Sync personale, backup, PDF, impostazioni** | Da fare | F1.13, F1.14, F1.15 | S20, S21 | **v0.1 beta** su GitHub Releases |
 | **M7 — Rilascio 1.0** | Da fare | Correzioni dalla beta, accessibilità, prestazioni, privacy policy, schede degli store | — | **v1.0** |
 
@@ -47,7 +47,7 @@ Si procede in ordine: le funzioni di una milestone successiva non si iniziano pr
 | Codice | Funzionalità | Milestone |
 |---|---|---|
 | F1.1 | Creazione del viaggio | M3 |
-| F1.2 | Giorni e tappe | M3 |
+| F1.2 | Giorni e tappe | M3 (alloggio della notte: M5) |
 | F1.3 | Orari automatici e avvisi | M3 |
 | F1.4 | Tratte e mezzi | M4 |
 | F1.5 | Percorsi con preferenze | M4 |

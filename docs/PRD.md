@@ -569,7 +569,11 @@ Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall
 - Se il luogo è nelle fonti dati, la tappa si compila da sola con indirizzo, coordinate, orari di apertura, telefono e sito web.
 - Campi della tappa: orario di inizio, durata, note, costo stimato, link, allegati, stato (da visitare / visitata / saltata). Durata predefinita: 1 ora, sempre modificabile.
 - Le tappe si riordinano trascinandole e si spostano in un altro giorno.
-- Ogni giorno può avere l'**alloggio della notte**: hotel, campeggio, area sosta o notte in auto (di solito l'ultimo giorno non ce l'ha).
+- Ogni giorno può avere l'**alloggio della notte**: hotel, campeggio, area sosta o notte in auto (di solito l'ultimo giorno non ce l'ha). **Arriva con M5**, insieme alle prenotazioni, con queste regole (decise il 15/11/2026):
+  - è **sempre facoltativo**: un giorno senza alloggio è normale e si mostra come "da decidere", **senza avvisi né blocchi**. Spesso si decide la sera stessa;
+  - si aggiunge **a mano in pochi tocchi**, anche senza prenotazione, dal telefono e **offline**: basta un nome; indirizzo, prezzo e orari sono facoltativi;
+  - un alloggio può **coprire più notti**;
+  - **gli orari del giorno non dipendono dall'alloggio** (F1.3).
 
 **CA**
 - Una tappa cercata per nome mostra orari e contatti quando OSM li ha. Quando non li ha, i campi restano vuoti e modificabili, senza errori.
@@ -578,7 +582,7 @@ Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall
 
 #### F1.3 Orari automatici e avvisi
 **Requisiti**
-- La prima tappa del giorno inizia all'**orario di inizio della giornata** (default 9:00, modificabile nelle impostazioni e per singolo giorno).
+- La prima tappa del giorno inizia all'**orario di inizio della giornata** (default 9:00, modificabile nelle impostazioni e per singolo giorno). **L'orario di inizio non dipende dall'alloggio:** se l'alloggio manca, il giorno parte comunque dall'orario predefinito, oppure dall'orario della prima tappa se è fissato.
 - Gli orari si calcolano a catena: inizio della tappa precedente + durata + tempo della tratta = inizio della tappa successiva. **In M3 le tratte non esistono ancora**: gli orari si calcolano con le sole durate delle tappe, e la schermata del Giorno lo dice chiaramente ("Gli orari non contano i tempi di spostamento", T4) finché M4 non aggiunge le tratte.
 - Le tappe **con prenotazione** e quelle con l'orario **fissato a mano** (lucchetto) hanno un orario **fisso**: il ricalcolo non le sposta.
 - Se cambiano una durata, una tratta o l'ordine delle tappe, le tappe successive **senza orario fisso** si ricalcolano da sole.
@@ -994,7 +998,7 @@ TELEFONO (una colonna)          DESKTOP / TABLET (affiancati)
 |---|---|---|---|
 | S01 | **Home – Viaggi** | Card "In viaggio oggi" se un viaggio è in corso (7.4); poi prossimi viaggi e viaggi passati; pulsante "Nuovo viaggio" | 1 |
 | S02 | **Nuovo viaggio** | Procedura in 3 passi: 1) Itinerario o Roadtrip; 2) destinazione e date; 3) partenza, ritorno e (facoltativo) volo o treno di andata e ritorno. Alla fine si apre il Giorno 1. | 1 |
-| S03 | **Giorno** | Meteo, alloggio della notte, elenco cronologico di tappe e tratte, avvisi (orari, chiusure), pulsante "+" | 1 |
+| S03 | **Giorno** | Meteo, alloggio della notte (da M5; facoltativo: se manca l'intestazione mostra "Alloggio da decidere" con un tocco per aggiungerlo, senza avvisi), elenco cronologico di tappe e tratte, avvisi (orari, chiusure), pulsante "+" | 1 |
 | S04 | **Dettaglio tappa** (pannello) | Info del luogo (orari, contatti, sito), orario e durata, costo, note, allegati, piani A–D, "Segna come visitata", "Naviga fin qui" | 1 |
 | S05 | **Dettaglio tratta** (pannello) | Mezzo, durata, distanza, profilo di percorso, percorsi alternativi, "Modifica percorso", "Apri nel navigatore"; costi carburante e pedaggi (F2/F3); soluzioni dei mezzi pubblici (F2) | 1 |
 | S06 | **Mappa** | Tappe e percorsi; selettore giorno; livelli (bagni, distributori, colonnine, campeggi, hotel, attrazioni); tocco su un luogo → "Aggiungi al giorno…" | 1 |
@@ -1101,7 +1105,7 @@ Biglietti, QR e allegati **non stanno mai nella cache**: il sistema operativo pu
 
 | Tabella | Contenuto |
 |---|---|
-| Entità | **Una sola tabella per tutte le entità** di 8.3 e 8.4: tipo, ID, viaggio, entità genitore, i campi come oggetto JSON e l'eventuale HLC di eliminazione (tombstone). Indici su tipo e viaggio e su tipo e genitore |
+| Entità | **Una sola tabella per tutte le entità** di 8.3 e 8.4: tipo, ID, viaggio, entità genitore, i campi come oggetto JSON, l'HLC dell'ultima eliminazione (tombstone) e quello dell'ultimo ripristino: l'entità è eliminata se è stata eliminata dopo l'ultimo ripristino. Indici su tipo e viaggio e su tipo e genitore |
 | HLC per campo | Per ogni campo di ogni entità, l'HLC dell'ultima modifica (8.1) |
 | Log delle operazioni | Ogni modifica locale e ogni modifica ricevuta, nel formato di 8.6, con lo spazio a cui appartiene (il viaggio, oppure i dati personali) e se è già stata inviata |
 | Dati di servizio | L'ID di questo dispositivo e l'ultimo valore del suo HLC, così l'orologio non torna indietro dopo un riavvio |
@@ -1238,8 +1242,10 @@ I `LegSlot` seguono le coppie di posizioni vicine: quando le tappe si riordinano
 | Campo | Tipo | Note |
 |---|---|---|
 | `type` | `hotel` \| `camping` \| `camperArea` \| `carNight` \| `other` | |
-| `name`, `place` | | |
-| `checkIn`, `checkOut` | data/ora locale + fuso | I giorni coperti si calcolano da queste date (F1.9) |
+| `name` | testo | **L'unico campo obbligatorio.** Si aggiunge a mano in pochi tocchi, anche senza prenotazione e offline |
+| `place` | `PlaceSnapshot?` | Facoltativo: indirizzo e coordinate |
+| `firstDayId`, `nights` | ID, intero | Il giorno della prima notte e il numero di notti consecutive (almeno 1). Un alloggio può coprire più notti. Funziona anche nei viaggi senza date, perché si riferisce ai giorni e non al calendario |
+| `checkIn`, `checkOut` | ora locale? | **Facoltativi.** Orari di arrivo e di uscita; le date si ricavano dai giorni coperti |
 | `bookingId` | ID? | |
 | `cost` | `Money?` | Solo se non c'è una prenotazione con costo |
 
@@ -1322,7 +1328,7 @@ Con la cifratura attiva, tutti i file tranne `manifest.json` sono cifrati (esten
 {"op":"<uuid>","dev":"<deviceId>","hlc":"<hlc>","v":3,
  "entity":"Stop","id":"<uuid>","set":{"durationMin":90,"status":"visited"}}
 ```
-Tipi di operazione: `create` (tutti i campi), `set` (campi modificati), `delete` (tombstone). Gli allegati non passano nelle operazioni: le operazioni ne riportano solo l'impronta.
+Tipi di operazione: `create` (tutti i campi), `set` (campi modificati), `restore` (ripristino di un'entità eliminata: annulla solo le eliminazioni più vecchie di sé), `delete` (tombstone). Gli allegati non passano nelle operazioni: le operazioni ne riportano solo l'impronta.
 
 ---
 
@@ -1381,6 +1387,7 @@ Stesso formato delle operazioni (8.6), ma trasportate via WebSocket. Il server c
 |---|---|
 | Due persone cambiano lo stesso campo | Vince l'HLC più recente. Per le note, l'altra versione resta nella cronologia. |
 | Una persona elimina una tappa che un'altra stava modificando | Vince l'eliminazione. Chi modificava vede "Questa tappa è stata eliminata da Marco", con "Ripristina". |
+| Qualcuno sceglie "Ripristina" su una tappa eliminata | La tappa torna dov'era, con i campi che aveva e con le modifiche fatte nel frattempo dagli altri. Il ripristino annulla solo le eliminazioni più vecchie di sé: se dopo viene eliminata di nuovo, resta eliminata. Una semplice modifica non riporta mai in vita una tappa eliminata |
 | Tappe spostate da due persone nello stesso giorno | Gli indici frazionari mantengono un ordine coerente. Se due indici coincidono, decide l'ID. |
 | Spesa con divisione non più valida (partecipante rimosso) | La spesa resta, segnata "Da rivedere" nel budget |
 | Una persona cambia l'**importo** di una spesa e un'altra ne cambia la **divisione** | Restano entrambe le modifiche (sono campi diversi). Le divisioni in parti uguali, a percentuale o a quote **si adattano** al nuovo importo, perché le parti si calcolano dall'importo. Una divisione a **importi esatti** la cui somma non coincide più con l'importo viene segnata "Da ricontrollare" e non entra nel saldo finché qualcuno non la corregge. Il segno è calcolato, non salvato |
@@ -1646,7 +1653,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 | **M2 — Nucleo dei dati** | Modello dati (8), database drift, log delle operazioni e regole CRDT con test | Test che simulano modifiche concorrenti e offline. **Completata il 14/11/2026** (PR n. 14, 15 e 16): ID, orologio logico, indici frazionari, due database, unione delle modifiche e controllo di coerenza, con test su 2 e 5 dispositivi simulati |
 | **M3 — Viaggio, giorni e tappe** | F1.1, F1.2, F1.3, F1.6 (tappe), schermate S01–S04 | Si pianifica un viaggio senza mappa. **In corso** |
 | **M4 — Mappa e percorsi** | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12, S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
-| **M5 — Prenotazioni, biglietti, budget, meteo** | F1.8, F1.9, F1.10, F1.11, S08–S12 | Un viaggio completo da usare davvero |
+| **M5 — Prenotazioni, biglietti, budget, meteo** | F1.8, F1.9, F1.10, F1.11, alloggio della notte (F1.2), S08–S12 | Un viaggio completo da usare davvero |
 | **M6 — Sync personale, backup, PDF, impostazioni** | F1.13, F1.14, F1.15, S20–S21 | **v0.1 beta** su GitHub Releases |
 | **M7 — Rilascio 1.0** | Correzioni dalla beta, accessibilità, prestazioni (T2), privacy policy, schede degli store, test chiuso Google Play (12 tester per 14 giorni), F-Droid e Flathub | **v1.0** |
 
