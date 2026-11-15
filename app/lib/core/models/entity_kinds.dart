@@ -48,6 +48,9 @@ abstract final class EntityKinds {
   /// A note.
   static const String note = 'Note';
 
+  /// The local profile of the user (personal data).
+  static const String profile = 'Profile';
+
   /// Field holding the identifier of the parent, for the kinds that hang
   /// from something other than the trip itself. The database indexes it, so
   /// that the stops of a day or the legs of a leg slot are found quickly.

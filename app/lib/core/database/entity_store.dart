@@ -225,6 +225,11 @@ class EntityStore {
     );
   });
 
+  /// Runs several changes as one: either all of them are written or none
+  /// is, for example a trip together with its days.
+  Future<T> atomically<T>(Future<T> Function() changes) =>
+      _db.transaction(changes);
+
   /// Reads an entity, deleted or not; null if it never existed here.
   Future<StoredEntity?> read(EntityId id) async {
     final row = await _row(id);

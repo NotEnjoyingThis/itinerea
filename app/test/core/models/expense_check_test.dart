@@ -193,9 +193,16 @@ void main() {
       });
     });
 
+    test('a place typed by hand has a name and no coordinates', () {
+      final place = PlaceSnapshot.fromJson({'name': 'Trattoria da Mario'});
+
+      expect(place.coordinates, isNull);
+      expect(place.toJson(), {'name': 'Trattoria da Mario'});
+    });
+
     test('missing or mistyped required values are rejected', () {
       expect(
-        () => PlaceSnapshot.fromJson({'name': 'x'}),
+        () => PlaceSnapshot.fromJson({'address': 'no name'}),
         throwsFormatException,
       );
       expect(
