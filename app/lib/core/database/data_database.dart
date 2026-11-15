@@ -32,6 +32,10 @@ class EntityRows extends Table {
   /// Clock value of the deletion (tombstone), or null if not deleted.
   TextColumn get deletedHlc => text().nullable()();
 
+  /// Clock value of the latest restore, or null if never restored. The
+  /// entity is deleted only if it was deleted after this (schema 2).
+  TextColumn get restoredHlc => text().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -120,7 +124,11 @@ class DataDatabase extends _$DataDatabase implements AppDatabase {
   DataDatabase(super.executor);
 
   /// Version of the schema; also written in every operation (PRD 8.1).
-  static const int currentSchemaVersion = 1;
+  ///
+  /// History:
+  /// 1. first schema (milestone M2);
+  /// 2. `restored_hlc` on entities, for "Restore" (milestone M3).
+  static const int currentSchemaVersion = 2;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -128,12 +136,12 @@ class DataDatabase extends _$DataDatabase implements AppDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
+    // One step per version, each with its test in
+    // test/core/database/migration_test.dart. A database written by a newer
+    // version of the app is never downgraded.
     onUpgrade: (migrator, from, to) async {
-      // No migration exists yet: version 1 is the first schema.
-      // TODO(M3): add each step here, with its test in
-      // test/core/database/migration_test.dart.
-      if (from != to) {
-        throw StateError('No migration from schema $from to $to');
+      if (from < 2) {
+        await migrator.addColumn(entityRows, entityRows.restoredHlc);
       }
     },
   );

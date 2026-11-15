@@ -12,6 +12,10 @@ enum OperationType {
 
   /// A tombstone.
   delete,
+
+  /// Brings back an entity deleted earlier: the "Restore" of PRD 9.5. It
+  /// undoes only deletions older than itself.
+  restore,
 }
 
 /// One change, as written on one line of an operations file (PRD 8.6).
@@ -71,6 +75,9 @@ class SyncOperation {
     if (json['delete'] == true) {
       type = OperationType.delete;
       fields = const {};
+    } else if (json['restore'] == true) {
+      type = OperationType.restore;
+      fields = const {};
     } else if (json['create'] case final Map<String, Object?> created) {
       type = OperationType.create;
       fields = created;
@@ -78,7 +85,10 @@ class SyncOperation {
       type = OperationType.set;
       fields = changed;
     } else {
-      throw FormatException('Operation without create, set or delete', json);
+      throw FormatException(
+        'Operation without create, set, delete or restore',
+        json,
+      );
     }
     return SyncOperation(
       id: EntityId(read<String>('op')),
@@ -101,13 +111,10 @@ class SyncOperation {
     'v': schemaVersion,
     'entity': entity,
     'id': entityId.value,
-    switch (type) {
-      OperationType.create => 'create',
-      OperationType.set => 'set',
-      OperationType.delete => 'delete',
-    }: type == OperationType.delete
-        ? true
-        : fields,
+    type.name: switch (type) {
+      OperationType.create || OperationType.set => fields,
+      OperationType.delete || OperationType.restore => true,
+    },
   };
 }
 

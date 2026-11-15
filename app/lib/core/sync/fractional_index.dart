@@ -52,6 +52,42 @@ abstract final class FractionalIndex {
     return keys;
   }
 
+  /// Works out the key for an item inserted at position [index] of a list
+  /// already in order, given as (identifier, key) pairs.
+  ///
+  /// Normally only the new item gets a key. When the items before and after
+  /// the position have the **same** key (two devices inserted at the same
+  /// place while offline), no key fits between them: the items that share
+  /// that key and come after the position get new keys too, returned in
+  /// `rekeyed`. The order of the existing items never changes.
+  static ({String key, Map<String, String> rekeyed}) planInsert(
+    List<({String id, String key})> ordered,
+    int index,
+  ) {
+    RangeError.checkValueInInterval(index, 0, ordered.length, 'index');
+    final before = index > 0 ? ordered[index - 1].key : null;
+    final after = index < ordered.length ? ordered[index].key : null;
+    if (before == null || after == null || before.compareTo(after) < 0) {
+      return (key: between(before, after), rekeyed: const {});
+    }
+    // The run of items after the position that share the key of [before].
+    var end = index;
+    while (end < ordered.length && ordered[end].key == before) {
+      end++;
+    }
+    final keys = spread(
+      end - index + 1,
+      after: before,
+      before: end < ordered.length ? ordered[end].key : null,
+    );
+    return (
+      key: keys.first,
+      rekeyed: {
+        for (var i = index; i < end; i++) ordered[i].id: keys[i - index + 1],
+      },
+    );
+  }
+
   /// Orders two items of a list: by key, and by identifier when the keys are
   /// equal. Every device uses this rule, so every device shows the same
   /// order even when two of them produced the same key (PRD 9.5).

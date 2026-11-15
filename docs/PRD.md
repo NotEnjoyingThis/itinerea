@@ -1101,7 +1101,7 @@ Biglietti, QR e allegati **non stanno mai nella cache**: il sistema operativo pu
 
 | Tabella | Contenuto |
 |---|---|
-| Entità | **Una sola tabella per tutte le entità** di 8.3 e 8.4: tipo, ID, viaggio, entità genitore, i campi come oggetto JSON e l'eventuale HLC di eliminazione (tombstone). Indici su tipo e viaggio e su tipo e genitore |
+| Entità | **Una sola tabella per tutte le entità** di 8.3 e 8.4: tipo, ID, viaggio, entità genitore, i campi come oggetto JSON, l'HLC dell'ultima eliminazione (tombstone) e quello dell'ultimo ripristino: l'entità è eliminata se è stata eliminata dopo l'ultimo ripristino. Indici su tipo e viaggio e su tipo e genitore |
 | HLC per campo | Per ogni campo di ogni entità, l'HLC dell'ultima modifica (8.1) |
 | Log delle operazioni | Ogni modifica locale e ogni modifica ricevuta, nel formato di 8.6, con lo spazio a cui appartiene (il viaggio, oppure i dati personali) e se è già stata inviata |
 | Dati di servizio | L'ID di questo dispositivo e l'ultimo valore del suo HLC, così l'orologio non torna indietro dopo un riavvio |
@@ -1322,7 +1322,7 @@ Con la cifratura attiva, tutti i file tranne `manifest.json` sono cifrati (esten
 {"op":"<uuid>","dev":"<deviceId>","hlc":"<hlc>","v":3,
  "entity":"Stop","id":"<uuid>","set":{"durationMin":90,"status":"visited"}}
 ```
-Tipi di operazione: `create` (tutti i campi), `set` (campi modificati), `delete` (tombstone). Gli allegati non passano nelle operazioni: le operazioni ne riportano solo l'impronta.
+Tipi di operazione: `create` (tutti i campi), `set` (campi modificati), `restore` (ripristino di un'entità eliminata: annulla solo le eliminazioni più vecchie di sé), `delete` (tombstone). Gli allegati non passano nelle operazioni: le operazioni ne riportano solo l'impronta.
 
 ---
 
@@ -1381,6 +1381,7 @@ Stesso formato delle operazioni (8.6), ma trasportate via WebSocket. Il server c
 |---|---|
 | Due persone cambiano lo stesso campo | Vince l'HLC più recente. Per le note, l'altra versione resta nella cronologia. |
 | Una persona elimina una tappa che un'altra stava modificando | Vince l'eliminazione. Chi modificava vede "Questa tappa è stata eliminata da Marco", con "Ripristina". |
+| Qualcuno sceglie "Ripristina" su una tappa eliminata | La tappa torna dov'era, con i campi che aveva e con le modifiche fatte nel frattempo dagli altri. Il ripristino annulla solo le eliminazioni più vecchie di sé: se dopo viene eliminata di nuovo, resta eliminata. Una semplice modifica non riporta mai in vita una tappa eliminata |
 | Tappe spostate da due persone nello stesso giorno | Gli indici frazionari mantengono un ordine coerente. Se due indici coincidono, decide l'ID. |
 | Spesa con divisione non più valida (partecipante rimosso) | La spesa resta, segnata "Da rivedere" nel budget |
 | Una persona cambia l'**importo** di una spesa e un'altra ne cambia la **divisione** | Restano entrambe le modifiche (sono campi diversi). Le divisioni in parti uguali, a percentuale o a quote **si adattano** al nuovo importo, perché le parti si calcolano dall'importo. Una divisione a **importi esatti** la cui somma non coincide più con l'importo viene segnata "Da ricontrollare" e non entra nel saldo finché qualcuno non la corregge. Il segno è calcolato, non salvato |

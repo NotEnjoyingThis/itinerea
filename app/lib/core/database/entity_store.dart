@@ -21,6 +21,7 @@ class StoredEntity {
     this.tripId,
     this.parentId,
     this.deletedHlc,
+    this.restoredHlc,
   });
 
   /// Identifier of the entity.
@@ -38,11 +39,14 @@ class StoredEntity {
   /// Fields of the entity, including those this version does not know.
   final Map<String, Object?> fields;
 
-  /// Clock value of the deletion, or null if the entity is not deleted.
+  /// Clock value of the latest deletion, or null if never deleted.
   final Hlc? deletedHlc;
 
-  /// True if the entity was deleted (tombstone).
-  bool get isDeleted => deletedHlc != null;
+  /// Clock value of the latest restore, or null if never restored.
+  final Hlc? restoredHlc;
+
+  /// True if the entity is deleted: deleted, and not restored since.
+  bool get isDeleted => EntityState.isDeletedAt(deletedHlc, restoredHlc);
 }
 
 /// What happened to an operation received from another device.
@@ -193,6 +197,26 @@ class EntityStore {
     );
   });
 
+  /// Brings back an entity deleted earlier, with the fields it had
+  /// (PRD 9.5, "Restore"). Changes made to it by other devices while it was
+  /// deleted are still there.
+  ///
+  /// Throws a [StateError] if the entity does not exist or is not deleted.
+  Future<void> restore(EntityId id) => _db.transaction(() async {
+    final row = await _row(id);
+    if (row == null) throw StateError('Entity ${id.value} does not exist');
+    if (!_toStored(row).isDeleted) {
+      throw StateError('Entity ${id.value} is not deleted');
+    }
+    await _applyLocal(
+      entity: row.entity,
+      entityId: id,
+      type: OperationType.restore,
+      fields: const {},
+      space: row.tripId ?? personalSpace,
+    );
+  });
+
   /// Applies an operation made on another device, read from [space] (the
   /// identifier of a trip, or [personalSpace]).
   ///
@@ -236,15 +260,23 @@ class EntityStore {
     return row == null ? null : _toStored(row);
   }
 
-  /// Lists the entities of one kind that are not deleted, optionally only
-  /// those of a trip or under a parent.
+  /// Lists the entities of one kind, optionally only those of a trip or
+  /// under a parent. Deleted entities are left out unless [includeDeleted].
   Future<List<StoredEntity>> list(
     String entity, {
     EntityId? tripId,
     EntityId? parentId,
+    bool includeDeleted = false,
   }) async {
     final query = _db.select(_db.entityRows)
-      ..where((t) => t.entity.equals(entity) & t.deletedHlc.isNull());
+      ..where((t) => t.entity.equals(entity));
+    if (!includeDeleted) {
+      // Not deleted, or restored after the deletion. Clock values compare
+      // as text.
+      query.where(
+        (t) => t.deletedHlc.isNull() | t.restoredHlc.isBiggerThan(t.deletedHlc),
+      );
+    }
     if (tripId != null) query.where((t) => t.tripId.equals(tripId.value));
     if (parentId != null) {
       query.where((t) => t.parentId.equals(parentId.value));
@@ -339,6 +371,7 @@ class EntityStore {
             fields: _decode(row.fields),
             clocks: await fieldClocks(id),
             deletedHlc: row.deletedHlc == null ? null : Hlc(row.deletedHlc!),
+            restoredHlc: row.restoredHlc == null ? null : Hlc(row.restoredHlc!),
           );
     final result = Merge.apply(current, operation);
     final state = result.state;
@@ -356,6 +389,7 @@ class EntityStore {
             parentId: Value(EntityKinds.parentOf(state.entity, state.fields)),
             fields: jsonEncode(state.fields),
             deletedHlc: Value(state.deletedHlc?.value),
+            restoredHlc: Value(state.restoredHlc?.value),
           ),
         );
     if (result.changedFields.isNotEmpty) {
@@ -380,7 +414,7 @@ class EntityStore {
   Future<EntityRow> _existing(EntityId id) async {
     final row = await _row(id);
     if (row == null) throw StateError('Entity ${id.value} does not exist');
-    if (row.deletedHlc != null) {
+    if (_toStored(row).isDeleted) {
       throw StateError('Entity ${id.value} was deleted');
     }
     return row;
@@ -436,6 +470,7 @@ class EntityStore {
     parentId: row.parentId == null ? null : EntityId(row.parentId!),
     fields: _decode(row.fields),
     deletedHlc: row.deletedHlc == null ? null : Hlc(row.deletedHlc!),
+    restoredHlc: row.restoredHlc == null ? null : Hlc(row.restoredHlc!),
   );
 
   static Map<String, Object?> _decode(String json) =>
