@@ -10,6 +10,7 @@ import 'package:itinerea/core/models/trip.dart';
 import 'package:itinerea/features/trips/new_trip_screen.dart';
 import 'package:itinerea/features/trips/timezone_picker_screen.dart';
 import 'package:itinerea/features/trips/trip_repository.dart';
+import 'package:itinerea/features/trips/trip_screen.dart';
 import 'package:itinerea/features/trips/trips_home_screen.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -67,9 +68,18 @@ void main() {
       expect(find.text('Step 3 of 3'), findsOneWidget);
       await tapKey(tester, 'newTripCreate');
 
-      // Back on the home, the trip is there, without dates.
-      expect(find.byType(TripsHomeScreen), findsOneWidget);
+      // The new trip opens on its first day.
+      expect(find.byType(TripScreen), findsOneWidget);
       expect(find.byType(NewTripScreen), findsNothing);
+      expect(
+        tester.widget<Text>(find.byKey(const Key('dayTitle'))).data,
+        'Day 1',
+      );
+
+      // Back on the home, the trip is there, without dates.
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.byType(TripsHomeScreen), findsOneWidget);
       expect(find.text('Giappone'), findsOneWidget);
       expect(find.text('Without dates'), findsOneWidget);
       expect(
@@ -95,6 +105,13 @@ void main() {
       await tapKey(tester, 'newTripNext');
       await tapKey(tester, 'newTripCreate');
 
+      expect(find.byType(TripScreen), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.byKey(const Key('dayTitle'))).data,
+        'Day 1 · Thu, Mar 12',
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
       expect(find.text('Upcoming'), findsOneWidget);
       expect(find.text('Mar 12, 2026 – Mar 15, 2026'), findsOneWidget);
       final repo = await repository();

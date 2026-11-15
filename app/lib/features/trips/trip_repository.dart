@@ -20,10 +20,14 @@ class TripSummary {
     this.destinations = const [],
     this.timezone,
     this.timezoneSource = TimezoneSource.device,
+    this.currency = 'EUR',
   });
 
   /// Identifier of the trip.
   final EntityId id;
+
+  /// ISO 4217 code of the main currency of the trip.
+  final String currency;
 
   /// Name of the trip.
   final String name;
@@ -482,6 +486,10 @@ class TripRepository {
       _ => null,
     },
     timezoneSource: _source(trip.fields['timezoneSource']),
+    currency: switch (trip.fields['currency']) {
+      final String code => code,
+      _ => 'EUR',
+    },
   );
 
   static LocalDate? _date(Object? value) =>

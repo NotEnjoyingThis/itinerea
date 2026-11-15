@@ -1043,6 +1043,7 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | FL7 | **Cambiare percorso a una tratta** | Tocco la tratta → "Modifica percorso" → trascino → "Salva" | 3 + trascinamento |
 | FL8 | **Da un giorno in poi: Roadtrip** | Menu del giorno "⋯" → "Da qui: Roadtrip" → scelgo auto o moto (dalla Fase 2: il veicolo salvato, F2.5) | 3 |
 | FL9 | **Spostare una tappa in un altro giorno** | Tengo premuto sulla tappa → "Sposta a…" → scelgo il giorno (su desktop: trascino sul giorno nella colonna a sinistra) | 2–3 |
+**Verificati con test automatici (M3, 16/11/2026):** FL8 in 3 tocchi e FL9 in 3 tocchi su telefono. **FL1 in M3** è "+" → scrivo il nome → "Aggiungi" (2 tocchi più la digitazione): mancano ancora la ricerca del luogo (passo successivo di M3) e il menu a tre scelte del "+", che arriva con spese e prenotazioni (M5); a quel punto torna ai 3 tocchi previsti.
 
 ### 7.6 Prima apertura
 

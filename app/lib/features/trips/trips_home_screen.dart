@@ -8,11 +8,11 @@ import '../../core/models/time.dart';
 import '../../core/theme/window_size.dart';
 import '../../core/time/timezones.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../day/day_screen.dart';
 import '../scaffold/scaffold_catalog_screen.dart';
 import '../settings/settings_screen.dart';
 import 'new_trip_screen.dart';
 import 'trip_list.dart';
+import 'trip_screen.dart';
 
 /// Home of the app (S01): the trip happening today first, then the upcoming
 /// ones, those without dates and the past ones; or an invitation to create
@@ -67,8 +67,7 @@ class TripsHomeScreen extends ConsumerWidget {
             trips: value,
             today: ref.watch(todayProvider)(),
             margin: margin,
-            // TODO(M3 F1.2): open the trip on its day list.
-            onOpen: (_) => open(const DayScreen()),
+            onOpen: (trip) => open(TripScreen(tripId: trip.id)),
           ),
           AsyncError() => _Message(
             icon: Icons.error_outline_rounded,
