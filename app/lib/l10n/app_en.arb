@@ -435,5 +435,279 @@
         "example": "4"
       }
     }
+  },
+  "dayNumber": "Day {number}",
+  "@dayNumber": {
+    "description": "Name of a day of a trip without dates, and first part of the name of a day with a date.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "dayNumberWithDate": "Day {number} · {date}",
+  "@dayNumberWithDate": {
+    "description": "Name of a day of a trip with dates. The date is already formatted, for example \"Fri, Mar 14\".",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "3"
+      },
+      "date": {
+        "type": "String",
+        "example": "Fri, Mar 14"
+      }
+    }
+  },
+  "tripNotFound": "This trip is no longer on this device.",
+  "@tripNotFound": {
+    "description": "Shown when a trip was deleted while it was open."
+  },
+  "tripDays": "Days",
+  "@tripDays": {
+    "description": "Heading of the list of the days of a trip."
+  },
+  "tripMenu": "Trip options",
+  "@tripMenu": {
+    "description": "Tooltip of the menu of a trip."
+  },
+  "tripEditDates": "Change dates",
+  "@tripEditDates": {
+    "description": "Menu entry and title of the screen that changes the dates of a trip."
+  },
+  "tripTimezoneOfTrip": "Time zone of the trip",
+  "@tripTimezoneOfTrip": {
+    "description": "Menu entry that changes the time zone of the whole trip."
+  },
+  "dayMenu": "Day options",
+  "@dayMenu": {
+    "description": "Tooltip of the menu of a day."
+  },
+  "dayTimezone": "Time zone of this day",
+  "@dayTimezone": {
+    "description": "Menu entry that changes the time zone of one day."
+  },
+  "dayTimezoneNote": "Times in {timezone}",
+  "@dayTimezoneNote": {
+    "description": "Shown under a day whose time zone differs from the one of the device.",
+    "placeholders": {
+      "timezone": {
+        "type": "String",
+        "example": "Europe/Dublin"
+      }
+    }
+  },
+  "dayFromHereRoadtrip": "From here: Roadtrip",
+  "@dayFromHereRoadtrip": {
+    "description": "Menu entry of a day: from this day on the trip is a roadtrip."
+  },
+  "dayFromHereItinerary": "From here: Itinerary",
+  "@dayFromHereItinerary": {
+    "description": "Menu entry of a day: from this day on the trip is an itinerary."
+  },
+  "dayRoadtripCar": "Roadtrip by car",
+  "@dayRoadtripCar": {
+    "description": "Label of a day that belongs to a roadtrip by car."
+  },
+  "dayRoadtripMotorbike": "Roadtrip by motorbike",
+  "@dayRoadtripMotorbike": {
+    "description": "Label of a day that belongs to a roadtrip by motorbike."
+  },
+  "stopsEmptyTitle": "No stops yet",
+  "@stopsEmptyTitle": {
+    "description": "Title of a day without stops."
+  },
+  "stopsEmptyBody": "Add the first one.",
+  "@stopsEmptyBody": {
+    "description": "Text under the title of a day without stops."
+  },
+  "stopAdd": "Add stop",
+  "@stopAdd": {
+    "description": "Button, tooltip and title: adds a stop to the day."
+  },
+  "stopNameLabel": "Name of the stop",
+  "@stopNameLabel": {
+    "description": "Label of the field with the name of a stop."
+  },
+  "stopNameHint": "For example: Lunch, Uffizi",
+  "@stopNameHint": {
+    "description": "Hint of the field with the name of a new stop."
+  },
+  "stopNameMissing": "Give the stop a name",
+  "@stopNameMissing": {
+    "description": "Error when the name of a stop is empty."
+  },
+  "actionAdd": "Add",
+  "@actionAdd": {
+    "description": "Button that confirms adding something."
+  },
+  "actionCancel": "Cancel",
+  "@actionCancel": {
+    "description": "Button that closes a dialog without doing anything."
+  },
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Button that saves the changes."
+  },
+  "actionClose": "Close",
+  "@actionClose": {
+    "description": "Tooltip of the button that closes a panel."
+  },
+  "actionDelete": "Delete",
+  "@actionDelete": {
+    "description": "Button or menu entry that deletes something."
+  },
+  "actionRestore": "Restore",
+  "@actionRestore": {
+    "description": "Button that brings back what was just deleted."
+  },
+  "stopDeleted": "\"{name}\" deleted",
+  "@stopDeleted": {
+    "description": "Confirmation shown after a stop is deleted, next to the Restore button.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Uffizi"
+      }
+    }
+  },
+  "stopMoveToDay": "Move to…",
+  "@stopMoveToDay": {
+    "description": "Menu entry and title: moves a stop to another day."
+  },
+  "stopDragHandle": "Drag to reorder",
+  "@stopDragHandle": {
+    "description": "Tooltip and screen reader label of the handle that reorders stops."
+  },
+  "stopDuration": "Duration",
+  "@stopDuration": {
+    "description": "Label of the duration of a stop."
+  },
+  "stopShorter": "15 minutes less",
+  "@stopShorter": {
+    "description": "Tooltip of the button that shortens a stop."
+  },
+  "stopLonger": "15 minutes more",
+  "@stopLonger": {
+    "description": "Tooltip of the button that lengthens a stop."
+  },
+  "durationMinutes": "{minutes} min",
+  "@durationMinutes": {
+    "description": "A duration shorter than one hour.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "45"
+      }
+    }
+  },
+  "durationHours": "{hours} h",
+  "@durationHours": {
+    "description": "A duration of whole hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} h {minutes} min",
+  "@durationHoursMinutes": {
+    "description": "A duration of hours and minutes.",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "1"
+      },
+      "minutes": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "stopStatus": "Status",
+  "@stopStatus": {
+    "description": "Label of the status of a stop."
+  },
+  "stopStatusPlanned": "To visit",
+  "@stopStatusPlanned": {
+    "description": "Status of a stop not visited yet. Chip label, keep it short."
+  },
+  "stopStatusVisited": "Visited",
+  "@stopStatusVisited": {
+    "description": "Status of a visited stop. Chip label, keep it short."
+  },
+  "stopStatusSkipped": "Skipped",
+  "@stopStatusSkipped": {
+    "description": "Status of a skipped stop. Chip label, keep it short."
+  },
+  "stopCost": "Estimated cost",
+  "@stopCost": {
+    "description": "Label of the estimated cost of a stop."
+  },
+  "stopCostEstimateNote": "An estimate: it does not enter the budget.",
+  "@stopCostEstimateNote": {
+    "description": "Explains that the estimated cost of a stop is not counted as an expense."
+  },
+  "stopCostInvalid": "Not an amount",
+  "@stopCostInvalid": {
+    "description": "Error when the cost typed is not a valid amount."
+  },
+  "stopNote": "Note",
+  "@stopNote": {
+    "description": "Label of the note of a stop."
+  },
+  "stopLinks": "Links",
+  "@stopLinks": {
+    "description": "Label of the web links saved with a stop."
+  },
+  "stopLinkAdd": "Add a link",
+  "@stopLinkAdd": {
+    "description": "Label of the field that adds a web link to a stop."
+  },
+  "stopLinkInvalid": "Not a web address",
+  "@stopLinkInvalid": {
+    "description": "Error when the link typed is not a web address."
+  },
+  "stopLinkRemove": "Remove link",
+  "@stopLinkRemove": {
+    "description": "Tooltip of the button that removes a link."
+  },
+  "stopAlternatives": "{count, plural, =1{1 alternative} other{{count} alternatives}}",
+  "@stopAlternatives": {
+    "description": "Screen reader label of the chip that shows how many alternative plans a stop has.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "datesChangeStopsTitle": "Stops in the days you are removing",
+  "@datesChangeStopsTitle": {
+    "description": "Title of the dialog shown when shortening a trip would remove days that contain stops."
+  },
+  "datesChangeStopsBody": "{count, plural, =1{1 stop is in the days that will be removed. What should happen to it?} other{{count} stops are in the days that will be removed. What should happen to them?}}",
+  "@datesChangeStopsBody": {
+    "description": "Body of the dialog shown when shortening a trip would remove days that contain stops.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "datesChangeMove": "Move to the last day",
+  "@datesChangeMove": {
+    "description": "Choice: keep the stops of the removed days by moving them to the last remaining day."
+  },
+  "datesChangeDelete": "Delete them",
+  "@datesChangeDelete": {
+    "description": "Choice: delete the stops together with the removed days."
+  },
+  "changeError": "The change could not be saved. Try again.",
+  "@changeError": {
+    "description": "Shown when saving a change fails. No technical codes."
   }
 }

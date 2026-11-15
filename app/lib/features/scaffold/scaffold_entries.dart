@@ -10,8 +10,6 @@ import '../bookings/new_booking_screen.dart';
 import '../bookings/ticket_screen.dart';
 import '../budget/budget_screen.dart';
 import '../budget/new_expense_screen.dart';
-import '../day/day_screen.dart';
-import '../day/stop_details_screen.dart';
 import '../explore/explore_screen.dart';
 import '../map/map_screen.dart';
 import '../notifications/notifications_screen.dart';
@@ -47,21 +45,10 @@ class ScaffoldEntry {
 }
 
 /// The screens of PRD 7.3 that are still placeholders, in order. A screen
-/// leaves this list when its real version exists: S01 (home), S02 (new trip)
-/// and S20 (settings, in a minimal form) left it with milestone M3.
+/// leaves this list when its real version exists. With milestone M3: S01
+/// (home), S02 (new trip), S03 (day), S04 (stop details) and S20 (settings,
+/// in a minimal form).
 final List<ScaffoldEntry> scaffoldEntries = [
-  ScaffoldEntry(
-    code: 'S03',
-    title: (l10n) => l10n.screenDay,
-    target: const ScaffoldTarget.milestone('M3'),
-    builder: (_) => const DayScreen(),
-  ),
-  ScaffoldEntry(
-    code: 'S04',
-    title: (l10n) => l10n.screenStopDetails,
-    target: const ScaffoldTarget.milestone('M3'),
-    builder: (_) => const StopDetailsScreen(),
-  ),
   ScaffoldEntry(
     code: 'S05',
     title: (l10n) => l10n.screenLegDetails,

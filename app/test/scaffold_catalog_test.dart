@@ -20,9 +20,9 @@ void main() {
   );
 
   test('the scaffolding lists the screens that are still placeholders', () {
-    // S01 (home), S02 (new trip) and S20 (settings) are real since M3.
+    // S01-S04 and S20 (settings) are real since milestone M3.
     expect(scaffoldEntries.map((entry) => entry.code), [
-      for (var n = 3; n <= 21; n++)
+      for (var n = 5; n <= 21; n++)
         if (n != 20) 'S${n.toString().padLeft(2, '0')}',
     ]);
   });

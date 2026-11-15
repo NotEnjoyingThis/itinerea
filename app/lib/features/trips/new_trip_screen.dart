@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import 'dart:ui' show PlatformDispatcher;
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../core/models/time.dart';
 import '../../core/models/trip.dart';
 import '../../core/theme/window_size.dart';
 import '../../core/time/timezones.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'timezone_picker_screen.dart';
+import 'trip_dates_editor.dart';
 import 'trip_list.dart';
 import 'trip_plan.dart';
+import 'trip_screen.dart';
 
 /// New trip (S02): three steps, then the trip exists (F1.1).
 ///
@@ -41,10 +42,7 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
   VehicleKind _vehicle = VehicleKind.car;
   final _name = TextEditingController();
   final _destinations = TextEditingController();
-  bool _hasDates = true;
-  LocalDate? _start;
-  LocalDate? _end;
-  int _dayCount = 3;
+  TripDates _dates = const TripDates();
   final _departure = TextEditingController();
   final _return = TextEditingController();
   bool _returnToSamePlace = true;
@@ -59,9 +57,8 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
     super.dispose();
   }
 
-  bool get _datesMissing => _hasDates && (_start == null || _end == null);
-
-  bool get _detailsValid => _name.text.trim().isNotEmpty && !_datesMissing;
+  bool get _detailsValid =>
+      _name.text.trim().isNotEmpty && !_dates.isIncomplete;
 
   void _next() {
     if (_step == 1) {
@@ -69,34 +66,6 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
       if (!_detailsValid) return;
     }
     setState(() => _step++);
-  }
-
-  Future<void> _pickDate({required bool start}) async {
-    final today = ref.read(todayProvider)();
-    final current = start ? _start : _end;
-    final first = start ? today.addDays(-365) : (_start ?? today);
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: (current ?? _start ?? today).toDateTime(),
-      firstDate: first.toDateTime(),
-      lastDate: (start ? today.addDays(3650) : first.addDays(364)).toDateTime(),
-    );
-    if (picked == null) return;
-    final date = LocalDate.of(picked);
-    setState(() {
-      if (start) {
-        _start = date;
-        // The end never comes before the start, nor a year after it.
-        final end = _end;
-        if (end == null ||
-            end.compareTo(date) < 0 ||
-            date.daysUntil(end) >= TripDraft.maxDays) {
-          _end = date;
-        }
-      } else {
-        _end = date;
-      }
-    });
   }
 
   Future<void> _pickTimezone(String current) async {
@@ -112,14 +81,13 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final start = _hasDates ? _start : null;
     final draft = TripDraft(
       type: _type,
       vehicleKind: _type == SegmentType.roadtrip ? _vehicle : null,
       name: _name.text,
       destinations: _destinations.text.split(','),
-      startDate: start,
-      dayCount: start == null ? _dayCount : TripDays.countBetween(start, _end!),
+      startDate: _dates.startDate,
+      dayCount: _dates.length,
       departure: _departure.text,
       returnPlace: _returnToSamePlace ? _departure.text : _return.text,
       timezone: _chosenTimezone ?? deviceTimezone,
@@ -131,13 +99,17 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
     setState(() => _saving = true);
     try {
       final repository = await ref.read(tripRepositoryProvider.future);
-      await repository.createTrip(draft);
+      final tripId = await repository.createTrip(draft);
       ref.invalidate(tripSummariesProvider);
       messenger.showSnackBar(
         SnackBar(content: Text(l10n.tripCreated(draft.name.trim()))),
       );
-      // TODO(M3 F1.2): open day 1 of the new trip instead of the home.
-      navigator.pop();
+      // The new trip opens on its first day (PRD 7.3, S02).
+      unawaited(
+        navigator.pushReplacement(
+          MaterialPageRoute<void>(builder: (_) => TripScreen(tripId: tripId)),
+        ),
+      );
     } on Exception {
       if (!mounted) return;
       setState(() => _saving = false);
@@ -149,7 +121,8 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
   // TODO(M6 F1.15): the default currency of the settings.
   static String _deviceCurrency() {
     try {
-      final locale = PlatformDispatcher.instance.locale.toString();
+      final locale = WidgetsBinding.instance.platformDispatcher.locale
+          .toString();
       return NumberFormat.simpleCurrency(locale: locale).currencyName ?? 'EUR';
     } on Exception {
       return 'EUR';
@@ -291,10 +264,6 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
   ];
 
   List<Widget> _detailsStep(AppLocalizations l10n, ThemeData theme) {
-    final locale = Localizations.localeOf(context).toString();
-    String label(LocalDate? date) => date == null
-        ? l10n.tripDateChoose
-        : DateFormat.yMMMEd(locale).format(date.toDateTime());
     return [
       TextField(
         key: const Key('tripName'),
@@ -324,92 +293,11 @@ class _NewTripScreenState extends ConsumerState<NewTripScreen> {
         ),
       ),
       const SizedBox(height: 24),
-      // Chips, not a segmented button: they wrap on a narrow screen with
-      // large text.
-      Wrap(
-        key: const Key('datesSelector'),
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          for (final (hasDates, label) in [
-            (true, l10n.tripDatesKnown),
-            (false, l10n.tripDatesUnknown),
-          ])
-            ChoiceChip(
-              label: Text(label),
-              selected: _hasDates == hasDates,
-              showCheckmark: false,
-              onSelected: (_) => setState(() => _hasDates = hasDates),
-            ),
-        ],
+      TripDatesEditor(
+        value: _dates,
+        showProblems: _triedToLeaveDetails,
+        onChanged: (dates) => setState(() => _dates = dates),
       ),
-      const SizedBox(height: 12),
-      if (_hasDates) ...[
-        ListTile(
-          key: const Key('tripStartDate'),
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.event_rounded),
-          title: Text(l10n.tripStartDate),
-          subtitle: Text(label(_start)),
-          trailing: const Icon(Icons.chevron_right_rounded),
-          onTap: () => _pickDate(start: true),
-        ),
-        ListTile(
-          key: const Key('tripEndDate'),
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.event_available_rounded),
-          title: Text(l10n.tripEndDate),
-          subtitle: Text(label(_end)),
-          trailing: const Icon(Icons.chevron_right_rounded),
-          onTap: () => _pickDate(start: false),
-        ),
-        if (_start != null && _end != null)
-          Text(
-            l10n.tripDayCount(TripDays.countBetween(_start!, _end!)),
-            key: const Key('tripLength'),
-            style: theme.textTheme.bodySmall,
-          )
-        else if (_triedToLeaveDetails)
-          Text(
-            l10n.tripDatesMissing,
-            style: theme.textTheme.bodySmall!.copyWith(
-              color: theme.colorScheme.error,
-            ),
-          ),
-      ] else ...[
-        Text(l10n.tripDayCountLabel, style: theme.textTheme.titleSmall),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            IconButton.outlined(
-              key: const Key('fewerDays'),
-              tooltip: l10n.tripFewerDays,
-              onPressed: _dayCount > 1
-                  ? () => setState(() => _dayCount--)
-                  : null,
-              icon: const Icon(Icons.remove_rounded),
-            ),
-            Expanded(
-              child: Text(
-                l10n.tripDayCount(_dayCount),
-                key: const Key('tripLength'),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleSmall,
-              ),
-            ),
-            IconButton.outlined(
-              key: const Key('moreDays'),
-              tooltip: l10n.tripMoreDays,
-              onPressed: _dayCount < TripDraft.maxDays
-                  ? () => setState(() => _dayCount++)
-                  : null,
-              icon: const Icon(Icons.add_rounded),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(l10n.tripDatesLater, style: theme.textTheme.bodySmall),
-      ],
     ];
   }
 
