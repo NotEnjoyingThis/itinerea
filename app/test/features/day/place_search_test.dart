@@ -235,6 +235,37 @@ void main() {
       );
     });
 
+    testWidgets('a search service that blocks the app leaves a free stop', (
+      tester,
+    ) async {
+      transport.handler = (_) => jsonAnswer({'error': 'blocked'}, status: 403);
+      final trip = await createTrip();
+      await openTrip(tester, trip.trip);
+
+      await tapKey(tester, 'addFirstStop');
+      await type(tester, 'Uffizi');
+      expect(
+        find.text(
+          'I could not search places. Try again in a moment, or add just '
+          'the name.',
+        ),
+        findsOneWidget,
+      );
+      await tapKey(tester, 'newStopAdd');
+      await openDetails(tester, 'Uffizi');
+      await tester.enterText(
+        find.byKey(const Key('stopName')),
+        'Galleria degli Uffizi',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      final stop = await stored(trip.day);
+      expect(stop.kind, StopKind.free);
+      expect(stop.name, 'Galleria degli Uffizi');
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('in Italian the sheet speaks Italian and asks local names', (
       tester,
     ) async {
@@ -298,6 +329,63 @@ void main() {
       await tester.pumpAndSettle();
 
       expect((await stored(trip.day)).place!.phone, '055 1234');
+    });
+
+    testWidgets('a details service that blocks leaves the place editable', (
+      tester,
+    ) async {
+      final services = osmServices();
+      transport.handler = (uri) => uri.path == '/lookup'
+          ? jsonAnswer({'error': 'blocked'}, status: 403)
+          : services(uri);
+      final trip = await createTrip();
+      await openTrip(tester, trip.trip);
+      await tapKey(tester, 'addFirstStop');
+      await type(tester, 'Uffizi');
+      await tapKey(tester, 'placeSuggestion-0');
+      await tester.pumpAndSettle();
+
+      await openDetails(tester, 'Galleria degli Uffizi');
+      expect(field(tester, 'stopOpeningHours'), isEmpty);
+      expect(find.byKey(const Key('placeDetailsMessage')), findsNothing);
+      await tester.enterText(
+        find.byKey(const Key('stopPhone')),
+        '+39 055 294883',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      final stop = await stored(trip.day);
+      expect(stop.kind, StopKind.place);
+      expect(stop.place!.osmId, 'W477279033');
+      expect(stop.place!.phone, '+39 055 294883');
+      expect(transport.requests.where((uri) => uri.path == '/lookup'), [
+        isA<Uri>(),
+      ]);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a saved place is never asked again on its own', (
+      tester,
+    ) async {
+      final trip = await createTrip(
+        at: [
+          const PlaceSnapshot(
+            name: 'Galleria degli Uffizi',
+            coordinates: Coordinates(lat: 43.7683, lon: 11.2558),
+            osmId: 'W477279033',
+          ),
+        ],
+      );
+      await openTrip(tester, trip.trip);
+
+      await openDetails(tester, 'Galleria degli Uffizi');
+      await tapKey(tester, 'closeStopDetail');
+      await openDetails(tester, 'Galleria degli Uffizi');
+
+      // Only "Update from OpenStreetMap" would ask (PRD 5.6, DECISIONS).
+      expect(transport.requests, isEmpty);
+      expect(find.byKey(const Key('placeDetailsRefresh')), findsOneWidget);
     });
 
     testWidgets('an update keeps what the user wrote', (tester) async {

@@ -21,7 +21,8 @@ import 'trip_screen.dart';
 /// 1. itinerary or roadtrip; 2. name, destinations, dates or only a number of
 /// days; 3. where the trip starts and ends, and its time zone.
 // TODO(M5 F1.9): the outbound and return flight or train, in step 3.
-// TODO(M3 F1.2): places picked from a search instead of typed names.
+// TODO(M4 F1.1): destinations picked from the place search instead of typed
+// names (decided on 16/11/2026).
 class NewTripScreen extends ConsumerStatefulWidget {
   /// Creates the "new trip" steps.
   const NewTripScreen({super.key});
