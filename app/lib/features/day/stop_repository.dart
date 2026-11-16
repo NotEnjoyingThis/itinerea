@@ -7,6 +7,7 @@ import '../../core/models/money.dart';
 import '../../core/models/place.dart';
 import '../../core/models/stop.dart';
 import '../../core/models/time.dart';
+import '../../core/models/web_address.dart';
 import '../../core/sync/fractional_index.dart';
 
 /// A stop as the day screen shows it: the position in the day together with
@@ -92,6 +93,9 @@ class StopRepository {
 
   /// Longest duration of a stop: one day.
   static const int maxDurationMin = 24 * 60;
+
+  /// Longest opening hours, phone or website accepted for a place.
+  static const int maxPlaceTextLength = 500;
 
   final EntityStore _store;
 
@@ -198,6 +202,68 @@ class StopRepository {
     return _store.set(stopId, {'estimatedCost': cost?.toJson()});
   }
 
+  /// Puts the opening hours and contacts downloaded for the place [osmId]
+  /// into the stops at [slotId] that are at that place, keeping what the
+  /// user wrote (see [PlaceDetails.applyTo]). A stop deleted, or moved to
+  /// another place, in the meantime is left as it is.
+  ///
+  /// Returns true if a stop changed.
+  Future<bool> applyPlaceDetails(
+    EntityId slotId, {
+    required String osmId,
+    required PlaceDetails details,
+    PlaceDetails? previous,
+  }) => _store.atomically(() async {
+    var changed = false;
+    for (final stop in await _store.list(EntityKinds.stop, parentId: slotId)) {
+      final place = _placeIn(stop);
+      if (place == null || place.osmId != osmId) continue;
+      final updated = details.applyTo(place, previous: previous);
+      if (updated.openingHours == place.openingHours &&
+          updated.phone == place.phone &&
+          updated.website == place.website &&
+          updated.wikidataId == place.wikidataId) {
+        continue;
+      }
+      await _store.set(stop.id, {'place': updated.toJson()});
+      changed = true;
+    }
+    return changed;
+  });
+
+  /// Sets the opening hours of the place of a stop as the user wrote them,
+  /// in the OpenStreetMap format or not; empty clears them.
+  ///
+  /// Throws a [StateError] if the stop has no place.
+  Future<void> setOpeningHours(EntityId stopId, String text) {
+    final hours = _placeText(text, 'openingHours');
+    return _updatePlace(stopId, (place) => place.copyWith(openingHours: hours));
+  }
+
+  /// Sets the phone number of the place of a stop; empty clears it.
+  ///
+  /// Throws a [StateError] if the stop has no place.
+  Future<void> setPhone(EntityId stopId, String text) {
+    final phone = _placeText(text, 'phone');
+    return _updatePlace(stopId, (place) => place.copyWith(phone: phone));
+  }
+
+  /// Sets the website of the place of a stop; empty clears it. Only web
+  /// addresses are accepted.
+  ///
+  /// Throws a [StateError] if the stop has no place.
+  Future<void> setWebsite(EntityId stopId, String text) {
+    final site = _placeText(text, 'website');
+    final address = site == null ? null : parseWebAddress(site);
+    if (site != null && address == null) {
+      throw ArgumentError.value(text, 'text', 'Not a web address');
+    }
+    return _updatePlace(
+      stopId,
+      (place) => place.copyWith(website: address?.toString()),
+    );
+  }
+
   /// Replaces the links of a stop. Only web addresses are accepted.
   Future<void> setLinks(EntityId stopId, List<Uri> links) {
     for (final link in links) {
@@ -285,6 +351,39 @@ class StopRepository {
     }
   });
 
+  Future<void> _updatePlace(
+    EntityId stopId,
+    PlaceSnapshot Function(PlaceSnapshot place) change,
+  ) => _store.atomically(() async {
+    final stop = await _store.read(stopId);
+    if (stop == null || stop.isDeleted) {
+      throw StateError('Stop ${stopId.value} does not exist');
+    }
+    final place = _placeIn(stop);
+    if (place == null) {
+      throw StateError('Stop ${stopId.value} has no place');
+    }
+    await _store.set(stopId, {'place': change(place).toJson()});
+  });
+
+  static PlaceSnapshot? _placeIn(StoredEntity stop) =>
+      switch (stop.fields['place']) {
+        final Map<Object?, Object?> place => PlaceSnapshot.fromJson(
+          place.cast<String, Object?>(),
+        ),
+        _ => null,
+      };
+
+  /// [text] trimmed, or null if empty. Throws an [ArgumentError] if it is
+  /// longer than [maxPlaceTextLength].
+  static String? _placeText(String text, String name) {
+    final trimmed = text.trim();
+    if (trimmed.length > maxPlaceTextLength) {
+      throw ArgumentError.value(text, name, 'Too long');
+    }
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
   /// The key for a stop that goes at [index] of the day (at the end if
   /// null), applying the new keys of the stops that need one. [moving] is
   /// the position being moved, which does not count among the others.
@@ -355,12 +454,7 @@ class StopRepository {
         _ => null,
       },
       timeFixed: fields['timeFixed'] == true,
-      place: switch (fields['place']) {
-        final Map<Object?, Object?> place => PlaceSnapshot.fromJson(
-          place.cast<String, Object?>(),
-        ),
-        _ => null,
-      },
+      place: _placeIn(stop),
       estimatedCost: switch (fields['estimatedCost']) {
         final Map<Object?, Object?> cost => Money.fromJson(
           cost.cast<String, Object?>(),

@@ -674,6 +674,94 @@
   "@stopLinkRemove": {
     "description": "Tooltip of the button that removes a link."
   },
+  "stopSearchLabel": "Place or name",
+  "@stopSearchLabel": {
+    "description": "Label of the field of a new stop: the text searches places, or is used as the name of the stop."
+  },
+  "stopSearchHelp": "Pick a place found, or add just the name.",
+  "@stopSearchHelp": {
+    "description": "Help under the field of a new stop: the user can pick a place from the search or add a stop with only a name."
+  },
+  "stopAddNameOnly": "Add just the name",
+  "@stopAddNameOnly": {
+    "description": "Button: adds a stop with only the name typed, without a place (also works offline)."
+  },
+  "placeSearchNoResults": "No places found. You can add just the name.",
+  "@placeSearchNoResults": {
+    "description": "Shown when the place search finds nothing."
+  },
+  "placeSearchOffline": "No connection: places cannot be searched. You can add just the name.",
+  "@placeSearchOffline": {
+    "description": "Shown when the place search cannot work because there is no network."
+  },
+  "placeSearchBusy": "The search service is busy. Try again in a moment, or add just the name.",
+  "@placeSearchBusy": {
+    "description": "Shown when the place search service asks to slow down."
+  },
+  "placeSearchFailed": "I could not search places. Try again in a moment, or add just the name.",
+  "@placeSearchFailed": {
+    "description": "Shown when the place search service gives an error. No technical codes."
+  },
+  "osmAttribution": "© OpenStreetMap contributors",
+  "@osmAttribution": {
+    "description": "Attribution required by the licence of OpenStreetMap data (ODbL). Keep it as it is in every language."
+  },
+  "placeInfoTitle": "Opening hours and contacts",
+  "@placeInfoTitle": {
+    "description": "Title of the part of a stop with opening hours, phone and website of its place."
+  },
+  "placeOpeningHours": "Opening hours",
+  "@placeOpeningHours": {
+    "description": "Label of the opening hours of the place of a stop."
+  },
+  "placeOpeningHoursHelp": "As in OpenStreetMap, for example Mo-Fr 09:00-18:00",
+  "@placeOpeningHoursHelp": {
+    "description": "Help under the opening hours: they are written in the format of OpenStreetMap. Keep the example as it is: the day names of that format are always in English."
+  },
+  "placePhone": "Phone",
+  "@placePhone": {
+    "description": "Label of the phone number of the place of a stop."
+  },
+  "placeWebsite": "Website",
+  "@placeWebsite": {
+    "description": "Label of the website of the place of a stop."
+  },
+  "placeDetailsUpdated": "From OpenStreetMap, updated on {date}",
+  "@placeDetailsUpdated": {
+    "description": "Where the opening hours and contacts of a place come from, and when they were downloaded.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Nov 16, 2026"
+      }
+    }
+  },
+  "placeDetailsUpdatedOld": "From OpenStreetMap, updated on {date}: they may have changed",
+  "@placeDetailsUpdatedOld": {
+    "description": "Like placeDetailsUpdated, for opening hours and contacts downloaded more than 30 days ago.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Oct 2, 2026"
+      }
+    }
+  },
+  "placeDetailsRefresh": "Update from OpenStreetMap",
+  "@placeDetailsRefresh": {
+    "description": "Button: downloads again the opening hours and contacts of the place of a stop. What the user wrote is kept."
+  },
+  "placeDetailsOffline": "No connection: hours and contacts cannot be downloaded.",
+  "@placeDetailsOffline": {
+    "description": "Shown when the opening hours and contacts cannot be downloaded because there is no network."
+  },
+  "placeDetailsBusy": "The service is busy. Try again in a moment.",
+  "@placeDetailsBusy": {
+    "description": "Shown when the service of opening hours and contacts asks to slow down."
+  },
+  "placeDetailsFailed": "I could not download hours and contacts. Try again in a moment.",
+  "@placeDetailsFailed": {
+    "description": "Shown when the service of opening hours and contacts gives an error. No technical codes."
+  },
   "stopAlternatives": "{count, plural, =1{1 alternative} other{{count} alternatives}}",
   "@stopAlternatives": {
     "description": "Screen reader label of the chip that shows how many alternative plans a stop has.",

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
@@ -7,6 +9,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/models/ids.dart';
 import '../../core/models/stop.dart';
 import '../../core/models/trip.dart';
+import '../../core/net/http_transport.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/time/timezones.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -15,6 +18,8 @@ import '../trips/trip_list.dart';
 import '../trips/trip_plan.dart';
 import '../trips/trip_providers.dart';
 import '../trips/trip_repository.dart';
+import 'add_stop_sheet.dart';
+import 'place_details_actions.dart';
 import 'stop_detail_panel.dart';
 import 'stop_repository.dart';
 
@@ -96,22 +101,44 @@ class DayViewState extends ConsumerState<DayView> {
     }
   }
 
-  /// Opens the "add stop" sheet.
+  /// Opens the "add stop" sheet (flow FL1).
   Future<void> addStop() async {
-    final name = await showModalBottomSheet<String>(
+    // The search prefers places near the last located stop of the day.
+    final near = [
+      for (final stop
+          in ref.read(dayStopsProvider(_dayId)).value ?? const <DayStop>[])
+        ?stop.place?.coordinates,
+    ].lastOrNull;
+    final choice = await showModalBottomSheet<NewStop>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => const _AddStopSheet(),
+      builder: (_) => AddStopSheet(near: near),
     );
-    if (name == null) return;
+    if (choice == null || !mounted) return;
+    final container = ProviderScope.containerOf(context, listen: false);
+    final language = Localizations.localeOf(context).languageCode;
     await _run(() async {
-      await (await _stops).addStop(
+      final slotId = await (await _stops).addStop(
         tripId: widget.tripId,
         dayId: _dayId,
-        name: name,
+        name: choice.name,
+        place: choice.place,
       );
       ref.invalidate(dayStopsProvider(_dayId));
+      if (choice.place?.osmId case final String osmId) {
+        // Opening hours and contacts arrive a moment later. The stop is
+        // complete without them, so a failure says nothing here: the
+        // details of the stop offer to try again (F1.2).
+        unawaited(
+          fillPlaceDetails(
+            container,
+            slotId: slotId,
+            osmId: osmId,
+            language: language,
+          ).catchError((Object _) => false, test: (e) => e is ServiceFailure),
+        );
+      }
     });
   }
 
@@ -602,79 +629,6 @@ class _StopRow extends StatelessWidget {
         ),
         onTap: onTap,
         onLongPress: onLongPress,
-      ),
-    );
-  }
-}
-
-/// The sheet that asks the name of a new stop.
-// TODO(M3 F1.2): suggestions from the place search while typing.
-class _AddStopSheet extends StatefulWidget {
-  const _AddStopSheet();
-
-  @override
-  State<_AddStopSheet> createState() => _AddStopSheetState();
-}
-
-class _AddStopSheetState extends State<_AddStopSheet> {
-  final _name = TextEditingController();
-  bool _tried = false;
-
-  @override
-  void dispose() {
-    _name.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    final name = _name.text.trim();
-    if (name.isEmpty) return setState(() => _tried = true);
-    Navigator.of(context).pop(name);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      // Stay above the keyboard.
-      padding: EdgeInsets.fromLTRB(
-        16,
-        16,
-        16,
-        16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(l10n.stopAdd, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 12),
-          TextField(
-            key: const Key('newStopName'),
-            controller: _name,
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-            textInputAction: TextInputAction.done,
-            decoration: InputDecoration(
-              labelText: l10n.stopNameLabel,
-              hintText: l10n.stopNameHint,
-              errorText: _tried && _name.text.trim().isEmpty
-                  ? l10n.stopNameMissing
-                  : null,
-              border: const OutlineInputBorder(),
-            ),
-            onChanged: (_) {
-              if (_tried) setState(() {});
-            },
-            onSubmitted: (_) => _submit(),
-          ),
-          const SizedBox(height: 12),
-          FilledButton(
-            key: const Key('newStopAdd'),
-            onPressed: _submit,
-            child: Text(l10n.actionAdd),
-          ),
-        ],
       ),
     );
   }

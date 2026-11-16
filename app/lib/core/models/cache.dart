@@ -2,42 +2,13 @@
 
 // Cache (PRD 8.5): never synchronised, downloaded again when needed. Old or
 // estimated data is always labelled as such in the interface (PRD T4).
+//
+// The details of places are PlaceDetails (place.dart), kept by
+// PlaceDetailsLookup.
 
 import 'money.dart';
 import 'place.dart';
 import 'time.dart';
-
-/// Data of a place from OpenStreetMap and Wikidata (PRD 8.5).
-// TODO(M3 F1.2): place search and cache, refreshed after 30 days when online.
-class PlaceCache {
-  /// Creates a cached place.
-  const PlaceCache({
-    required this.place,
-    required this.fetchedAt,
-    this.category,
-    this.phone,
-    this.website,
-    this.popularity,
-  });
-
-  /// Essential data of the place.
-  final PlaceSnapshot place;
-
-  /// Category of the place.
-  final String? category;
-
-  /// Phone number.
-  final String? phone;
-
-  /// Website.
-  final Uri? website;
-
-  /// Popularity score.
-  final int? popularity;
-
-  /// Instant the data was downloaded, in UTC.
-  final DateTime fetchedAt;
-}
 
 /// A rectangle on the map, used by downloaded packs.
 class BoundingBox {

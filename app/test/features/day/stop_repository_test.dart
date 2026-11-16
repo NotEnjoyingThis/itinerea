@@ -443,5 +443,158 @@ void main() {
 
       expect(await names(), ['Bargello']);
     });
+
+    group('opening hours and contacts of the place', () {
+      const uffizi = PlaceSnapshot(
+        name: 'Galleria degli Uffizi',
+        coordinates: Coordinates(lat: 43.7683, lon: 11.2558),
+        osmId: 'W477279033',
+        unknown: {'fromANewerVersion': 1},
+      );
+      final osm = PlaceDetails(
+        fetchedAt: DateTime.utc(2026, 11, 16),
+        openingHours: 'Tu-Su 08:15-18:30; Mo off',
+        phone: '+39 055 294883',
+        website: 'https://www.uffizi.it',
+        wikidataId: 'Q51252',
+      );
+
+      Future<EntityId> addAt(PlaceSnapshot place) => stops.addStop(
+        tripId: trip,
+        dayId: day,
+        name: place.name,
+        place: place,
+      );
+
+      test('downloaded details fill the place of the stop', () async {
+        final slot = await addAt(uffizi);
+
+        final changed = await stops.applyPlaceDetails(
+          slot,
+          osmId: 'W477279033',
+          details: osm,
+        );
+
+        final place = (await stopOf(slot)).place!;
+        expect(changed, isTrue);
+        expect(place.openingHours, 'Tu-Su 08:15-18:30; Mo off');
+        expect(place.phone, '+39 055 294883');
+        expect(place.website, 'https://www.uffizi.it');
+        expect(place.wikidataId, 'Q51252');
+        expect(place.unknown, {'fromANewerVersion': 1});
+      });
+
+      test('what the user wrote stays when details arrive again', () async {
+        final slot = await addAt(uffizi);
+        await stops.applyPlaceDetails(slot, osmId: 'W477279033', details: osm);
+        final stop = await stopOf(slot);
+        await stops.setPhone(stop.stopId, '+39 333 1234567');
+
+        await stops.applyPlaceDetails(
+          slot,
+          osmId: 'W477279033',
+          details: PlaceDetails(
+            fetchedAt: DateTime.utc(2026, 12, 20),
+            openingHours: 'Tu-Su 08:15-18:30',
+            phone: '+39 055 000000',
+          ),
+          previous: osm,
+        );
+
+        final place = (await stopOf(slot)).place!;
+        expect(place.phone, '+39 333 1234567', reason: 'written by the user');
+        expect(place.openingHours, 'Tu-Su 08:15-18:30', reason: 'newer');
+        expect(place.website, isNull, reason: 'removed from OpenStreetMap');
+      });
+
+      test(
+        'details of another place, or the same again, change nothing',
+        () async {
+          final slot = await addAt(uffizi);
+          await stops.applyPlaceDetails(
+            slot,
+            osmId: 'W477279033',
+            details: osm,
+          );
+          final before = (await store.pendingOperations()).length;
+
+          expect(
+            await stops.applyPlaceDetails(slot, osmId: 'N1', details: osm),
+            isFalse,
+          );
+          expect(
+            await stops.applyPlaceDetails(
+              slot,
+              osmId: 'W477279033',
+              details: osm,
+              previous: osm,
+            ),
+            isFalse,
+          );
+          expect(await store.pendingOperations(), hasLength(before));
+        },
+      );
+
+      test('details for a stop deleted meanwhile are dropped', () async {
+        final slot = await addAt(uffizi);
+        await stops.deleteStop(slot);
+
+        expect(
+          await stops.applyPlaceDetails(
+            slot,
+            osmId: 'W477279033',
+            details: osm,
+          ),
+          isFalse,
+        );
+      });
+
+      test('the user can write, change and clear them', () async {
+        final stop = await stopOf(await addAt(uffizi));
+
+        await stops.setOpeningHours(stop.stopId, '  Mo-Su 09:00-19:00 ');
+        await stops.setPhone(stop.stopId, '055 1234');
+        await stops.setWebsite(stop.stopId, 'www.uffizi.it');
+        var place = (await stopOf(stop.slotId)).place!;
+        expect(place.openingHours, 'Mo-Su 09:00-19:00');
+        expect(place.phone, '055 1234');
+        expect(place.website, 'https://www.uffizi.it');
+
+        await stops.setOpeningHours(stop.stopId, '');
+        await stops.setPhone(stop.stopId, '   ');
+        await stops.setWebsite(stop.stopId, '');
+        place = (await stopOf(stop.slotId)).place!;
+        expect(place.openingHours, isNull);
+        expect(place.phone, isNull);
+        expect(place.website, isNull);
+        expect(place.name, 'Galleria degli Uffizi');
+        expect(place.osmId, 'W477279033');
+      });
+
+      test('a website that is not a web address is refused', () async {
+        final stop = await stopOf(await addAt(uffizi));
+
+        for (final text in ['javascript:alert(1)', 'ftp://uffizi.it', 'x']) {
+          expect(
+            () => stops.setWebsite(stop.stopId, text),
+            throwsArgumentError,
+            reason: text,
+          );
+        }
+        expect(
+          () => stops.setOpeningHours(stop.stopId, 'x' * 501),
+          throwsArgumentError,
+        );
+      });
+
+      test('a free stop has no place to write them in', () async {
+        final stop = await stopOf(await add('Pranzo'));
+
+        await expectLater(
+          stops.setPhone(stop.stopId, '055 1234'),
+          throwsStateError,
+        );
+      });
+    });
   });
 }

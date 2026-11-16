@@ -63,18 +63,31 @@ abstract interface class ElevationProvider implements ServiceProvider {
   Future<List<int>> heights(List<Coordinates> points);
 }
 
-/// Search of places and addresses (default: Photon).
-// TODO(M3 F1.2): search with a 300 ms wait after the last key (PRD 5.4).
+/// Search of places and addresses while the user types (default: Photon,
+/// see photon_search.dart). Never Nominatim: its rules forbid it (PRD 5.6).
 abstract interface class PlaceSearchProvider implements ServiceProvider {
-  /// Searches places matching the text typed by the user.
-  Future<List<PlaceSnapshot>> search(String query, {Coordinates? near});
+  /// Shortest text searched: a shorter one gives no places.
+  int get minimumQueryLength;
+
+  /// Searches places matching the text typed by the user, in [language]
+  /// when the service can, preferring those near [near].
+  ///
+  /// Throws a ServiceFailure when the service cannot answer.
+  Future<List<PlaceSuggestion>> search(
+    String query, {
+    required String language,
+    Coordinates? near,
+  });
 }
 
-/// Details of a place (OpenStreetMap, Wikidata).
-// TODO(M3 F1.2): opening hours, contacts and website of a stop.
+/// Opening hours and contacts of one place, asked once when the user chooses
+/// it (default: Nominatim, see nominatim_details.dart).
 abstract interface class PlaceDetailsProvider implements ServiceProvider {
-  /// Returns the details of a place.
-  Future<PlaceCache> details(PlaceSnapshot place);
+  /// Returns the details of the place with the OpenStreetMap identifier
+  /// [osmId], for example W477279033.
+  ///
+  /// Throws a ServiceFailure when the service cannot answer.
+  Future<PlaceDetails> details(String osmId, {required String language});
 }
 
 /// Places for the layers of the map (default: Overpass API).
