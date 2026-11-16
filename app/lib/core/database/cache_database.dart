@@ -33,8 +33,7 @@ class CacheRows extends Table {
 
 /// The database of the cache (PRD 8.2, 8.5). It lives in the cache folder of
 /// the app: it is never synchronised and losing it loses nothing, everything
-/// in it can be downloaded again.
-// TODO(M3 F1.2): the place cache is the first user of this database.
+/// in it can be downloaded again. Read and written through CacheStore.
 @DriftDatabase(tables: [CacheRows])
 class CacheDatabase extends _$CacheDatabase implements AppDatabase {
   /// Opens the database on [executor].

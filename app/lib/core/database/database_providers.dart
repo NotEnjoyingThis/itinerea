@@ -2,6 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'cache_database.dart';
 import 'data_database.dart';
 import 'database_locations.dart';
 import 'entity_store.dart';
@@ -16,6 +17,15 @@ final databaseLocationsProvider = FutureProvider<DatabaseLocations>(
 final dataDatabaseProvider = FutureProvider<DataDatabase>((ref) async {
   final locations = await ref.watch(databaseLocationsProvider.future);
   final database = locations.openData();
+  ref.onDispose(database.close);
+  return database;
+});
+
+/// The database of the cache (PRD 8.5), opened when first needed and closed
+/// with the app. Tests override it with a database in memory.
+final cacheDatabaseProvider = FutureProvider<CacheDatabase>((ref) async {
+  final locations = await ref.watch(databaseLocationsProvider.future);
+  final database = locations.openCache();
   ref.onDispose(database.close);
   return database;
 });

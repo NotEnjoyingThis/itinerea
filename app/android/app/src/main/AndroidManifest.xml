@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Place search and details (PRD 5.2): only the services the user can
+         see in the app, never telemetry (PRD 1.4). -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="Itinerea"
         android:name="${applicationName}"

@@ -180,7 +180,7 @@ Questi termini vanno usati in modo coerente nel codice, nell'interfaccia e nei d
 | **Rimborso** | `Repayment` | Un pagamento con cui un partecipante salda un debito; entra nel saldo. |
 | **Veicolo** | `Vehicle` | Auto o moto dell'utente: modello, tipo di alimentazione, consumo, capienza serbatoio o batteria, autonomia. Dati compilati dal database quando possibile, sempre modificabili. |
 | **Sosta pianificata** | `Stop` con `kind` = `refuel` / `charge` | Rifornimento o ricarica proposti dall'app in base all'autonomia del veicolo, oppure inseriti dall'utente se ha scelto la pianificazione manuale. |
-| **Luogo** | `Place` (`PlaceSnapshot` nel viaggio, `PlaceCache` nella cache) | Un punto d'interesse sulla mappa (monumento, museo, ristorante, distributore, bagno, campeggio…), con le informazioni prese dalle fonti dati. |
+| **Luogo** | `Place` (`PlaceSnapshot` nel viaggio, `PlaceDetails` nella cache) | Un punto d'interesse sulla mappa (monumento, museo, ristorante, distributore, bagno, campeggio…), con le informazioni prese dalle fonti dati. |
 | **Assistente** | `PlannerAssistant` | La procedura guidata, facoltativa, che fa domande all'utente e propone come distribuire giorni e luoghi. |
 | **Visita verificata** | `VerifiedVisit` | La visita a un luogo confermata dal GPS sul posto. Serve per badge e punti. |
 | **Badge** | `Badge` | Riconoscimento legato a un'area geografica (città, regione o nazione) oppure a un traguardo speciale (es. passi alpini, km in moto, 11.3). Ha livelli da 1 a 10, che salgono con le visite verificate ai luoghi della sua lista. |
@@ -416,8 +416,8 @@ CLAUDE.md           regole per Claude Code
 | **Percorsi** (auto, moto, bici, a piedi) | **Valhalla pubblico di FOSSGIS** (lo stesso usato da openstreetmap.org) | Gratis, fair use | Opzioni utili: evitare autostrade, pedaggi, traghetti, sterrato; profilo moto. Uso moderato, User-Agent identificativo. **Condizioni d'uso da rileggere prima del rilascio** (pagina FOSSGIS non accessibile durante la verifica). | OSRM pubblico di FOSSGIS (senza preferenze avanzate) oppure server GraphHopper/Valhalla dell'utente. **Esito M1 (13/11/2026): funziona con limiti** (16.3). Condizioni lette (5.6): al massimo **una richiesta al secondo**, User-Agent dell'app, intestazione `X-Client-Id`, avviso su GitHub Discussions per le app pubblicate, email di contatto pubblica. |
 | **Curve e panoramico** (mare, lago, montagna) | **Valutazione sul dispositivo**: l'app chiede a Valhalla più percorsi alternativi (parametro `alternates`, anche con punti di passaggio diversi) e li ordina per tortuosità (dalla geometria), vicinanza a coste o laghi (dati OSM via Overpass lungo il corridoio) e quota | — | **Risultato "il meglio possibile"**, non un giudizio umano sulla bellezza. **Attenzione (esito M1, 16.3):** `alternates` ha restituito alternative solo sulla tratta lunga (2 su 2 per Aosta–Bari) e nessuna su tratte da 80 e 200 km né con punti di passaggio. I percorsi candidati vanno quindi generati cambiando opzioni o punti di passaggio, una richiesta al secondo. | Profilo personalizzato su un GraphHopper dell'utente |
 | **Altitudine** | Endpoint `/height` di Valhalla, se attivo sull'istanza usata; altrimenti **Open-Meteo Elevation API** | Open-Meteo: gratis per uso non commerciale (Itinerea lo è) | Da verificare in M1 quale delle due è disponibile e con quali limiti. **Esito M1 (13/11/2026): `/height` è attivo sull'istanza FOSSGIS** (1.932 punti in 0,13 s) e diventa la fonte principale; Open-Meteo funziona (100 punti per richiesta, 0,25 s) e resta il piano B. | Open-Meteo Elevation; poi solo tag OSM (passi di montagna, vette vicine) |
-| **Ricerca luoghi e indirizzi** | Photon pubblico (OSM) per i suggerimenti mentre si scrive, con attesa tra i tasti e numero minimo di caratteri. **Mai Nominatim per i suggerimenti** (le sue regole lo vietano). Orari e contatti con **una sola richiesta** quando l'utente sceglie il luogo (es. Nominatim con `extratags`), da verificare sulle condizioni d'uso prima di usarlo (M3) | Fair use | Uso intensivo rallentato | Nominatim pubblico (max 1 richiesta al secondo) o server dell'utente |
-| **Dettagli dei luoghi** (orari, telefono, sito, descrizione, foto) | OpenStreetMap + Wikidata e Wikimedia Commons | OSM: ODbL. Wikidata: CC0 | **Meno completi di Google**, soprattutto orari. Nessuna recensione. | Valutazioni personali dell'utente (F4.4) |
+| **Ricerca luoghi e indirizzi** | **Photon pubblico di komoot** (dati OSM) per i suggerimenti mentre si scrive: da 3 lettere, 300 ms dopo l'ultimo tasto, una richiesta alla volta e almeno 0,4 s tra due, 6 risultati, gli ultimi 50 testi tenuti in memoria. **Mai Nominatim per i suggerimenti** (le sue regole lo vietano, 5.6). Orari e contatti con **una sola richiesta `lookup` a Nominatim** con `extratags` quando l'utente sceglie il luogo (condizioni lette il 16/11/2026, 5.6; in uso da M3) | Fair use | Photon: "please be fair", uso intensivo rallentato o bloccato, nessuna garanzia; l'istanza pubblica accetta solo `lang` = `de`, `en`, `fr` o i nomi locali (con `it` risponde errore 400: in italiano si chiedono i nomi locali). Nominatim: al massimo una richiesta al secondo **sommando tutti gli utenti dell'app**, risultati da tenere in cache, servizio da poter cambiare senza aggiornare l'app (R17) | Istanze Photon e Nominatim dell'utente (indirizzo configurabile, F1.15) |
+| **Dettagli dei luoghi** (orari, telefono, sito, descrizione, foto) | OpenStreetMap + Wikidata e Wikimedia Commons. **In M3:** orari, telefono, sito e ID Wikidata dai tag OSM (Nominatim `extratags`); descrizione e foto più avanti | OSM: ODbL. Wikidata: CC0 | **Meno completi di Google**, soprattutto orari. Nessuna recensione. | Valutazioni personali dell'utente (F4.4) |
 | **Luoghi offline e livelli mappa** (bagni, distributori, colonnine, campeggi, aree sosta, hotel) | Overpass API (OSM) | ODbL, fair use | Query per area, salvate in locale. Niente scaricamenti di intere nazioni a ogni avvio. | Istanze Overpass alternative o server dell'utente |
 | **Mezzi pubblici** | Transitous (motore MOTIS) | Gratis | Pensato proprio per app open source e non-profit: **Itinerea rientra nell'uso previsto**. Copertura variabile da paese a paese. Condizioni d'uso da rileggere prima del rilascio, come per Valhalla (R2). | Server MOTIS dell'utente |
 | **Meteo** | MET Norway (Locationforecast) | Gratis, CC BY 4.0 | User-Agent identificativo obbligatorio, cache, attribuzione | Open-Meteo (gratis per uso non commerciale) |
@@ -467,6 +467,8 @@ L'app ha una schermata **"Fonti dei dati"**, raggiungibile anche dalla mappa, co
 - Open Charge Map e i singoli fornitori dei dati
 - Frankfurter / BCE, MIMIT, Agenzia Europea dell'Ambiente, Wikidata, Wikivoyage, Transitous e i fornitori dei loro dati
 
+Dove compaiono dati OpenStreetMap l'app mostra anche "© OpenStreetMap contributors": **da M3** sotto i suggerimenti della ricerca e negli orari e contatti di una tappa, con la data in cui sono stati scaricati (T4).
+
 ### 5.6 Condizioni d'uso lette
 
 Per ogni servizio: pagina, frase esatta (in lingua originale) e data in cui è stata letta. Vanno rilette prima di ogni rilascio.
@@ -502,6 +504,19 @@ Per ogni servizio: pagina, frase esatta (in lingua originale) e data in cui è s
 | Google Drive — ambiti | https://developers.google.com/workspace/drive/api/guides/api-specific-auth | `drive.file` e `drive.appdata` sono "non-sensitive"; `drive`, `drive.readonly` e `drive.metadata` sono "restricted" (riassunto) | 13/11/2026 |
 | Google — verifica degli ambiti "restricted" | https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification | Serve la verifica di Google e, se i dati passano o restano su server, una valutazione di sicurezza annuale (CASA). Non è stata trovata un'esenzione esplicita per le app che tengono i dati solo sul dispositivo (riassunto) | 13/11/2026 |
 | Google Picker per app desktop e mobile | https://developers.google.com/workspace/drive/picker/guides/overview-desktop | Il selettore si apre nel browser durante il consenso, con i parametri `trigger_onepick=true`, `allow_folder_selection`, `allow_multiple`, `file_ids`; il reindirizzamento riporta `picked_file_ids`. È ammesso solo l'ambito `drive.file` e va attivata la "Google Picker API" (riassunto) | 13/11/2026 |
+| Nominatim — limite | https://operations.osmfoundation.org/policies/nominatim/ (la pagina non riporta una data di modifica) | "No heavy uses (an absolute maximum of 1 request per second)." | 16/11/2026 |
+| Nominatim — identificazione e attribuzione | stessa pagina | "Provide a valid HTTP Referer or User-Agent identifying the application (stock User-Agents as set by http libraries will not do)." · "Clearly display attribution as suitable for your medium." | 16/11/2026 |
+| Nominatim — app e siti | stessa pagina | "Use that is directly triggered by the end-user (for example, user searches for something) is ok, provided that your number of users is moderate." · "Note that the usage limits above apply per website/application: the sum of traffic by all your users should not exceed the limits." | 16/11/2026 |
+| Nominatim — cambio del servizio | stessa pagina | "Apps must make sure that they can switch the service at our request at any time (in particular, switching should be possible without requiring a software update)." · "If at all possible, set up a proxy and also enable caching of requests." | 16/11/2026 |
+| Nominatim — richieste periodiche | stessa pagina | "Note: periodic requests from apps are considered bulk geocoding and as such are strongly discouraged." · "It may be okay if your app has very few users and applies appropriate caching of results." | 16/11/2026 |
+| Nominatim — usi vietati e cache | stessa pagina | "Auto-complete search This is not yet supported by Nominatim and you must not implement such a service on the client side using the API." · "Results must be cached on your side." · "Clients sending repeatedly the same query may be classified as faulty and blocked." | 16/11/2026 |
+| Nominatim — scelta consapevole | stessa pagina (sezione "Usage in LLMs") | "Use of the public API is only permitted where the application developer has made a deliberate, informed decision to use it and is directly responsible for complying with this policy." | 16/11/2026 |
+| Nominatim — modifiche | stessa pagina | "Please be aware that this usage policy may change without notice." · "In particular, the definition of heavy use may need to be modified in the future and you might have your access withdrawn." | 16/11/2026 |
+| Photon — istanza pubblica | https://photon.komoot.io/ | "You can use the API for your project, but please be fair - extensive usage will be throttled." · "We do not guarantee for the availability and usage might be subject of change in the future." | 16/11/2026 |
+| Photon — server dimostrativo | https://github.com/komoot/photon (README) | "You are welcome to use the API for your project as long as the number of requests stay in a reasonable limit." · "Extensive usage will be throttled or completely banned." · "If you have a larger number of requests to make, please consider setting up your own private instance." | 16/11/2026 |
+| Photon — lingue | nessuna pagina le elenca | Verificato con una richiesta il 16/11/2026: `lang=it` risponde con un errore 400; `default` (nomi locali), `de`, `en`, `fr` funzionano | 16/11/2026 |
+
+**Obblighi che ne derivano per Itinerea verso Nominatim (M3):** solo la richiesta `lookup` dei dettagli di un luogo che l'utente ha appena scelto, mai mentre scrive e mai in automatico; una richiesta alla volta, almeno 1,1 s tra due; risposte nella cache 30 giorni, la stessa richiesta mai due volte nello stesso giorno; User-Agent dell'app; "© OpenStreetMap contributors" accanto ai dati. **Restano aperti** (R17): il limite vale per la somma di tutti gli utenti, e il servizio deve potersi cambiare senza aggiornare l'app. L'uso dell'istanza pubblica è una **scelta dello sviluppatore**, che ne risponde: **confermata dall'utente il 16/11/2026** per Nominatim e Photon, con quattro vincoli (DECISIONS): nessuna richiesta periodica o automatica a Nominatim (i dettagli di un luogo già salvato si ricaricano solo se lo chiede l'utente); indirizzi dei due servizi configurabili nelle Impostazioni (F1.15) e tappa sempre modificabile, senza errori, se un servizio rifiuta o blocca; R17 risolto prima della beta senza server centrale; attribuzione a OpenStreetMap visibile nei risultati.
 
 **Google:** le righe segnate "riassunto" vanno rilette e citate alla lettera prima di registrare il client definitivo (R10). Non è stato letto che cosa chiede Google per passare da "Testing" a "In produzione" con il solo ambito `drive.file` (verifica del marchio, pagina della privacy, dominio).
 
@@ -567,6 +582,7 @@ Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall
 **Requisiti**
 - Si aggiunge una tappa cercandola per nome o indirizzo, toccandola sulla mappa, oppure come tappa libera (solo nome e note).
 - Se il luogo è nelle fonti dati, la tappa si compila da sola con indirizzo, coordinate, orari di apertura, telefono e sito web.
+- **Come funziona la ricerca (M3, 16/11/2026):** mentre si scrive compaiono fino a 6 luoghi (Photon, 5.2), preferendo quelli vicini all'ultima tappa del giorno; un tocco aggiunge il luogo con nome, indirizzo e coordinate. Subito dopo **una sola richiesta** scarica orari, telefono e sito (Nominatim, 5.6): arrivano un attimo dopo, e la tappa è completa anche senza. **"Aggiungi solo il nome"** crea una tappa libera, anche offline; il tasto della tastiera cerca e non aggiunge. Senza rete, con il servizio occupato o senza risultati il foglio lo dice con una frase e offre di aggiungere solo il nome. Orari, telefono e sito restano modificabili; **"Aggiorna da OpenStreetMap"** li riscarica (non due volte nello stesso giorno) e tiene quello che l'utente ha scritto. Gli orari si mostrano come testo, con la fonte e la data del download (T4); leggerli per gli avvisi di chiusura è F1.3. Se un servizio rifiuta o blocca, la tappa resta modificabile e senza errori: libera se manca la ricerca, con il suo luogo e i campi vuoti se mancano i dettagli. Toccare il luogo sulla mappa arriva con la mappa (M4). **"Cerca il luogo"** nel dettaglio di una tappa libera la collega a un luogo con la stessa ricerca (approvato il 16/11/2026, in M3 dopo questo passo).
 - Campi della tappa: orario di inizio, durata, note, costo stimato, link, allegati, stato (da visitare / visitata / saltata). Durata predefinita: 1 ora, sempre modificabile.
 - Le tappe si riordinano trascinandole e si spostano in un altro giorno.
 - Ogni giorno può avere l'**alloggio della notte**: hotel, campeggio, area sosta o notte in auto (di solito l'ultimo giorno non ce l'ha). **Arriva con M5**, insieme alle prenotazioni, con queste regole (decise il 15/11/2026):
@@ -724,7 +740,7 @@ Itinerea non usa MapLibre, quindi l'attribuzione di OpenFreeMap va mostrata dall
 - Il PDF è leggibile su telefono e stampabile in A4.
 
 #### F1.15 Impostazioni di base
-- Lingua (italiano/inglese), tema, unità di misura (km/miglia, litri/galloni), valuta predefinita, formato di data e ora, orario di inizio della giornata (default 9:00), durata predefinita delle tappe (default 1 ora), profilo locale (nome), spazi di sincronizzazione e backup, **fornitori dei servizi** (indirizzi dei server alternativi, chiavi personali facoltative come Tankerkönig).
+- Lingua (italiano/inglese), tema, unità di misura (km/miglia, litri/galloni), valuta predefinita, formato di data e ora, orario di inizio della giornata (default 9:00), durata predefinita delle tappe (default 1 ora), profilo locale (nome), spazi di sincronizzazione e backup, **fornitori dei servizi** (indirizzi dei server alternativi, chiavi personali facoltative come Tankerkönig). Tra gli indirizzi configurabili ci sono **Photon e Nominatim** (vincolo dell'utente del 16/11/2026, 5.6).
 
 ---
 
@@ -1028,6 +1044,8 @@ Quando un viaggio è in corso, la home (S01) apre la card **"Oggi"** in cima:
 
 Così le cose che servono in viaggio sono a **1 tocco** dall'apertura dell'app.
 
+**Deciso il 16/11/2026:** la card "Oggi" entra nel passo 5 di M3; quali parti ci sono già si stabilisce nel piano di quel passo.
+
 ### 7.5 Flussi principali e numero di tocchi
 
 Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La digitazione non conta come tocco.
@@ -1043,7 +1061,7 @@ Il conteggio parte dalla schermata del Giorno (S03), salvo dove indicato. La dig
 | FL7 | **Cambiare percorso a una tratta** | Tocco la tratta → "Modifica percorso" → trascino → "Salva" | 3 + trascinamento |
 | FL8 | **Da un giorno in poi: Roadtrip** | Menu del giorno "⋯" → "Da qui: Roadtrip" → scelgo auto o moto (dalla Fase 2: il veicolo salvato, F2.5) | 3 |
 | FL9 | **Spostare una tappa in un altro giorno** | Tengo premuto sulla tappa → "Sposta a…" → scelgo il giorno (su desktop: trascino sul giorno nella colonna a sinistra) | 2–3 |
-**Verificati con test automatici (M3, 16/11/2026):** FL8 in 3 tocchi e FL9 in 3 tocchi su telefono. **FL1 in M3** è "+" → scrivo il nome → "Aggiungi" (2 tocchi più la digitazione): mancano ancora la ricerca del luogo (passo successivo di M3) e il menu a tre scelte del "+", che arriva con spese e prenotazioni (M5); a quel punto torna ai 3 tocchi previsti.
+**Verificati con test automatici (M3, 16/11/2026):** FL8 in 3 tocchi e FL9 in 3 tocchi su telefono. **FL1 in M3** è "+" → scrivo il nome → tocco il luogo trovato (2 tocchi più la digitazione; una tappa libera: "+" → nome → "Aggiungi solo il nome", sempre 2). Manca il menu a tre scelte del "+", che arriva con spese e prenotazioni (M5); a quel punto FL1 torna ai 3 tocchi previsti.
 
 ### 7.6 Prima apertura
 
@@ -1298,7 +1316,7 @@ Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, presti
 
 | Entità | Contenuto | Durata |
 |---|---|---|
-| **PlaceCache** | Dati OSM/Wikidata dei luoghi: nome, categoria, coordinate, indirizzo, `opening_hours`, telefono, sito, ID Wikidata, punteggio di popolarità, `fetchedAt` | Aggiornata dopo 30 giorni, se online |
+| **PlaceDetails** (dettagli dei luoghi) | Per ID OSM: `opening_hours`, telefono, sito, ID Wikidata, `fetchedAt`. Il punteggio di popolarità arriverà con i consigli (Fase 3) | 30 giorni: **non si aggiornano in automatico** (Nominatim scoraggia le richieste periodiche delle app, 5.6). Dopo 30 giorni si mostrano come "potrebbero essere cambiati" (T4) e si riscaricano quando l'utente sceglie di nuovo il luogo o tocca "Aggiorna da OpenStreetMap", mai due volte nello stesso giorno (deciso il 16/11/2026) |
 | **PoiPack** | Luoghi di un'area per i livelli della mappa (bagni, distributori…) | Finché l'utente non la elimina o la aggiorna |
 | **MapPack** | Tile vettoriali di una regione, in un archivio locale (PMTiles o MBTiles) | Come sopra |
 | **FxRate** | Cambio per data e coppia di valute | Per sempre (i cambi storici non cambiano) |
@@ -1306,7 +1324,7 @@ Il **saldo** (`Settlement`) non si salva: si calcola ogni volta da spese, presti
 | **FuelPrices** | Prezzi per distributore, con data | 24 ore |
 | **DataPack** | Veicoli, badge, pedaggi, shop | Fino alla versione successiva |
 
-`PlaceSnapshot` (dentro tappe e prenotazioni) è una **copia** dei dati essenziali del luogo (nome, coordinate, indirizzo, ID OSM e Wikidata, `opening_hours`). Così il viaggio resta completo anche senza cache e per i compagni di viaggio. Le **coordinate sono facoltative**: un luogo scritto a mano, come una destinazione o una tappa libera, ha solo il nome.
+`PlaceSnapshot` (dentro tappe e prenotazioni) è una **copia** dei dati essenziali del luogo (nome, coordinate, indirizzo, ID OSM e Wikidata, `opening_hours`, **telefono e sito web**: aggiunti il 16/11/2026, decisione dell'utente). Così il viaggio resta completo anche senza cache e per i compagni di viaggio. Un nuovo download dei dettagli riempie i campi vuoti e sostituisce solo i valori ancora uguali al download precedente: quello che l'utente ha scritto resta. Il sito è sempre un indirizzo `http` o `https` senza nome utente. Le **coordinate sono facoltative**: un luogo scritto a mano, come una destinazione o una tappa libera, ha solo il nome.
 
 ### 8.6 Formato dei file di sincronizzazione
 
@@ -1562,7 +1580,8 @@ Il progetto non raccoglie nulla. Alcune funzioni però inviano dati a servizi es
 |---|---|---|
 | Mappa (OpenFreeMap o server dell'utente) | Area della mappa visualizzata (IP, tile richieste) | Mappa online |
 | Percorsi (Valhalla) | Coordinate di partenza, arrivo e passaggio | Calcolo di un percorso |
-| Ricerca (Photon/Nominatim) | Testo cercato, area | Ricerca |
+| Ricerca luoghi (Photon) | Testo cercato, lingua e, se il giorno ha già una tappa con un luogo, la sua posizione arrotondata a ~1 km | Mentre si scrive il nome di una tappa (da 3 lettere) |
+| Dettagli dei luoghi (Nominatim) | Solo l'ID OSM del luogo scelto e la lingua | Quando si sceglie un luogo trovato, o si tocca "Aggiorna da OpenStreetMap" |
 | Overpass (OSM) | Area richiesta | Download luoghi e livelli |
 | Mezzi (Transitous) | Partenza, arrivo, data e ora | Ricerca di una soluzione |
 | Meteo (MET Norway) | Coordinate arrotondate | Previsioni |
@@ -1588,6 +1607,7 @@ Il progetto non raccoglie nulla. Alcune funzioni però inviano dati a servizi es
 | Notifiche | Sezione 10 | Alla prima notifica utile |
 | Allarmi esatti (Android 12+) | Notifiche puntuali | Insieme alle notifiche, spiegando perché |
 | File / foto | Allegati, scontrini, import | Tramite il selettore di sistema, senza accesso a tutta la galleria |
+| Accesso a Internet (Android `INTERNET`, macOS `network.client`) | Servizi della sezione 5, da M3 la ricerca dei luoghi | All'installazione, senza domande (permesso normale) |
 
 Mai: contatti, microfono, calendario (in questa versione).
 
@@ -1653,7 +1673,7 @@ Il progetto **non tratta dati personali** degli utenti: non ha server e non rice
 | **M1 — Prototipi di rischio** | Prove isolate dei punti incerti (16.1): mappa vettoriale OpenFreeMap con `vector_map_tiles` su Linux e Windows; download regionale dal PMTiles di OpenFreeMap e lettura offline; percorsi Valhalla con opzioni e alternative; altitudine; sync in modalità file su Google Drive tra 2 dispositivi (con registrazione del client OAuth); notifiche programmate su desktop | Per ogni prova: funziona / funziona con limiti / non funziona, e PRD aggiornato. **Le cinque prove sono state eseguite (13–14/11/2026)**: esiti in 16.3 |
 | **M2 — Nucleo dei dati** | Modello dati (8), database drift, log delle operazioni e regole CRDT con test | Test che simulano modifiche concorrenti e offline. **Completata il 14/11/2026** (PR n. 14, 15 e 16): ID, orologio logico, indici frazionari, due database, unione delle modifiche e controllo di coerenza, con test su 2 e 5 dispositivi simulati |
 | **M3 — Viaggio, giorni e tappe** | F1.1, F1.2, F1.3, F1.6 (tappe), schermate S01–S04 | Si pianifica un viaggio senza mappa. **In corso** |
-| **M4 — Mappa e percorsi** | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12, S05–S07 | Si pianifica un roadtrip con percorsi e alternative |
+| **M4 — Mappa e percorsi** | F1.4, F1.5, F1.6 (tratte), F1.7, F1.12, S05–S07; F1.1: destinazioni del viaggio scelte con la ricerca dei luoghi (deciso il 16/11/2026) | Si pianifica un roadtrip con percorsi e alternative |
 | **M5 — Prenotazioni, biglietti, budget, meteo** | F1.8, F1.9, F1.10, F1.11, alloggio della notte (F1.2), S08–S12 | Un viaggio completo da usare davvero |
 | **M6 — Sync personale, backup, PDF, impostazioni** | F1.13, F1.14, F1.15, S20–S21 | **v0.1 beta** su GitHub Releases |
 | **M7 — Rilascio 1.0** | Correzioni dalla beta, accessibilità, prestazioni (T2), privacy policy, schede degli store, test chiuso Google Play (12 tester per 14 giorni), F-Droid e Flathub | **v1.0** |
@@ -1693,7 +1713,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R6 | Dati OSM incompleti (orari di apertura, colonnine) | Medio | Etichette di onestà (T4), campi sempre modificabili, invito a contribuire a OSM |
 | R7 | Qualità del percorso panoramico calcolato sul dispositivo | Medio | Etichetta "il meglio possibile", modifica manuale sempre disponibile |
 | R8 | Estrarre consigli dal testo di Wikivoyage | Medio | Partire dai dati strutturati (Wikidata, OSM) e aggiungere Wikivoyage solo dove la struttura delle pagine lo permette |
-| R9 | Servizi pubblici sovraccarichi se l'app diventa popolare | Medio | Regole 5.4, fornitori configurabili, guide al self-hosting |
+| R9 | Servizi pubblici sovraccarichi se l'app diventa popolare | Medio | Regole 5.4, fornitori configurabili, guide al self-hosting. Photon (5.6) accetta l'uso "in a reasonable limit" e suggerisce un'istanza propria per volumi alti; per Nominatim vedi R17 |
 | R10 | Registrazione delle app OAuth presso Google, Microsoft e Dropbox (verifiche, schermate di consenso) | Medio | Avviare le registrazioni in M1, usare permessi non sensibili. **Google (14/11/2026):** registrato un client di prova di tipo "Desktop app" in stato "Testing" (100 utenti, permessi che scadono dopo 7 giorni). `drive.file` è non sensibile; l'ambito `drive` completo è "restricted" e richiede verifica e valutazione di sicurezza annuale: da evitare. Il client Android è legato a nome del pacchetto e impronta SHA-1 della firma, diversa tra F-Droid, Google Play e GitHub. Dopo la decisione su R1 serve solo il client desktop. Restano da leggere i requisiti per uscire da "Testing" (5.6) |
 | R11 | Progetto molto grande per una persona sola | Alto | Ordine rigoroso delle fasi, MVP piccolo, CLAUDE.md che vieta di anticipare le fasi |
 | R12 | Google Play: trovare 12 tester per 14 giorni | Basso | Cercarli durante la beta (M6) |
@@ -1701,6 +1721,7 @@ Le milestone delle Fasi 2–4 si definiscono alla fine della Fase 1, con lo stes
 | R14 | `vector_map_tiles`: ultima versione stabile dell'agosto 2024, sviluppo attuale solo in beta | Medio (mappa) | **Provato in M1: funziona con limiti** (16.3). Si usa la 9.0.0-beta.13 in modalità `raster`, con versione fissata. Resta il rischio di dipendere da una beta mantenuta da una sola persona; piano B: pacchetto `maplibre` o tile raster per la mappa online |
 | R15 | Schemi di tile diversi tra mappa online e offline | Medio | Usare OpenFreeMap sia online sia offline (stesso schema OpenMapTiles e stesso stile). **Verificato in M1** (16.3): con le tile di OpenFreeMap salvate in locale e lo stile `liberty` salvato in locale la mappa offline è identica a quella online. Offline manca solo il rilievo ombreggiato (livello raster visibile sotto lo zoom 7) |
 | R16 | Identificativo dell'app Android (`applicationId`) non modificabile dopo la pubblicazione su Google Play e F-Droid | Medio | Deciso: `io.github.notenjoyingthis.itinerea` (12/11/2026). Non va più cambiato. |
+| R17 | Nominatim pubblico: il limite di una richiesta al secondo vale per la **somma di tutti gli utenti** dell'app, e il servizio deve potersi cambiare **senza aggiornare l'app** (5.6) | Medio (orari e contatti) | Da M3: una sola richiesta per luogo scelto, cache di 30 giorni, nessuna richiesta automatica. Prima della beta (M6), **senza server centrale e senza identificativi dell'utente** (vincolo dell'utente, 16/11/2026): un modo per cambiare o spegnere il servizio, per esempio un file di configurazione statico nel repository letto al massimo una volta al giorno; la soluzione si propone all'utente quando ci si arriva. Indirizzo configurabile dall'utente (F1.15). Con molti utenti: istanza dell'utente, oppure tag dei luoghi da un'altra fonte (Overpass, pacchetti dati). Senza Nominatim la ricerca funziona lo stesso: mancano solo orari e contatti, che restano scrivibili a mano |
 
 ### 16.2 Domande aperte
 

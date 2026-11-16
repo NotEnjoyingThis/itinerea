@@ -10,9 +10,14 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/models/ids.dart';
 import '../../core/models/money.dart';
 import '../../core/models/money_text.dart';
+import '../../core/models/place.dart';
 import '../../core/models/stop.dart';
+import '../../core/models/web_address.dart';
+import '../../core/net/http_transport.dart';
+import '../../core/providers/service_providers.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../trips/trip_providers.dart';
+import 'place_details_actions.dart';
 import 'stop_repository.dart';
 
 /// A duration in words: "45 min", "2 h", "1 h 30 min".
@@ -24,12 +29,12 @@ String formatDuration(AppLocalizations l10n, int minutes) {
   return l10n.durationHoursMinutes(hours, rest);
 }
 
-/// Details of a stop (S04): name, duration, status, estimated cost, note and
-/// links, each saved as soon as it changes; and the actions on the stop.
+/// Details of a stop (S04): name, duration, status, opening hours and
+/// contacts of its place, estimated cost, note and links, each saved as soon
+/// as it changes; and the actions on the stop.
 ///
 /// Shown as a panel from the bottom on phones and beside the day on wide
 /// screens (PRD 7.1).
-// TODO(M3 F1.2): place details from the search (hours, contacts).
 // TODO(M3 F1.3): start time and the lock that fixes it.
 // TODO(M3 F1.6): plans A-D.
 // TODO(M5 F1.8): attachments.
@@ -121,6 +126,14 @@ class StopDetailPanel extends ConsumerWidget {
               ),
             ],
           ),
+          if (stop.place?.address case final String address)
+            Text(
+              address,
+              key: const Key('stopAddress'),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           const SizedBox(height: 8),
           _CommitField(
             key: const Key('stopName'),
@@ -196,6 +209,10 @@ class StopDetailPanel extends ConsumerWidget {
                 ),
             ],
           ),
+          if (stop.place case final PlaceSnapshot place) ...[
+            const SizedBox(height: 20),
+            _PlaceInfo(stop: stop, place: place, change: change),
+          ],
           const SizedBox(height: 20),
           _CommitField(
             key: const Key('stopCost'),
@@ -274,11 +291,12 @@ class StopDetailPanel extends ConsumerWidget {
             value: '',
             clearOnCommit: true,
             keyboard: TextInputType.url,
-            validate: (text) => text.trim().isEmpty || _webLink(text) != null
+            validate: (text) =>
+                text.trim().isEmpty || parseWebAddress(text) != null
                 ? null
                 : l10n.stopLinkInvalid,
             onCommit: (text) async {
-              final link = _webLink(text);
+              final link = parseWebAddress(text);
               if (link == null || stop.links.contains(link)) return;
               await change(
                 (stops) => stops.setLinks(stop.stopId, [...stop.links, link]),
@@ -312,19 +330,173 @@ class StopDetailPanel extends ConsumerWidget {
       ),
     );
   }
+}
 
-  /// A web address typed by a person, with https added if no scheme was
-  /// given; null if it is not one.
-  static Uri? _webLink(String text) {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty || trimmed.contains(' ')) return null;
-    final uri = Uri.tryParse(
-      trimmed.contains('://') ? trimmed : 'https://$trimmed',
-    );
-    if (uri == null || !uri.hasAuthority || !uri.host.contains('.')) {
-      return null;
+/// Opening hours, phone and website of the place of a stop (F1.2), with
+/// where they come from and when they were downloaded (PRD T4). The user
+/// can change them; a new download keeps what the user wrote.
+class _PlaceInfo extends ConsumerStatefulWidget {
+  const _PlaceInfo({
+    required this.stop,
+    required this.place,
+    required this.change,
+  });
+
+  final DayStop stop;
+  final PlaceSnapshot place;
+  final Future<void> Function(
+    Future<void> Function(StopRepository stops) action,
+  )
+  change;
+
+  @override
+  ConsumerState<_PlaceInfo> createState() => _PlaceInfoState();
+}
+
+class _PlaceInfoState extends ConsumerState<_PlaceInfo> {
+  bool _loading = false;
+  ServiceFailureKind? _failure;
+
+  Future<void> _refresh(String osmId) async {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final language = Localizations.localeOf(context).languageCode;
+    setState(() {
+      _loading = true;
+      _failure = null;
+    });
+    ServiceFailureKind? failure;
+    try {
+      await fillPlaceDetails(
+        container,
+        slotId: widget.stop.slotId,
+        osmId: osmId,
+        language: language,
+        refresh: true,
+      );
+    } on ServiceFailure catch (error) {
+      failure = error.kind;
     }
-    return uri.scheme == 'http' || uri.scheme == 'https' ? uri : null;
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _failure = failure;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final stop = widget.stop;
+    final place = widget.place;
+    final osmId = place.osmId;
+    final lookup = ref.watch(placeDetailsLookupProvider).value;
+    final known = osmId == null
+        ? null
+        : ref.watch(cachedPlaceDetailsProvider(osmId)).value;
+    final quiet = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    String? source;
+    if (known != null && lookup != null) {
+      final date = DateFormat.yMMMd(Localizations.localeOf(context).toString())
+          .format(known.fetchedAt.toLocal());
+      source = lookup.isOld(known)
+          ? l10n.placeDetailsUpdatedOld(date)
+          : l10n.placeDetailsUpdated(date);
+    }
+    final message = switch (_failure) {
+      ServiceFailureKind.noConnection => l10n.placeDetailsOffline,
+      ServiceFailureKind.busy => l10n.placeDetailsBusy,
+      ServiceFailureKind.badResponse => l10n.placeDetailsFailed,
+      null => null,
+    };
+    final limit = [
+      LengthLimitingTextInputFormatter(StopRepository.maxPlaceTextLength),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.placeInfoTitle, style: theme.textTheme.labelSmall),
+        const SizedBox(height: 8),
+        _CommitField(
+          key: const Key('stopOpeningHours'),
+          label: l10n.placeOpeningHours,
+          // The text as it is: reading it comes with the warnings (F1.3).
+          helper: l10n.placeOpeningHoursHelp,
+          value: place.openingHours ?? '',
+          lines: 2,
+          formatters: limit,
+          onCommit: (text) => widget.change(
+            (stops) => stops.setOpeningHours(stop.stopId, text),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _CommitField(
+          key: const Key('stopPhone'),
+          label: l10n.placePhone,
+          value: place.phone ?? '',
+          keyboard: TextInputType.phone,
+          formatters: limit,
+          onCommit: (text) =>
+              widget.change((stops) => stops.setPhone(stop.stopId, text)),
+        ),
+        const SizedBox(height: 12),
+        _CommitField(
+          key: const Key('stopWebsite'),
+          label: l10n.placeWebsite,
+          value: place.website ?? '',
+          keyboard: TextInputType.url,
+          formatters: limit,
+          validate: (text) =>
+              text.trim().isEmpty || parseWebAddress(text) != null
+              ? null
+              : l10n.stopLinkInvalid,
+          onCommit: (text) =>
+              widget.change((stops) => stops.setWebsite(stop.stopId, text)),
+        ),
+        if (osmId != null) ...[
+          const SizedBox(height: 8),
+          if (source != null)
+            Text(source, key: const Key('placeDetailsSource'), style: quiet),
+          if (message != null)
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                message,
+                key: const Key('placeDetailsMessage'),
+                style: quiet,
+              ),
+            ),
+          // Downloaded less than a day ago: asking again is not offered, the
+          // date above says why (PRD 5.6, repeated queries).
+          if (_loading || (lookup?.canRefresh(known) ?? false))
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton.icon(
+                key: const Key('placeDetailsRefresh'),
+                onPressed: _loading ? null : () => _refresh(osmId),
+                icon: _loading
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.refresh_rounded),
+                label: Text(l10n.placeDetailsRefresh),
+              ),
+            )
+          else
+            const SizedBox(height: 8),
+          Text(
+            l10n.osmAttribution,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }
 
